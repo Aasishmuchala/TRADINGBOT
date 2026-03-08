@@ -1,0 +1,11 @@
+[package]
+name = "sthyra-execution"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-domain = { path = "../domain" }
+
+[lib]
+name = "sthyra_execution"
+path = "src/lib.rs"

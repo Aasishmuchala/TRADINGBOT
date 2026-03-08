@@ -1,0 +1,12 @@
+[package]
+name = "sthyra-self-heal"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-mode-authority = { path = "../mode-authority" }
+sthyra-watchdog = { path = "../watchdog" }
+
+[lib]
+name = "sthyra_self_heal"
+path = "src/lib.rs"

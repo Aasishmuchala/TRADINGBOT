@@ -1,0 +1,15 @@
+[package]
+name = "sthyra-backtest"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-confluence = { path = "../confluence" }
+sthyra-domain = { path = "../domain" }
+sthyra-market-data = { path = "../market-data" }
+sthyra-news-sentiment = { path = "../news-sentiment" }
+sthyra-replay = { path = "../replay" }
+
+[lib]
+name = "sthyra_backtest"
+path = "src/lib.rs"

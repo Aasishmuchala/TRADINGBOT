@@ -1,0 +1,12 @@
+[package]
+name = "sthyra-strategy-engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-domain = { path = "../domain" }
+sthyra-market-data = { path = "../market-data" }
+
+[lib]
+name = "sthyra_strategy_engine"
+path = "src/lib.rs"

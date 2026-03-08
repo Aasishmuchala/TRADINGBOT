@@ -1,0 +1,11 @@
+[package]
+name = "sthyra-event-bus"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-domain = { path = "../domain" }
+
+[lib]
+name = "sthyra_event_bus"
+path = "src/lib.rs"

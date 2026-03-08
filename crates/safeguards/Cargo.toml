@@ -1,0 +1,10 @@
+[package]
+name = "sthyra-safeguards"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[lib]
+name = "sthyra_safeguards"
+path = "src/lib.rs"

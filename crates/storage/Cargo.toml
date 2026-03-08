@@ -1,0 +1,13 @@
+[package]
+name = "sthyra-storage"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rusqlite = { version = "0.32", features = ["bundled"] }
+sthyra-account-state = { path = "../account-state" }
+sthyra-domain = { path = "../domain" }
+
+[lib]
+name = "sthyra_storage"
+path = "src/lib.rs"
