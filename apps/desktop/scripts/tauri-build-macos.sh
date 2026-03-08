@@ -8,7 +8,7 @@ TAURI_TARGET_DIR="$APP_ROOT/src-tauri/target/release"
 BUNDLE_MACOS_DIR="$TAURI_TARGET_DIR/bundle/macos"
 APP_BUNDLE_PATH="$BUNDLE_MACOS_DIR/NyraQ.app"
 DMG_DIR="$TAURI_TARGET_DIR/bundle/dmg"
-DMG_PATH="$DMG_DIR/NyraQ_0.1.0_aarch64.dmg"
+DMG_PATH="$DMG_DIR/NyraQ_0.1.1_aarch64.dmg"
 
 cleanup_stale_tauri_mounts() {
   local mounted_volume
