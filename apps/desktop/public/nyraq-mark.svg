@@ -1,0 +1,47 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ringA" x1="172" y1="758" x2="430" y2="274" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D4ED8"/>
+      <stop offset="0.35" stop-color="#0EA5A4"/>
+      <stop offset="1" stop-color="#84CC16"/>
+    </linearGradient>
+    <linearGradient id="ringB" x1="418" y1="202" x2="818" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FACC15"/>
+      <stop offset="0.55" stop-color="#F97316"/>
+      <stop offset="1" stop-color="#DC2626"/>
+    </linearGradient>
+    <linearGradient id="ringC" x1="760" y1="554" x2="322" y2="844" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43F5E"/>
+      <stop offset="0.5" stop-color="#C026D3"/>
+      <stop offset="1" stop-color="#4C1D95"/>
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="274" y1="250" x2="756" y2="774" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22C55E" stop-opacity="0.95"/>
+      <stop offset="0.32" stop-color="#EAB308" stop-opacity="0.92"/>
+      <stop offset="0.68" stop-color="#F97316" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#EC4899" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="softShadow" x="104" y="108" width="816" height="816" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="22"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0588 0 0 0 0 0.0902 0 0 0 0 0.149 0 0 0 0.18 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <circle cx="512" cy="512" r="332" fill="#F8FAFC"/>
+    <path d="M212 512C212 672.162 351.838 812 512 812C543.999 812 574.786 806.418 603.381 796.173C560.626 764.749 507.402 721.404 454.163 666.019C381.06 589.941 319.237 498.9 281.592 413.957C237.514 460.787 212 522.965 212 512Z" fill="url(#ringC)"/>
+    <path d="M281.592 413.957C319.237 498.9 381.06 589.941 454.163 666.019C507.402 721.404 560.626 764.749 603.381 796.173C696.441 762.821 771.687 692.778 807.72 602.346C734.388 608.987 643.523 584.061 555.368 522.529C442.75 443.933 359.701 321.404 333.721 210.926C312.7 222.356 293.375 236.541 276.188 253.023C294.524 310.605 320.173 364.626 352.039 414.955C329.184 409.615 305.455 409.279 281.592 413.957Z" fill="url(#ringA)"/>
+    <path d="M333.721 210.926C359.701 321.404 442.75 443.933 555.368 522.529C643.523 584.061 734.388 608.987 807.72 602.346C822.202 565.998 830 526.378 830 485C830 325.942 694.058 196 535 196C464.261 196 399.479 221.518 349.457 264.19C342.995 246.733 337.74 228.968 333.721 210.926Z" fill="url(#ringB)"/>
+    <circle cx="512" cy="512" r="287" fill="#F8FAFC"/>
+    <path d="M511.242 253L649.513 425.571H571.344V617.24C571.344 652.414 588.762 683.106 618.232 701.214C638.828 713.877 663.265 721 689.498 721C667.416 776.98 621.014 825.659 558.961 855.175C451.339 793.01 393.198 690.447 393.198 558.832V425.571H372.971L511.242 253Z" fill="url(#innerGlow)"/>
+    <path d="M512.758 253L374.487 425.571H452.656V617.24C452.656 652.414 435.238 683.106 405.768 701.214C385.172 713.877 360.735 721 334.502 721C356.584 776.98 402.986 825.659 465.039 855.175C572.661 793.01 630.802 690.447 630.802 558.832V425.571H651.029L512.758 253Z" fill="#FFFFFF" opacity="0.94"/>
+    <path d="M512 442L579.473 526.772H541.375V627.021C541.375 646.195 549.809 663.284 564.193 674.477C574.706 682.66 587.59 687.407 601.494 688.274C581.756 718.823 550.196 744.894 510.647 764.14C442.182 724.377 405.125 658.772 405.125 574.642V526.772H444.527L512 442Z" fill="#FFFFFF"/>
+    <circle cx="512" cy="512" r="331" stroke="rgba(255,255,255,0.7)" stroke-width="6"/>
+  </g>
+</svg>
