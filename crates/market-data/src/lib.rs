@@ -20,6 +20,27 @@ pub struct Candle {
     pub close_time_ms: u64,
 }
 
+impl Candle {
+    /// Returns `true` if OHLC values are positive, non-NaN, and correctly ordered.
+    pub fn is_valid(&self) -> bool {
+        !self.open.is_nan()
+            && !self.high.is_nan()
+            && !self.low.is_nan()
+            && !self.close.is_nan()
+            && !self.volume.is_nan()
+            && self.open > 0.0
+            && self.high > 0.0
+            && self.low > 0.0
+            && self.close > 0.0
+            && self.volume >= 0.0
+            && self.high >= self.low
+            && self.high >= self.open
+            && self.high >= self.close
+            && self.low <= self.open
+            && self.low <= self.close
+    }
+}
+
 impl OrderBookSnapshot {
     pub fn spread_bps(&self) -> f64 {
         let mid = (self.best_bid + self.best_ask) / 2.0;
@@ -35,6 +56,11 @@ impl OrderBookSnapshot {
             return 0.0;
         }
         (self.bid_depth - self.ask_depth) / total
+    }
+
+    /// Returns `true` if bid and ask prices are positive and correctly ordered.
+    pub fn is_valid(&self) -> bool {
+        self.best_bid > 0.0 && self.best_ask > 0.0 && self.best_bid <= self.best_ask
     }
 }
 
@@ -316,7 +342,7 @@ pub fn infer_regime(
         + ((1.0 - market_health.spread_penalty) * 0.2))
         .clamp(0.0, 1.0) as f32;
 
-    RegimeAssessment::new(regime, confidence).expect("computed regime confidence should be valid")
+    RegimeAssessment::new_clamped(regime, confidence)
 }
 
 fn average(values: &[f64]) -> f64 {
@@ -625,5 +651,91 @@ mod tests {
         assert!(indicators.signal_consensus > 0.0);
         assert!(structure.structure_score > 0.0);
         assert_ne!(regime.regime, MarketRegime::NoTrade);
+    }
+
+    #[test]
+    fn order_book_snapshot_validates_bid_ask_order() {
+        let valid = OrderBookSnapshot {
+            symbol: Symbol::new("BTCUSDT").expect("valid symbol"),
+            best_bid: 100.0,
+            best_ask: 100.1,
+            bid_depth: 50_000.0,
+            ask_depth: 50_000.0,
+            last_update_ms: 1_000,
+        };
+        assert!(valid.is_valid());
+
+        let inverted = OrderBookSnapshot {
+            symbol: Symbol::new("BTCUSDT").expect("valid symbol"),
+            best_bid: 100.1,
+            best_ask: 100.0,
+            bid_depth: 50_000.0,
+            ask_depth: 50_000.0,
+            last_update_ms: 1_000,
+        };
+        assert!(!inverted.is_valid());
+
+        let zero_bid = OrderBookSnapshot {
+            symbol: Symbol::new("BTCUSDT").expect("valid symbol"),
+            best_bid: 0.0,
+            best_ask: 100.0,
+            bid_depth: 50_000.0,
+            ask_depth: 50_000.0,
+            last_update_ms: 1_000,
+        };
+        assert!(!zero_bid.is_valid());
+
+        let zero_ask = OrderBookSnapshot {
+            symbol: Symbol::new("BTCUSDT").expect("valid symbol"),
+            best_bid: 100.0,
+            best_ask: 0.0,
+            bid_depth: 50_000.0,
+            ask_depth: 50_000.0,
+            last_update_ms: 1_000,
+        };
+        assert!(!zero_ask.is_valid());
+    }
+
+    #[test]
+    fn candle_validates_ohlc_integrity() {
+        let valid = Candle {
+            open: 100.0,
+            high: 105.0,
+            low: 98.0,
+            close: 102.0,
+            volume: 1_000.0,
+            close_time_ms: 60_000,
+        };
+        assert!(valid.is_valid());
+
+        let invalid_high_below_low = Candle {
+            open: 100.0,
+            high: 95.0,
+            low: 98.0,
+            close: 102.0,
+            volume: 1_000.0,
+            close_time_ms: 60_000,
+        };
+        assert!(!invalid_high_below_low.is_valid());
+
+        let invalid_high_below_close = Candle {
+            open: 100.0,
+            high: 101.0,
+            low: 98.0,
+            close: 103.0,
+            volume: 1_000.0,
+            close_time_ms: 60_000,
+        };
+        assert!(!invalid_high_below_close.is_valid());
+
+        let nan_close = Candle {
+            open: 100.0,
+            high: 105.0,
+            low: 98.0,
+            close: f64::NAN,
+            volume: 1_000.0,
+            close_time_ms: 60_000,
+        };
+        assert!(!nan_close.is_valid());
     }
 }

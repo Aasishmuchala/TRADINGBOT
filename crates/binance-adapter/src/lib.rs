@@ -600,20 +600,20 @@ pub fn sign_query_string(query_string: &str, secret: &str) -> Result<String, Bin
     Ok(hex::encode(signer.finalize().into_bytes()))
 }
 
-pub fn build_signed_request_preview(params: &[(&str, &str)], secret: &str) -> SignedRequestPreview {
+pub fn build_signed_request_preview(params: &[(&str, &str)], secret: &str) -> Result<SignedRequestPreview, BinanceHttpError> {
     let query_params = params
         .iter()
         .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
         .collect::<Vec<_>>();
     let query_string = build_query_string(&query_params);
-    let signature = sign_query_string(&query_string, secret).expect("preview signing should succeed");
+    let signature = sign_query_string(&query_string, secret)?;
     let signing_command_preview = format!("{:?}", build_hmac_command(&query_string, secret));
 
-    SignedRequestPreview {
+    Ok(SignedRequestPreview {
         query_string,
         signature,
         signing_command_preview,
-    }
+    })
 }
 
 pub fn build_signed_rest_request(
@@ -1041,7 +1041,8 @@ mod tests {
         let preview = build_signed_request_preview(
             &[("symbol", "BTCUSDT"), ("timestamp", "12345")],
             "secret",
-        );
+        )
+        .expect("signed preview should build");
 
         assert!(preview.query_string.contains("symbol=BTCUSDT"));
         assert!(preview.signing_command_preview.contains("openssl"));

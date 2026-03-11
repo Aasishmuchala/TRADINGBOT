@@ -360,7 +360,8 @@ fn main() {
     let signed_preview = build_signed_request_preview(
         &[("symbol", "BTCUSDT"), ("timestamp", "1234567890")],
         "local-secret-preview",
-    );
+    )
+    .expect("HMAC signing with local preview secret should succeed");
     let _book_ticker_stream = build_stream_url(binance_environment, "BTCUSDT", StreamKind::BookTicker);
     let local_snapshot = AccountSnapshot {
         balances: vec![],
