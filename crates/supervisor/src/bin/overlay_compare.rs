@@ -360,6 +360,7 @@ fn build_scenarios() -> Result<Vec<Scenario>, Box<dyn std::error::Error>> {
     ])
 }
 
+#[allow(clippy::too_many_arguments)]
 fn base_inputs(
     higher_timeframe_alignment: f64,
     recent_strategy_performance: f64,

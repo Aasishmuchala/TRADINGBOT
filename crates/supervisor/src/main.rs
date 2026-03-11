@@ -444,20 +444,17 @@ fn main() {
             exchange_snapshot
                 .positions
                 .iter()
-                .map(|position| position.leverage as u8)
+                .map(|position| position.leverage)
                 .max()
                 .unwrap_or(0),
             &risk_gate,
         );
     } else {
-        let no_candidate_msg = format!(
-            "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
-            mode_authority.current(),
+        log_no_candidate(
+            &format!("{:?}", mode_authority.current()),
             regime.regime,
             regime.confidence,
         );
-        println!("{no_candidate_msg}");
-        append_operator_event("no-candidate", "info", &no_candidate_msg, None);
     }
 
     println!(
@@ -797,20 +794,18 @@ fn main() {
                         cycle_account_snapshot
                             .positions
                             .iter()
-                            .map(|position| position.leverage as u8)
+                            .map(|position| position.leverage)
                             .max()
                             .unwrap_or(0),
                         &risk_gate,
                     )
                 })
                 .unwrap_or_else(|| {
-                    let no_candidate_msg = format!(
-                        "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
+                    log_no_candidate(
                         execution_surface_label(cycle_execution_mode, trading_enabled),
                         cycle_regime.regime,
                         cycle_regime.confidence,
                     );
-                    println!("{no_candidate_msg}");
                     format!(
                         "{} / mode={:?} / decision=NoCandidate / risk=Unavailable",
                         execution_surface_label(cycle_execution_mode, trading_enabled),
@@ -1025,6 +1020,7 @@ fn build_snapshot_positions(snapshot: &AccountSnapshot) -> Vec<SnapshotPosition>
         .collect()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn detect_closed_trades(
     previous: &AccountSnapshot,
     current: &AccountSnapshot,
@@ -1286,6 +1282,7 @@ fn infer_position_entry_timestamp_from_trades(
     lots.front().map(|lot| lot.time_ms)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn build_exact_closed_trade_record(
     previous_position: &PositionState,
     closed_quantity: f64,
@@ -1477,6 +1474,15 @@ fn execution_surface_label(mode: sthyra_domain::RuntimeMode, trading_enabled: bo
         sthyra_domain::RuntimeMode::Replay => "ReplayMode",
         sthyra_domain::RuntimeMode::Research => "ResearchOnly",
     }
+}
+
+fn log_no_candidate(surface_label: &str, regime: sthyra_domain::MarketRegime, confidence: f32) {
+    let msg = format!(
+        "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
+        surface_label, regime, confidence,
+    );
+    println!("{msg}");
+    append_operator_event("no-candidate", "info", &msg, None);
 }
 
 fn opportunity_action_for_mode(mode: sthyra_domain::RuntimeMode, decision: TradeDecision) -> String {
@@ -2028,6 +2034,7 @@ fn candidate_confluence_inputs(
     apply_promoted_indicator_genome(&model_adjusted, indicator_inputs, selected_indicator)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn execute_candidate(
     candidate: &sthyra_strategy_engine::StrategyCandidate,
     regime: RegimeAssessment,

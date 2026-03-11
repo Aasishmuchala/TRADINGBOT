@@ -682,7 +682,7 @@ impl AuditStore {
                                 .as_deref()
                                 .map(|value| value.contains("duplicate column name"))
                                 .unwrap_or(false) => {}
-                    Err(error) => return Err(error.into()),
+                    Err(error) => return Err(error),
                 }
             }
             connection.execute(
