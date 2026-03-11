@@ -65,7 +65,7 @@ impl std::error::Error for ConfigError {}
 
 pub fn default_local_config() -> AppConfig {
     AppConfig {
-        mode: RuntimeMode::Research,
+        mode: RuntimeMode::Paper,
         exchange: ExchangeConfig {
             exchange_name: "binance".to_string(),
             primary_symbols: vec!["BTCUSDT".to_string(), "ETHUSDT".to_string()],

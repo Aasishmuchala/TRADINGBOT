@@ -25,6 +25,21 @@ impl RuntimeMode {
     }
 }
 
+impl fmt::Display for RuntimeMode {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Research => write!(formatter, "Research"),
+            Self::Backtest => write!(formatter, "Backtest"),
+            Self::Replay => write!(formatter, "Replay"),
+            Self::Paper => write!(formatter, "Paper"),
+            Self::SemiAuto => write!(formatter, "SemiAuto"),
+            Self::FullAuto => write!(formatter, "FullAuto"),
+            Self::Protected => write!(formatter, "Protected"),
+            Self::Halted => write!(formatter, "Halted"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MarketRegime {
     Trending,
@@ -34,6 +49,20 @@ pub enum MarketRegime {
     ReversalAttempt,
     Disordered,
     NoTrade,
+}
+
+impl fmt::Display for MarketRegime {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Trending => write!(formatter, "Trending"),
+            Self::Ranging => write!(formatter, "Ranging"),
+            Self::BreakoutExpansion => write!(formatter, "BreakoutExpansion"),
+            Self::VolatilityCompression => write!(formatter, "VolatilityCompression"),
+            Self::ReversalAttempt => write!(formatter, "ReversalAttempt"),
+            Self::Disordered => write!(formatter, "Disordered"),
+            Self::NoTrade => write!(formatter, "NoTrade"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -57,6 +86,16 @@ impl RegimeAssessment {
         }
 
         Ok(Self { regime, confidence })
+    }
+
+    /// Creates a `RegimeAssessment` clamping `confidence` to `[0.0, 1.0]`.
+    /// Use this when the confidence value has already been bounded but floating-point
+    /// arithmetic may have introduced a marginal out-of-range result.
+    pub fn new_clamped(regime: MarketRegime, confidence: f32) -> Self {
+        Self {
+            regime,
+            confidence: confidence.clamp(0.0, 1.0),
+        }
     }
 }
 
@@ -190,5 +229,28 @@ mod tests {
         };
 
         assert!(matches!(intent.validate(), Err(DomainError::InvalidDecisionFlow)));
+    }
+
+    #[test]
+    fn new_clamped_clamps_out_of_range_confidence() {
+        let assessment = RegimeAssessment::new_clamped(MarketRegime::Ranging, 1.5);
+        assert_eq!(assessment.confidence, 1.0);
+
+        let assessment = RegimeAssessment::new_clamped(MarketRegime::Ranging, -0.5);
+        assert_eq!(assessment.confidence, 0.0);
+    }
+
+    #[test]
+    fn runtime_mode_display() {
+        assert_eq!(RuntimeMode::Paper.to_string(), "Paper");
+        assert_eq!(RuntimeMode::FullAuto.to_string(), "FullAuto");
+        assert_eq!(RuntimeMode::Halted.to_string(), "Halted");
+    }
+
+    #[test]
+    fn market_regime_display() {
+        assert_eq!(MarketRegime::Trending.to_string(), "Trending");
+        assert_eq!(MarketRegime::NoTrade.to_string(), "NoTrade");
+        assert_eq!(MarketRegime::BreakoutExpansion.to_string(), "BreakoutExpansion");
     }
 }

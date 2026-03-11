@@ -517,7 +517,7 @@ pub fn save_research_cycle_report(path: impl AsRef<Path>, report: &ResearchCycle
         fs::create_dir_all(parent)?;
     }
     let json = serde_json::to_string_pretty(report)
-        .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error.to_string()))?;
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
     fs::write(path, json)
 }
 

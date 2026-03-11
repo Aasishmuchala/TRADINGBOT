@@ -360,7 +360,8 @@ fn main() {
     let signed_preview = build_signed_request_preview(
         &[("symbol", "BTCUSDT"), ("timestamp", "1234567890")],
         "local-secret-preview",
-    );
+    )
+    .expect("HMAC signing with local preview secret should succeed");
     let _book_ticker_stream = build_stream_url(binance_environment, "BTCUSDT", StreamKind::BookTicker);
     let local_snapshot = AccountSnapshot {
         balances: vec![],
@@ -443,10 +444,16 @@ fn main() {
             exchange_snapshot
                 .positions
                 .iter()
-                .map(|position| position.leverage as u8)
+                .map(|position| position.leverage)
                 .max()
                 .unwrap_or(0),
             &risk_gate,
+        );
+    } else {
+        log_no_candidate(
+            &format!("{:?}", mode_authority.current()),
+            regime.regime,
+            regime.confidence,
         );
     }
 
@@ -787,13 +794,18 @@ fn main() {
                         cycle_account_snapshot
                             .positions
                             .iter()
-                            .map(|position| position.leverage as u8)
+                            .map(|position| position.leverage)
                             .max()
                             .unwrap_or(0),
                         &risk_gate,
                     )
                 })
                 .unwrap_or_else(|| {
+                    log_no_candidate(
+                        execution_surface_label(cycle_execution_mode, trading_enabled),
+                        cycle_regime.regime,
+                        cycle_regime.confidence,
+                    );
                     format!(
                         "{} / mode={:?} / decision=NoCandidate / risk=Unavailable",
                         execution_surface_label(cycle_execution_mode, trading_enabled),
@@ -1008,6 +1020,7 @@ fn build_snapshot_positions(snapshot: &AccountSnapshot) -> Vec<SnapshotPosition>
         .collect()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn detect_closed_trades(
     previous: &AccountSnapshot,
     current: &AccountSnapshot,
@@ -1269,6 +1282,7 @@ fn infer_position_entry_timestamp_from_trades(
     lots.front().map(|lot| lot.time_ms)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn build_exact_closed_trade_record(
     previous_position: &PositionState,
     closed_quantity: f64,
@@ -1460,6 +1474,15 @@ fn execution_surface_label(mode: sthyra_domain::RuntimeMode, trading_enabled: bo
         sthyra_domain::RuntimeMode::Replay => "ReplayMode",
         sthyra_domain::RuntimeMode::Research => "ResearchOnly",
     }
+}
+
+fn log_no_candidate(surface_label: &str, regime: sthyra_domain::MarketRegime, confidence: f32) {
+    let msg = format!(
+        "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
+        surface_label, regime, confidence,
+    );
+    println!("{msg}");
+    append_operator_event("no-candidate", "info", &msg, None);
 }
 
 fn opportunity_action_for_mode(mode: sthyra_domain::RuntimeMode, decision: TradeDecision) -> String {
@@ -2011,6 +2034,7 @@ fn candidate_confluence_inputs(
     apply_promoted_indicator_genome(&model_adjusted, indicator_inputs, selected_indicator)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn execute_candidate(
     candidate: &sthyra_strategy_engine::StrategyCandidate,
     regime: RegimeAssessment,
@@ -2265,6 +2289,17 @@ fn execute_candidate(
                     selected_model,
                     selected_indicator,
                 ));
+                let paper_msg = format!(
+                    "[PAPER] {} {} | size_usd={:.2} | decision={} | confidence={:.3} | ev={:.3}",
+                    execution_mode,
+                    execution_ticket.intent.symbol.0,
+                    execution_ticket.intent.size_usd,
+                    decision_label(execution_ticket.intent.decision),
+                    confluence.confidence_score,
+                    confluence.expected_value_score,
+                );
+                println!("{paper_msg}");
+                append_operator_event("paper-fill", "info", &paper_msg, None);
             }
         }
     } else {
@@ -2276,6 +2311,16 @@ fn execute_candidate(
             selected_model,
             selected_indicator,
         ));
+        let reject_msg = format!(
+            "[BLOCKED] {} {} | decision={} | confidence={:.3} | reason={:?}",
+            execution_mode,
+            execution_ticket.intent.symbol.0,
+            decision_label(confluence.decision),
+            confluence.confidence_score,
+            risk_outcome,
+        );
+        println!("{reject_msg}");
+        append_operator_event("risk-blocked", "warn", &reject_msg, None);
     }
 
     record_operational_incidents(
