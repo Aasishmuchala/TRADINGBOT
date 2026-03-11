@@ -449,6 +449,15 @@ fn main() {
                 .unwrap_or(0),
             &risk_gate,
         );
+    } else {
+        let no_candidate_msg = format!(
+            "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
+            mode_authority.current(),
+            regime.regime,
+            regime.confidence,
+        );
+        println!("{no_candidate_msg}");
+        append_operator_event("no-candidate", "info", &no_candidate_msg, None);
     }
 
     println!(
@@ -795,6 +804,13 @@ fn main() {
                     )
                 })
                 .unwrap_or_else(|| {
+                    let no_candidate_msg = format!(
+                        "[NO-CANDIDATE] {} | regime={:?} | confidence={:.3} | no strategy eligible this cycle",
+                        execution_surface_label(cycle_execution_mode, trading_enabled),
+                        cycle_regime.regime,
+                        cycle_regime.confidence,
+                    );
+                    println!("{no_candidate_msg}");
                     format!(
                         "{} / mode={:?} / decision=NoCandidate / risk=Unavailable",
                         execution_surface_label(cycle_execution_mode, trading_enabled),
@@ -2266,6 +2282,17 @@ fn execute_candidate(
                     selected_model,
                     selected_indicator,
                 ));
+                let paper_msg = format!(
+                    "[PAPER] {} {} | size_usd={:.2} | decision={} | confidence={:.3} | ev={:.3}",
+                    execution_mode,
+                    execution_ticket.intent.symbol.0,
+                    execution_ticket.intent.size_usd,
+                    decision_label(execution_ticket.intent.decision),
+                    confluence.confidence_score,
+                    confluence.expected_value_score,
+                );
+                println!("{paper_msg}");
+                append_operator_event("paper-fill", "info", &paper_msg, None);
             }
         }
     } else {
@@ -2277,6 +2304,16 @@ fn execute_candidate(
             selected_model,
             selected_indicator,
         ));
+        let reject_msg = format!(
+            "[BLOCKED] {} {} | decision={} | confidence={:.3} | reason={:?}",
+            execution_mode,
+            execution_ticket.intent.symbol.0,
+            decision_label(confluence.decision),
+            confluence.confidence_score,
+            risk_outcome,
+        );
+        println!("{reject_msg}");
+        append_operator_event("risk-blocked", "warn", &reject_msg, None);
     }
 
     record_operational_incidents(
