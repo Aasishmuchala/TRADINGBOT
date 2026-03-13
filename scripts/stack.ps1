@@ -59,8 +59,8 @@ function Load-BinanceCredentials {
 # ─── PID helpers ──────────────────────────────────────────────────────────────
 function Get-SupervisorPid {
     if (Test-Path $SupervisorPidFile) {
-        $pid = (Get-Content $SupervisorPidFile -Raw).Trim()
-        if ($pid -match '^\d+$') { return [int]$pid }
+        $savedPid = (Get-Content $SupervisorPidFile -Raw).Trim()
+        if ($savedPid -match '^\d+$') { return [int]$savedPid }
     }
     return $null
 }
@@ -150,22 +150,22 @@ function Start-Supervisor {
 }
 
 function Stop-SupervisorProcess {
-    $pid = Get-SupervisorPid
-    if (-not (Test-ProcessRunning $pid)) {
+    $svPid = Get-SupervisorPid
+    if (-not (Test-ProcessRunning $svPid)) {
         Write-Host "Supervisor is not running"
         Remove-Item -Force -ErrorAction SilentlyContinue $SupervisorPidFile
         return
     }
-    Write-Host "Stopping supervisor (PID $pid)..."
-    Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+    Write-Host "Stopping supervisor (PID $svPid)..."
+    Stop-Process -Id $svPid -Force -ErrorAction SilentlyContinue
     Remove-Item -Force -ErrorAction SilentlyContinue $SupervisorPidFile, $SupervisorLockFile
     Write-Host "Supervisor stopped"
 }
 
 function Get-Status {
-    $pid = Get-SupervisorPid
-    $running = Test-ProcessRunning $pid
-    Write-Host "Supervisor: $(if ($running) { "running (PID $pid)" } else { "not running" })"
+    $svPid = Get-SupervisorPid
+    $running = Test-ProcessRunning $svPid
+    Write-Host "Supervisor: $(if ($running) { "running (PID $svPid)" } else { "not running" })"
     if (Test-Path (Join-Path $RootDir "apps\desktop\runtime\runtime_snapshot.json")) {
         $snap = Get-Content (Join-Path $RootDir "apps\desktop\runtime\runtime_snapshot.json") -Raw | ConvertFrom-Json
         Write-Host "  Mode:    $($snap.mode)"
@@ -187,13 +187,13 @@ function Run-OverlayCompare {
 }
 
 function Get-Health {
-    $pid = Get-SupervisorPid
-    $running = Test-ProcessRunning $pid
+    $svPid = Get-SupervisorPid
+    $running = Test-ProcessRunning $svPid
     if (-not $running) {
         Write-Host "Supervisor process FAIL"
         exit 1
     }
-    Write-Host "Supervisor process OK: $pid"
+    Write-Host "Supervisor process OK: $svPid"
 
     if ($env:STHYRA_DESKTOP_PORT) { $port = $env:STHYRA_DESKTOP_PORT } else { $port = "4174" }
     $apiUrl = "http://localhost:$port/api/runtime-snapshot"
