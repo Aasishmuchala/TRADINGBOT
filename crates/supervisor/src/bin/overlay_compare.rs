@@ -384,7 +384,9 @@ fn base_inputs(
         news: NewsSentimentSnapshot::default(),
         extras: sthyra_market_data::MarketExtras::default(),
     }
-}(intensity: f64) -> IndicatorGeneInputs {
+}
+
+fn trend_indicator_inputs(intensity: f64) -> IndicatorGeneInputs {
     IndicatorGeneInputs {
         rsi_bias: 0.28 * intensity,
         macd_bias: 0.34 * intensity,

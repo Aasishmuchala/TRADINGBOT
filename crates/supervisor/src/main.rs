@@ -1929,7 +1929,7 @@ fn build_research_frames(
             let structure = assess_market_structure(window, &context.book);
             let regime = infer_regime(&indicators, &structure, &context.market_health);
             let features = derive_feature_vector(context.symbol.clone(), &context.book, &indicators, &structure);
-            let confluence_inputs = build_confluence_inputs(&indicators, &structure, &news, &context.market_health);
+            let confluence_inputs = build_confluence_inputs(&indicators, &structure, &news, &context.market_health, sthyra_market_data::MarketExtras::default());
             frames.push(ReplayFrame {
                 regime,
                 features,
@@ -1951,7 +1951,7 @@ fn build_research_frames(
                 features,
                 market_health: context.market_health.clone(),
                 indicator_inputs: build_indicator_gene_inputs(&indicators),
-                confluence_inputs: build_confluence_inputs(&indicators, &structure, &news, &context.market_health),
+                confluence_inputs: build_confluence_inputs(&indicators, &structure, &news, &context.market_health, sthyra_market_data::MarketExtras::default()),
             });
         }
     }
