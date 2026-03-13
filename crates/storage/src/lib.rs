@@ -863,7 +863,7 @@ pub struct SnapshotKpi {
     pub tone: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SnapshotOpportunity {
     pub symbol: String,
     pub family: String,
@@ -872,6 +872,16 @@ pub struct SnapshotOpportunity {
     pub model_scope: String,
     pub confidence: String,
     pub action: String,
+    /// Funding rate (e.g. 0.0012 = 0.12% per 8h). Positive = longs pay shorts.
+    pub funding_rate: f64,
+    /// HTF trend bias: +1 strong bull, -1 strong bear, 0 neutral.
+    pub htf_trend_bias: f64,
+    /// L2 depth imbalance: +1 heavy bids, -1 heavy asks, 0 balanced.
+    pub depth_imbalance: f64,
+    /// Open interest delta (normalised): positive = OI growing, negative = unwinding.
+    pub oi_delta: f64,
+    /// BTC correlation (0–1). High = moves with BTC, less independent edge.
+    pub btc_correlation: f64,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -986,14 +996,34 @@ impl RuntimeSnapshot {
                 .iter()
                 .map(|opportunity| {
                     format!(
-                        "{{\"symbol\":{},\"family\":{},\"regime\":{},\"model_id\":{},\"model_scope\":{},\"confidence\":{},\"action\":{}}}",
+                        concat!(
+                            "{{",
+                            "\"symbol\":{},",
+                            "\"family\":{},",
+                            "\"regime\":{},",
+                            "\"model_id\":{},",
+                            "\"model_scope\":{},",
+                            "\"confidence\":{},",
+                            "\"action\":{},",
+                            "\"funding_rate\":{},",
+                            "\"htf_trend_bias\":{},",
+                            "\"depth_imbalance\":{},",
+                            "\"oi_delta\":{},",
+                            "\"btc_correlation\":{}",
+                            "}}"
+                        ),
                         json_string(&opportunity.symbol),
                         json_string(&opportunity.family),
                         json_string(&opportunity.regime),
                         json_string(&opportunity.model_id),
                         json_string(&opportunity.model_scope),
                         json_string(&opportunity.confidence),
-                        json_string(&opportunity.action)
+                        json_string(&opportunity.action),
+                        opportunity.funding_rate,
+                        opportunity.htf_trend_bias,
+                        opportunity.depth_imbalance,
+                        opportunity.oi_delta,
+                        opportunity.btc_correlation,
                     )
                 })
                 .collect::<Vec<_>>()
@@ -1668,7 +1698,7 @@ mod tests {
         let snapshot = RuntimeSnapshot {
             mode: "Protected".to_string(),
             venue: "Binance USD-M".to_string(),
-            host: "Mac Local Runtime".to_string(),
+            host: "Local Runtime".to_string(),
             headline: "Institutional Local Trading Machine".to_string(),
             cycle: 1,
             updated_at: "1234567890".to_string(),
@@ -1685,6 +1715,11 @@ mod tests {
                 model_scope: "BTCUSDT / Trend Pullback / Trending".to_string(),
                 confidence: "0.84".to_string(),
                 action: "Approve".to_string(),
+                funding_rate: 0.0001,
+                htf_trend_bias: 0.6,
+                depth_imbalance: 0.2,
+                oi_delta: 0.05,
+                btc_correlation: 0.85,
             }],
             risk_notes: vec!["Per-trade cap 50 bps".to_string()],
             heal_logs: vec!["Watchdog healthy".to_string()],

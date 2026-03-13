@@ -17,6 +17,16 @@ export type QueueItem = {
   model_scope: string;
   confidence: string;
   action: string;
+  /** Raw funding rate e.g. 0.0001 = 0.01% per 8h. Positive = longs pay shorts. */
+  funding_rate: number;
+  /** HTF trend bias: +1 strong bull, -1 strong bear, 0 neutral */
+  htf_trend_bias: number;
+  /** L2 depth imbalance: +1 heavy bids (bullish), -1 heavy asks (bearish) */
+  depth_imbalance: number;
+  /** Open interest delta (normalised): positive = OI growing */
+  oi_delta: number;
+  /** BTC 30-bar return correlation (0–1) */
+  btc_correlation: number;
 };
 
 export type RuntimeBalance = {

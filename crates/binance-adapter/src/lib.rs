@@ -222,6 +222,62 @@ pub enum ExchangeValidationError {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+/// Funding rate fetched from Binance Futures.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FundingRateSnapshot {
+    pub symbol: String,
+    pub rate: f64,
+    pub next_funding_ms: u64,
+}
+
+/// Open interest fetched from Binance Futures.
+#[derive(Debug, Clone, PartialEq)]
+pub struct OpenInterestSnapshot {
+    pub symbol: String,
+    pub open_interest: f64,
+}
+
+/// Top N bid/ask levels from the order book.
+#[derive(Debug, Clone, PartialEq)]
+pub struct OrderBookDepth {
+    pub symbol: String,
+    pub bids: Vec<(f64, f64)>,
+    pub asks: Vec<(f64, f64)>,
+}
+
+impl OrderBookDepth {
+    /// Largest stacked bid wall within `price_range_pct` of mid price (0–1 normalised).
+    pub fn bid_wall_strength(&self, price_range_pct: f64) -> f64 {
+        let mid = self.mid_price();
+        let threshold = mid * (1.0 - price_range_pct);
+        let total: f64 = self.bids.iter().filter(|(p, _)| *p >= threshold).map(|(_, q)| q).sum();
+        total
+    }
+
+    /// Largest stacked ask wall within `price_range_pct` of mid price (0–1 normalised).
+    pub fn ask_wall_strength(&self, price_range_pct: f64) -> f64 {
+        let mid = self.mid_price();
+        let threshold = mid * (1.0 + price_range_pct);
+        let total: f64 = self.asks.iter().filter(|(p, _)| *p <= threshold).map(|(_, q)| q).sum();
+        total
+    }
+
+    /// Bid/ask depth imbalance in range: +1 = all bids, -1 = all asks.
+    pub fn depth_imbalance(&self, price_range_pct: f64) -> f64 {
+        let bid = self.bid_wall_strength(price_range_pct);
+        let ask = self.ask_wall_strength(price_range_pct);
+        let total = bid + ask;
+        if total <= 0.0 { return 0.0; }
+        (bid - ask) / total
+    }
+
+    fn mid_price(&self) -> f64 {
+        let best_bid = self.bids.first().map(|(p, _)| *p).unwrap_or(0.0);
+        let best_ask = self.asks.first().map(|(p, _)| *p).unwrap_or(0.0);
+        (best_bid + best_ask) / 2.0
+    }
+}
+
 pub struct RemoteBookTicker {
     pub symbol: String,
     pub bid_price: f64,
@@ -353,14 +409,70 @@ impl BinanceHttpClient {
     }
 
     pub fn fetch_recent_klines(&self, symbol: &str, limit: usize) -> Result<Vec<RemoteKline>, BinanceHttpError> {
+        self.fetch_klines_interval(symbol, "1m", limit)
+    }
+
+    /// Fetch klines for any interval: "1m", "5m", "15m", "1h", "4h", "1d".
+    pub fn fetch_klines_interval(&self, symbol: &str, interval: &str, limit: usize) -> Result<Vec<RemoteKline>, BinanceHttpError> {
         let params = [
             ("symbol".to_string(), symbol.to_string()),
-            ("interval".to_string(), "1m".to_string()),
+            ("interval".to_string(), interval.to_string()),
             ("limit".to_string(), limit.clamp(1, 250).to_string()),
         ];
         let response: Vec<Vec<serde_json::Value>> = self.send_public_get(BinanceEndpoint::Klines.path(), &params)?;
-
         response.into_iter().map(RemoteKline::try_from).collect()
+    }
+
+    /// Fetch current funding rate for a symbol.
+    pub fn fetch_funding_rate(&self, symbol: &str) -> Result<FundingRateSnapshot, BinanceHttpError> {
+        let params = [("symbol".to_string(), symbol.to_string())];
+        let response: serde_json::Value = self.send_public_get("/fapi/v1/premiumIndex", &params)?;
+        let rate = response["lastFundingRate"]
+            .as_str()
+            .and_then(|s| s.parse::<f64>().ok())
+            .unwrap_or(0.0);
+        let next_funding_ms = response["nextFundingTime"]
+            .as_u64()
+            .unwrap_or(0);
+        Ok(FundingRateSnapshot { symbol: symbol.to_string(), rate, next_funding_ms })
+    }
+
+    /// Fetch current open interest for a symbol.
+    pub fn fetch_open_interest(&self, symbol: &str) -> Result<OpenInterestSnapshot, BinanceHttpError> {
+        let params = [("symbol".to_string(), symbol.to_string())];
+        let response: serde_json::Value = self.send_public_get("/fapi/v1/openInterest", &params)?;
+        let open_interest = response["openInterest"]
+            .as_str()
+            .and_then(|s| s.parse::<f64>().ok())
+            .unwrap_or(0.0);
+        Ok(OpenInterestSnapshot { symbol: symbol.to_string(), open_interest })
+    }
+
+    /// Fetch L2 order book depth (top `limit` levels, max 20).
+    pub fn fetch_order_book_depth(&self, symbol: &str, limit: usize) -> Result<OrderBookDepth, BinanceHttpError> {
+        let params = [
+            ("symbol".to_string(), symbol.to_string()),
+            ("limit".to_string(), limit.clamp(5, 20).to_string()),
+        ];
+        let response: serde_json::Value = self.send_public_get("/fapi/v1/depth", &params)?;
+
+        let parse_levels = |arr: &serde_json::Value| -> Vec<(f64, f64)> {
+            arr.as_array()
+                .map(|levels| {
+                    levels.iter().filter_map(|level| {
+                        let price = level[0].as_str()?.parse::<f64>().ok()?;
+                        let qty = level[1].as_str()?.parse::<f64>().ok()?;
+                        Some((price, qty))
+                    }).collect()
+                })
+                .unwrap_or_default()
+        };
+
+        Ok(OrderBookDepth {
+            symbol: symbol.to_string(),
+            bids: parse_levels(&response["bids"]),
+            asks: parse_levels(&response["asks"]),
+        })
     }
 
     pub fn fetch_account_snapshot(&self) -> Result<AccountSnapshot, BinanceHttpError> {

@@ -51,12 +51,6 @@
   --danger-surface: color-mix(in srgb, oklch(0.57 0.11 20) 12%, white 88%);
   --danger-border: color-mix(in srgb, oklch(0.57 0.11 20) 24%, transparent 76%);
   --danger-foreground: oklch(0.48 0.06 18);
-  --cal-green-surface: color-mix(in srgb, oklch(0.52 0.16 145) 14%, white 86%);
-  --cal-green-border: color-mix(in srgb, oklch(0.52 0.16 145) 30%, transparent 70%);
-  --cal-green-text: oklch(0.34 0.10 145);
-  --cal-red-surface: color-mix(in srgb, oklch(0.57 0.18 22) 14%, white 86%);
-  --cal-red-border: color-mix(in srgb, oklch(0.57 0.18 22) 30%, transparent 70%);
-  --cal-red-text: oklch(0.40 0.10 22);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,12 +95,6 @@
     --danger-surface: color-mix(in srgb, oklch(0.67 0.12 18) 14%, transparent 86%);
     --danger-border: color-mix(in srgb, oklch(0.67 0.12 18) 26%, transparent 74%);
     --danger-foreground: oklch(0.85 0.025 18);
-    --cal-green-surface: color-mix(in srgb, oklch(0.52 0.18 145) 18%, transparent 82%);
-    --cal-green-border: color-mix(in srgb, oklch(0.52 0.18 145) 36%, transparent 64%);
-    --cal-green-text: oklch(0.78 0.14 145);
-    --cal-red-surface: color-mix(in srgb, oklch(0.57 0.18 22) 18%, transparent 82%);
-    --cal-red-border: color-mix(in srgb, oklch(0.57 0.18 22) 36%, transparent 64%);
-    --cal-red-text: oklch(0.82 0.12 22);
   }
 }
 
@@ -151,12 +139,6 @@
   --danger-surface: color-mix(in srgb, oklch(0.67 0.12 18) 14%, transparent 86%);
   --danger-border: color-mix(in srgb, oklch(0.67 0.12 18) 26%, transparent 74%);
   --danger-foreground: oklch(0.85 0.025 18);
-  --cal-green-surface: color-mix(in srgb, oklch(0.52 0.18 145) 18%, transparent 82%);
-  --cal-green-border: color-mix(in srgb, oklch(0.52 0.18 145) 36%, transparent 64%);
-  --cal-green-text: oklch(0.78 0.14 145);
-  --cal-red-surface: color-mix(in srgb, oklch(0.57 0.18 22) 18%, transparent 82%);
-  --cal-red-border: color-mix(in srgb, oklch(0.57 0.18 22) 36%, transparent 64%);
-  --cal-red-text: oklch(0.82 0.12 22);
 }
 
 * {
@@ -215,27 +197,6 @@ select {
 
 ::selection {
   background: color-mix(in srgb, var(--primary) 18%, white 82%);
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.92);
-    opacity: 0.8;
-  }
-  60% {
-    transform: scale(1.38);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1.38);
-    opacity: 0;
-  }
-}
-
-@keyframes value-flash {
-  0% { opacity: 1; }
-  18% { opacity: 0.3; }
-  50% { opacity: 1; }
 }
 
 @keyframes executive-fade-up {
@@ -322,20 +283,6 @@ select {
   .executive-card:hover {
     transform: translate3d(0, -3px, 0);
     box-shadow: var(--shadow-shell);
-  }
-
-  .bot-healthy-pulse::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: 9999px;
-    border: 2px solid color-mix(in srgb, var(--success-foreground) 60%, transparent 40%);
-    animation: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    pointer-events: none;
-  }
-
-  .value-flash {
-    animation: value-flash 380ms ease-out both;
   }
 
   .executive-button,

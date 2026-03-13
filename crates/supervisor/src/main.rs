@@ -15,6 +15,7 @@ use sthyra_binance_adapter::{
     BinanceCredentials, BinanceEndpoint, BinanceEnvironment, BinanceHttpClient,
     CancelOrderRequest, ExchangeSymbolRules, ExchangeValidationInput, NewOrderRequest, OrderSide,
     OrderType, StreamKind, ExchangeValidationError, UserTrade,
+    FundingRateSnapshot, OpenInterestSnapshot, OrderBookDepth,
 };
 use sthyra_confluence::{score_candidate, ConfluenceInputs};
 use sthyra_config::default_local_config;
@@ -29,8 +30,9 @@ use sthyra_learning::{
 };
 use sthyra_market_data::{
     assess_market_health, assess_market_structure, compute_indicator_snapshot,
-    derive_feature_vector, infer_regime, Candle, IndicatorSnapshot, MarketStructureSnapshot,
-    OrderBookSnapshot, RegimeFeatureVector,
+    compute_htf_trend_bias, compute_return_correlation, compute_oi_delta,
+    derive_feature_vector, infer_regime, Candle, IndicatorSnapshot, MarketExtras,
+    MarketStructureSnapshot, OrderBookSnapshot, RegimeFeatureVector,
 };
 use sthyra_mode_authority::{ModeAuthority, TransitionReason};
 use sthyra_news_sentiment::{collect_headlines, score_headlines, NewsSentimentSnapshot};
@@ -471,7 +473,14 @@ fn main() {
     let mut snapshot = RuntimeSnapshot {
         mode: format!("{:?}", mode_authority.current()),
         venue: "Binance USD-M".to_string(),
-        host: "Mac Local Runtime".to_string(),
+        host: {
+            #[cfg(target_os = "windows")]
+            { "Windows Local Runtime".to_string() }
+            #[cfg(target_os = "macos")]
+            { "Mac Local Runtime".to_string() }
+            #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+            { "Linux Local Runtime".to_string() }
+        },
         headline: "Institutional Local Trading Machine".to_string(),
         cycle: 1,
         updated_at: current_timestamp_string(),
@@ -573,8 +582,26 @@ fn main() {
         ),
         balances: build_snapshot_balances(&exchange_snapshot),
         positions: build_snapshot_positions(&exchange_snapshot),
-        candle_points: build_candle_points(&symbol.0, &market_intelligence.candles),
-        indicator_points: build_indicator_points(&symbol.0, &market_intelligence.candles),
+        candle_points: {
+            let mut pts = Vec::new();
+            for sym_str in &config.exchange.primary_symbols {
+                if let Ok(sym) = Symbol::new(sym_str.clone()) {
+                    let intel = build_market_intelligence(&sym, &book, &market_health, live_client.as_ref(), research_report.as_ref());
+                    pts.extend(build_candle_points(&sym.0, &intel.candles));
+                }
+            }
+            pts
+        },
+        indicator_points: {
+            let mut pts = Vec::new();
+            for sym_str in &config.exchange.primary_symbols {
+                if let Ok(sym) = Symbol::new(sym_str.clone()) {
+                    let intel = build_market_intelligence(&sym, &book, &market_health, live_client.as_ref(), research_report.as_ref());
+                    pts.extend(build_indicator_points(&sym.0, &intel.candles));
+                }
+            }
+            pts
+        },
         research_models: build_snapshot_research_models(market_intelligence.research_report.as_ref()),
         promoted_indicator: build_snapshot_promoted_indicator(market_intelligence.research_report.as_ref()),
         news_sentiment: build_snapshot_news_sentiment(&market_intelligence.news),
@@ -829,8 +856,76 @@ fn main() {
             );
             snapshot.balances = build_snapshot_balances(&cycle_account_snapshot);
             snapshot.positions = build_snapshot_positions(&cycle_account_snapshot);
-            snapshot.candle_points = build_candle_points(&symbol.0, &cycle_market_intelligence.candles);
-            snapshot.indicator_points = build_indicator_points(&symbol.0, &cycle_market_intelligence.candles);
+
+            // ── Multi-symbol scan ─────────────────────────────────────────────
+            // Run market intelligence + strategy selection for every configured
+            // symbol and aggregate candle points, indicator points, and
+            // opportunities across all symbols, sorted by confluence confidence.
+            let multi_symbol_contexts = collect_symbol_market_contexts(
+                &config.exchange.primary_symbols,
+                config.watchdog.stale_feed_timeout_secs * 1_000,
+                live_client.as_ref(),
+            );
+            let mut all_candle_points: Vec<SnapshotCandlePoint> = Vec::new();
+            let mut all_indicator_points: Vec<SnapshotIndicatorPoint> = Vec::new();
+            let mut all_opportunities: Vec<SnapshotOpportunity> = Vec::new();
+            for ctx in &multi_symbol_contexts {
+                let ctx_intelligence = build_market_intelligence(
+                    &ctx.symbol,
+                    &ctx.book,
+                    &ctx.market_health,
+                    live_client.as_ref(),
+                    cycle_research_report.as_ref(),
+                );
+                let ctx_regime = ctx_intelligence.regime;
+                let ctx_features = ctx_intelligence.features.clone();
+                let (ctx_candidates, _) = StrategySelector::select(ctx_regime, &ctx_features);
+                let ctx_ops = build_snapshot_opportunities(
+                    &ctx_candidates,
+                    ctx_regime,
+                    &ctx.market_health,
+                    &ctx_intelligence.confluence_inputs,
+                    &ctx_intelligence.indicator_inputs,
+                    cycle_research_report.as_ref(),
+                    mode_authority.current(),
+                );
+                // Only include real candidates (not placeholder NoCandidate entries)
+                for op in ctx_ops {
+                    if op.family != "NoCandidate" {
+                        all_opportunities.push(op);
+                    }
+                }
+                all_candle_points.extend(build_candle_points(&ctx.symbol.0, &ctx_intelligence.candles));
+                all_indicator_points.extend(build_indicator_points(&ctx.symbol.0, &ctx_intelligence.candles));
+            }
+            // Sort opportunities: highest confidence first
+            all_opportunities.sort_by(|a, b| {
+                let ca = a.confidence.parse::<f64>().unwrap_or(0.0);
+                let cb = b.confidence.parse::<f64>().unwrap_or(0.0);
+                cb.partial_cmp(&ca).unwrap_or(std::cmp::Ordering::Equal)
+            });
+            // Fallback if truly no opportunities across all symbols
+            if all_opportunities.is_empty() {
+                all_opportunities.push(SnapshotOpportunity {
+                    symbol: symbol.0.clone(),
+                    family: "NoCandidate".to_string(),
+                    regime: format!("{:?}", cycle_regime.regime),
+                    model_id: "base-runtime".to_string(),
+                    model_scope: "All / All / All".to_string(),
+                    confidence: "0.00".to_string(),
+                    action: "StandDown".to_string(),
+                    funding_rate: 0.0,
+                    htf_trend_bias: 0.0,
+                    depth_imbalance: 0.0,
+                    oi_delta: 0.0,
+                    btc_correlation: 0.0,
+                });
+            }
+            snapshot.candle_points = all_candle_points;
+            snapshot.indicator_points = all_indicator_points;
+            snapshot.opportunities = all_opportunities;
+            // ── End multi-symbol scan ─────────────────────────────────────────
+
             snapshot.research_models = build_snapshot_research_models(cycle_market_intelligence.research_report.as_ref());
             snapshot.promoted_indicator = build_snapshot_promoted_indicator(cycle_market_intelligence.research_report.as_ref());
             snapshot.news_sentiment = build_snapshot_news_sentiment(&cycle_market_intelligence.news);
@@ -855,17 +950,9 @@ fn main() {
                         .unwrap_or("none"),
                     if promoted_indicators_disabled() { "disabled" } else { "active" }
                 ),
+                format!("Multi-symbol scan: {} symbols, {} opportunities.", multi_symbol_contexts.len(), snapshot.opportunities.len()),
                 format!("Runtime refresh cycle {} at {}.", cycle, snapshot.updated_at),
             ];
-            snapshot.opportunities = build_snapshot_opportunities(
-                &cycle_candidates,
-                cycle_regime,
-                &cycle_market_health,
-                &cycle_confluence_inputs,
-                &cycle_indicator_inputs,
-                cycle_market_intelligence.research_report.as_ref(),
-                mode_authority.current(),
-            );
             update_kpi(
                 &mut snapshot.kpis,
                 "Market Confidence",
@@ -955,25 +1042,31 @@ fn build_snapshot_opportunities(
             let selected_model = research_report.and_then(|report| {
                 select_promoted_model(report, &candidate.symbol.0, candidate.regime, candidate.family)
             });
+            let (model_id, model_scope) = match selected_model {
+                Some(model) => (
+                    model.model.id.clone(),
+                    format!(
+                        "{} / {} / {}",
+                        model.model.target_symbol.as_deref().unwrap_or("All"),
+                        model.model.target_family.as_deref().unwrap_or("All"),
+                        model.model.target_regime.as_deref().unwrap_or("All"),
+                    ),
+                ),
+                None => ("base-runtime".to_string(), "All / All / All".to_string()),
+            };
             SnapshotOpportunity {
                 symbol: candidate.symbol.0.clone(),
                 family: format!("{:?}", candidate.family),
                 regime: format!("{:?}", candidate.regime),
-                model_id: selected_model
-                    .map(|model| model.model.id.clone())
-                    .unwrap_or_else(|| "base-runtime".to_string()),
-                model_scope: selected_model
-                    .map(|model| {
-                        format!(
-                            "{} / {} / {}",
-                            model.model.target_symbol.as_deref().unwrap_or("All"),
-                            model.model.target_family.as_deref().unwrap_or("All"),
-                            model.model.target_regime.as_deref().unwrap_or("All"),
-                        )
-                    })
-                    .unwrap_or_else(|| "All / All / All".to_string()),
+                model_id,
+                model_scope,
                 confidence: format!("{:.2}", confluence.confidence_score),
                 action: opportunity_action_for_mode(mode, confluence.decision),
+                funding_rate: selected_inputs.extras.funding_rate,
+                htf_trend_bias: selected_inputs.extras.htf_trend_bias,
+                depth_imbalance: selected_inputs.extras.depth_imbalance,
+                oi_delta: selected_inputs.extras.open_interest_delta,
+                btc_correlation: selected_inputs.extras.btc_correlation,
             }
         })
         .collect::<Vec<_>>();
@@ -987,6 +1080,11 @@ fn build_snapshot_opportunities(
             model_scope: "All / All / All".to_string(),
             confidence: "0.00".to_string(),
             action: "StandDown".to_string(),
+            funding_rate: 0.0,
+            htf_trend_bias: 0.0,
+            depth_imbalance: 0.0,
+            oi_delta: 0.0,
+            btc_correlation: 0.0,
         });
     }
 
@@ -1515,20 +1613,101 @@ fn build_market_intelligence(
     live_client: Option<&BinanceHttpClient>,
     research_report: Option<&ResearchCycleReport>,
 ) -> MarketIntelligence {
+    // 1m candles (primary signal source)
     let candles = live_client
         .and_then(|client| client.fetch_recent_klines(&symbol.0, 96).ok())
         .map(|klines| klines.into_iter().map(|kline| kline.to_candle()).collect::<Vec<_>>())
         .filter(|candles| !candles.is_empty())
         .unwrap_or_else(|| synthetic_recent_candles(book));
+
+    // 4h candles for real higher-timeframe alignment
+    let candles_4h = live_client
+        .and_then(|client| client.fetch_klines_interval(&symbol.0, "4h", 50).ok())
+        .map(|klines| klines.into_iter().map(|k| k.to_candle()).collect::<Vec<_>>())
+        .unwrap_or_default();
+
+    // 1d candles for macro trend context
+    let candles_1d = live_client
+        .and_then(|client| client.fetch_klines_interval(&symbol.0, "1d", 14).ok())
+        .map(|klines| klines.into_iter().map(|k| k.to_candle()).collect::<Vec<_>>())
+        .unwrap_or_default();
+
+    // Funding rate
+    let funding = live_client
+        .and_then(|client| client.fetch_funding_rate(&symbol.0).ok())
+        .unwrap_or(FundingRateSnapshot { symbol: symbol.0.clone(), rate: 0.0, next_funding_ms: 0 });
+
+    // Open interest (current — compare to prior cycle via candle proxy)
+    let open_interest = live_client
+        .and_then(|client| client.fetch_open_interest(&symbol.0).ok())
+        .unwrap_or(OpenInterestSnapshot { symbol: symbol.0.clone(), open_interest: 0.0 });
+
+    // L2 order book depth (top 10 levels)
+    let depth = live_client
+        .and_then(|client| client.fetch_order_book_depth(&symbol.0, 10).ok())
+        .unwrap_or(OrderBookDepth { symbol: symbol.0.clone(), bids: vec![], asks: vec![] });
+
+    // BTC benchmark correlation (if not already BTC)
+    let btc_prices: Vec<f64> = if symbol.0 == "BTCUSDT" {
+        candles.iter().map(|c| c.close).collect()
+    } else {
+        live_client
+            .and_then(|client| client.fetch_recent_klines("BTCUSDT", 32).ok())
+            .map(|klines| klines.into_iter().map(|k| k.to_candle().close).collect())
+            .unwrap_or_default()
+    };
+    let symbol_prices: Vec<f64> = candles.iter().map(|c| c.close).collect();
+    let btc_correlation = if btc_prices.len() >= 31 && symbol_prices.len() >= 31 {
+        compute_return_correlation(&symbol_prices, &btc_prices)
+    } else {
+        0.5
+    };
+
+    // HTF trend bias from 4h candles
+    let htf_trend_bias = compute_htf_trend_bias(&candles_4h);
+
+    // 1d macro bias (secondary confirmation)
+    let daily_trend_bias = compute_htf_trend_bias(&candles_1d);
+
+    // OI delta: use volume as proxy when OI history not tracked
+    // (supervisor will track prior OI in a future pass; for now use volume delta)
+    let oi_delta = if !candles.is_empty() {
+        let vol_recent: f64 = candles.iter().rev().take(5).map(|c| c.volume).sum::<f64>() / 5.0;
+        let vol_prior: f64 = candles.iter().rev().skip(5).take(10).map(|c| c.volume).sum::<f64>() / 10.0;
+        compute_oi_delta(open_interest.open_interest.max(vol_recent), open_interest.open_interest.max(vol_prior))
+    } else {
+        0.0
+    };
+
+    // L2 depth imbalance within 0.3% of mid
+    let depth_imbalance = depth.depth_imbalance(0.003);
+
+    // Portfolio correlation penalty: higher when BTC correlation is extreme and trending same direction
+    let portfolio_correlation_penalty = if btc_correlation.abs() > 0.85 {
+        0.25 // very high correlation = less diversification benefit
+    } else if btc_correlation.abs() > 0.65 {
+        0.15
+    } else {
+        0.08
+    };
+
+    let extras = MarketExtras {
+        funding_rate: funding.rate,
+        open_interest_delta: oi_delta,
+        depth_imbalance,
+        htf_trend_bias: (htf_trend_bias * 0.7 + daily_trend_bias * 0.3).clamp(-1.0, 1.0),
+        btc_correlation,
+        portfolio_correlation_penalty,
+    };
+
     let indicators = compute_indicator_snapshot(&candles);
     let structure = assess_market_structure(&candles, book);
     let regime = infer_regime(&indicators, &structure, market_health);
     let features = derive_feature_vector(symbol.clone(), book, &indicators, &structure);
     let headlines = collect_headlines(NEWS_HEADLINES_PATH);
     let news = score_headlines(&headlines);
-    let base_inputs = build_confluence_inputs(&indicators, &structure, &news, market_health);
+    let confluence_inputs = build_confluence_inputs(&indicators, &structure, &news, market_health, extras);
     let indicator_inputs = build_indicator_gene_inputs(&indicators);
-    let confluence_inputs = base_inputs;
 
     MarketIntelligence {
         regime,
@@ -1546,6 +1725,7 @@ fn build_confluence_inputs(
     structure: &MarketStructureSnapshot,
     news: &NewsSentimentSnapshot,
     market_health: &sthyra_market_data::MarketHealthAssessment,
+    extras: sthyra_market_data::MarketExtras,
 ) -> ConfluenceInputs {
     let system_health_modifier = if market_health.manipulation_suspected {
         0.2
@@ -1555,12 +1735,20 @@ fn build_confluence_inputs(
         0.45
     };
 
-    ConfluenceInputs {
-        higher_timeframe_alignment: ((indicators.ema_fast > indicators.ema_slow) as u8 as f64 * 0.5
+    // Real HTF alignment replaces the fake EMA-on-1m calculation
+    let higher_timeframe_alignment = if extras.htf_trend_bias.abs() > 0.05 {
+        extras.real_htf_alignment()
+    } else {
+        // Fallback when HTF data unavailable
+        ((indicators.ema_fast > indicators.ema_slow) as u8 as f64 * 0.5
             + structure.trend_bias.abs() * 0.5)
-            .clamp(0.0, 1.0),
+            .clamp(0.0, 1.0)
+    };
+
+    ConfluenceInputs {
+        higher_timeframe_alignment,
         recent_strategy_performance: (0.45 + indicators.signal_consensus * 0.35).clamp(0.0, 1.0),
-        correlation_penalty: 0.1,
+        correlation_penalty: extras.portfolio_correlation_penalty,
         system_health_modifier,
         indicator_consensus: indicators.signal_consensus,
         market_structure_score: structure.structure_score,
@@ -1576,6 +1764,7 @@ fn build_confluence_inputs(
             + ((1.0 - market_health.spread_penalty) * 0.3))
             .clamp(0.0, 1.0),
         news: news.clone(),
+        extras,
     }
 }
 

@@ -27,6 +27,9 @@ function workspaceRoot() {
 }
 
 function stateDir() {
+  // The supervisor always writes its state files (operator-events, mode-request,
+  // audit.sqlite3) relative to its working directory — the workspace root.
+  // We always resolve against the workspace root so the Node.js layer can find them.
   return path.join(workspaceRoot(), ".sthyra");
 }
 

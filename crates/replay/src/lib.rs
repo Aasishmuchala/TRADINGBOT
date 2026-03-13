@@ -96,6 +96,7 @@ mod tests {
                 order_flow_score: 0.75,
                 confirmation_score: 0.8,
                 news: NewsSentimentSnapshot::default(),
+                extras: sthyra_market_data::MarketExtras::default(),
             },
             indicator_inputs: IndicatorGeneInputs {
                 rsi_bias: 0.82,

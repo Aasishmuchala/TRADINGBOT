@@ -52,6 +52,9 @@ function workspaceRoot() {
 }
 
 function stackScriptPath() {
+  if (process.platform === "win32") {
+    return path.join(workspaceRoot(), "scripts", "stack.ps1");
+  }
   return path.join(workspaceRoot(), "scripts", "stack.sh");
 }
 
@@ -244,7 +247,12 @@ function buildOverlayEffectReport(
 
 function runStackCommand(args: string[], timeoutMs = 20_000): Promise<{ code: number | null; stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn("zsh", [stackScriptPath(), ...args], {
+    const isWindows = process.platform === "win32";
+    const [cmd, cmdArgs] = isWindows
+      ? ["powershell", ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", stackScriptPath(), ...args]]
+      : ["zsh", [stackScriptPath(), ...args]];
+
+    const child = spawn(cmd, cmdArgs, {
       cwd: workspaceRoot(),
       env: process.env,
     });

@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity,
   BrainCircuit,
   CandlestickChart,
   Check,
   Download,
-  Eraser,
   Gauge,
   Monitor,
   Moon,
@@ -864,69 +863,13 @@ function OverviewPage({
               </div>
               <div className="mt-2 text-sm leading-6 text-muted-foreground">
                 {topOpportunity
-                  ? `Best queued opportunity is ${topOpportunity.symbol} ${formatStrategyFamily(topOpportunity.family)} with ${topOpportunity.action.toLowerCase()} confidence ${topOpportunity.confidence}. HTF bias ${(topOpportunity.htf_trend_bias ?? 0) >= 0 ? "+" : ""}${(topOpportunity.htf_trend_bias ?? 0).toFixed(2)}, funding ${((topOpportunity.funding_rate ?? 0) * 100).toFixed(4)}% per 8h.`
+                  ? `Best queued opportunity is ${topOpportunity.symbol} ${formatStrategyFamily(topOpportunity.family)} with ${topOpportunity.action.toLowerCase()} confidence ${topOpportunity.confidence}.`
                   : "No opportunity is strong enough to act on. That is valid market feedback, not inactivity."}
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Compact symbol heatmap strip */}
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold tracking-[-0.04em]">Symbol scan</CardTitle>
-          <CardDescription>Live regime and top opportunity across all 10 monitored symbols.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-2 grid-cols-5 sm:grid-cols-10">
-            {["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","DOTUSDT"].map((sym) => {
-              const op = snapshot.opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
-              const conf = op ? parseFloat(op.confidence) : 0;
-              const isGood = op && !op.regime.includes("NoTrade") && !op.regime.includes("Disordered");
-              const isBad = op && (op.regime.includes("NoTrade") || op.regime.includes("Disordered"));
-              return (
-                <div
-                  className={cn(
-                    "relative overflow-hidden rounded-[16px] border px-2.5 py-2.5 text-center",
-                    isGood ? "border-(--success-border) bg-(--success-surface)" :
-                    isBad ? "border-(--danger-border) bg-(--danger-surface)" :
-                    "border-border/60 bg-muted/25",
-                  )}
-                  key={sym}
-                >
-                  <div className="text-xs font-semibold tracking-[-0.02em] text-foreground">{sym.replace("USDT","")}</div>
-                  <div className="mt-0.5 text-[9px] uppercase tracking-[0.14em] text-muted-foreground truncate">
-                    {op ? op.action : "—"}
-                  </div>
-                  {op && (
-                    <div className={cn(
-                      "text-[8px] tabular-nums mt-0.5",
-                      (op.htf_trend_bias ?? 0) > 0.3 ? "text-(--success-foreground)" :
-                      (op.htf_trend_bias ?? 0) < -0.3 ? "text-(--danger-foreground)" :
-                      "text-muted-foreground"
-                    )}>
-                      {(op.htf_trend_bias ?? 0) > 0.3 ? "↑" : (op.htf_trend_bias ?? 0) < -0.3 ? "↓" : "—"}
-                      {" "}{(op.funding_rate ?? 0) !== 0 ? `${((op.funding_rate ?? 0) * 100).toFixed(3)}%` : ""}
-                    </div>
-                  )}
-                  {op && conf > 0 && (
-                    <div className="mt-1.5 h-[2px] w-full overflow-hidden rounded-full bg-black/10">
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${Math.min(100, conf * 100)}%`,
-                          background: isGood ? "var(--cal-green-text)" : isBad ? "var(--cal-red-text)" : "currentColor",
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)]">
         <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
@@ -1128,7 +1071,7 @@ function SymbolHeatmap({
     <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
       <CardHeader>
         <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Symbol heatmap</CardTitle>
-        <CardDescription>Top candidate per symbol. Green = tradeable regime. Funding, HTF bias, and depth imbalance shown per cell.</CardDescription>
+        <CardDescription>Top candidate per symbol across the full watchlist. Green = tradeable regime, red = no-trade or disordered.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -1143,19 +1086,9 @@ function SymbolHeatmap({
                   ? "border-(--danger-border) bg-(--danger-surface)"
                   : "border-border/60 bg-muted/25";
 
-            const fundingRate = op?.funding_rate ?? 0;
-            const htf = op?.htf_trend_bias ?? 0;
-            const depth = op?.depth_imbalance ?? 0;
-            const oi = op?.oi_delta ?? 0;
-
-            const htfLabel = htf > 0.3 ? "↑ Bull" : htf < -0.3 ? "↓ Bear" : "— Flat";
-            const htfColor = htf > 0.3 ? "text-(--success-foreground)" : htf < -0.3 ? "text-(--danger-foreground)" : "text-muted-foreground";
-            const fundingColor = fundingRate > 0.0005 ? "text-(--danger-foreground)" : fundingRate < -0.0005 ? "text-(--success-foreground)" : "text-muted-foreground";
-            const depthColor = depth > 0.15 ? "text-(--success-foreground)" : depth < -0.15 ? "text-(--danger-foreground)" : "text-muted-foreground";
-
             return (
               <div
-                className={cn("relative overflow-hidden rounded-[20px] border px-4 py-3 transition-all", toneClass)}
+                className={cn("rounded-[20px] border px-4 py-3 transition-all", toneClass)}
                 key={sym}
               >
                 <div className="text-sm font-semibold tracking-[-0.02em] text-foreground">
@@ -1172,34 +1105,6 @@ function SymbolHeatmap({
                     </div>
                     <div className="mt-0.5 text-[11px] text-muted-foreground">
                       conf {op.confidence} · {op.action}
-                    </div>
-                    {/* Signal row: HTF · Funding · Depth */}
-                    <div className="mt-1.5 flex items-center gap-2 text-[10px] tabular-nums">
-                      <span className={htfColor}>{htfLabel}</span>
-                      <span className="text-border/60">·</span>
-                      <span className={fundingColor} title="Funding rate per 8h">
-                        F:{(fundingRate * 100).toFixed(3)}%
-                      </span>
-                      <span className="text-border/60">·</span>
-                      <span className={depthColor} title="L2 depth imbalance">
-                        D:{depth >= 0 ? "+" : ""}{depth.toFixed(2)}
-                      </span>
-                    </div>
-                    {/* OI delta micro badge */}
-                    {Math.abs(oi) > 0.01 && (
-                      <div className={cn("mt-1 text-[10px]", oi > 0 ? "text-(--success-foreground)" : "text-(--danger-foreground)")}>
-                        OI {oi > 0 ? "▲" : "▼"} {Math.abs(oi).toFixed(3)}
-                      </div>
-                    )}
-                    {/* Confidence bar */}
-                    <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-black/10">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${Math.min(100, conf * 100)}%`,
-                          background: conf >= 0.75 ? "var(--cal-green-text)" : conf >= 0.55 ? "currentColor" : "rgba(148,163,184,0.6)",
-                        }}
-                      />
                     </div>
                   </>
                 ) : (
@@ -1264,13 +1169,10 @@ function StrategiesPage({
             <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Market structure, opportunity ranking, and live posture in one view.</div>
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Chart first, watchlist second, and research context close enough to act without scanning disconnected panels.</p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
+          <div className="grid gap-3 sm:grid-cols-3">
             <MetricBlock compact label="Last price" value={latestCandle ? formatUsd(latestCandle.close, 2) : "No data"} />
             <MetricBlock compact label="Consensus" tone={(latestIndicatorPoint?.signal_consensus ?? 0) > 0 ? "positive" : (latestIndicatorPoint?.signal_consensus ?? 0) < 0 ? "negative" : "neutral"} value={latestIndicatorPoint ? formatSignedNumber(latestIndicatorPoint.signal_consensus, 3) : "No data"} />
             <MetricBlock compact label="Queued action" tone={selectedOpportunity?.action === "Buy" ? "positive" : selectedOpportunity?.action === "Sell" ? "negative" : "neutral"} value={selectedOpportunity ? `${selectedOpportunity.action} · ${selectedOpportunity.family}` : "NoSignal"} />
-            <MetricBlock compact label="Funding rate" tone={(selectedOpportunity?.funding_rate ?? 0) > 0.0005 ? "negative" : (selectedOpportunity?.funding_rate ?? 0) < -0.0005 ? "positive" : "neutral"} value={selectedOpportunity ? `${((selectedOpportunity.funding_rate ?? 0) * 100).toFixed(4)}%` : "—"} />
-            <MetricBlock compact label="HTF bias" tone={(selectedOpportunity?.htf_trend_bias ?? 0) > 0.2 ? "positive" : (selectedOpportunity?.htf_trend_bias ?? 0) < -0.2 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.htf_trend_bias ?? 0, 2) : "—"} />
-            <MetricBlock compact label="Depth imbal." tone={(selectedOpportunity?.depth_imbalance ?? 0) > 0.1 ? "positive" : (selectedOpportunity?.depth_imbalance ?? 0) < -0.1 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.depth_imbalance ?? 0, 2) : "—"} />
           </div>
         </CardContent>
       </Card>
@@ -1325,45 +1227,22 @@ function StrategiesPage({
                       <TableHead>Symbol</TableHead>
                       <TableHead>Family</TableHead>
                       <TableHead>Regime</TableHead>
-                      <TableHead>Conf</TableHead>
-                      <TableHead className="text-right">Funding</TableHead>
-                      <TableHead className="text-right">HTF</TableHead>
-                      <TableHead className="text-right">OI Δ</TableHead>
-                      <TableHead className="text-right">Depth</TableHead>
-                      <TableHead className="text-right">BTC corr</TableHead>
+                      <TableHead>Confidence</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {scopedSnapshot.opportunities.map((item) => {
-                      const fundingRate = item.funding_rate ?? 0;
-                      const htf = item.htf_trend_bias ?? 0;
-                      const oi = item.oi_delta ?? 0;
-                      const depth = item.depth_imbalance ?? 0;
-                      const corr = item.btc_correlation ?? 0;
-                      const fundingPct = (fundingRate * 100).toFixed(4);
-                      const fundingTone = fundingRate > 0.0005 ? "text-(--danger-foreground)" : fundingRate < -0.0005 ? "text-(--success-foreground)" : "text-muted-foreground";
-                      const htfTone = htf > 0.2 ? "text-(--success-foreground)" : htf < -0.2 ? "text-(--danger-foreground)" : "text-muted-foreground";
-                      const oiTone = oi > 0.02 ? "text-(--success-foreground)" : oi < -0.02 ? "text-(--danger-foreground)" : "text-muted-foreground";
-                      const depthTone = depth > 0.1 ? "text-(--success-foreground)" : depth < -0.1 ? "text-(--danger-foreground)" : "text-muted-foreground";
-                      const corrTone = corr > 0.8 ? "text-(--warning-foreground)" : "text-muted-foreground";
-                      return (
-                        <TableRow key={`${item.symbol}-${item.model_id}`}>
-                          <TableCell className="font-medium">{item.symbol}</TableCell>
-                          <TableCell>{formatStrategyFamily(item.family)}</TableCell>
-                          <TableCell>{item.regime}</TableCell>
-                          <TableCell className="tabular-nums">{item.confidence}</TableCell>
-                          <TableCell className={cn("text-right tabular-nums text-xs", fundingTone)}>{fundingPct}%</TableCell>
-                          <TableCell className={cn("text-right tabular-nums text-xs", htfTone)}>{htf >= 0 ? "+" : ""}{htf.toFixed(2)}</TableCell>
-                          <TableCell className={cn("text-right tabular-nums text-xs", oiTone)}>{oi >= 0 ? "+" : ""}{oi.toFixed(3)}</TableCell>
-                          <TableCell className={cn("text-right tabular-nums text-xs", depthTone)}>{depth >= 0 ? "+" : ""}{depth.toFixed(2)}</TableCell>
-                          <TableCell className={cn("text-right tabular-nums text-xs", corrTone)}>{corr.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <Badge className={cn("rounded-full border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                    {scopedSnapshot.opportunities.map((item) => (
+                      <TableRow key={`${item.symbol}-${item.model_id}`}>
+                        <TableCell className="font-medium">{item.symbol}</TableCell>
+                        <TableCell>{formatStrategyFamily(item.family)}</TableCell>
+                        <TableCell>{item.regime}</TableCell>
+                        <TableCell>{item.confidence}</TableCell>
+                        <TableCell>
+                          <Badge className={cn("rounded-full border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
@@ -1594,25 +1473,18 @@ function ExecutionPage({
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-3 sm:grid-cols-2">
-              {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => {
-                const isActive = snapshot.mode === mode;
-                return (
-                  <Button
-                    className={cn(
-                      "justify-start rounded-[20px] px-4 py-5",
-                      isActive && "ring-2 ring-primary/40 ring-offset-1 ring-offset-background",
-                    )}
-                    disabled={pendingOperatorAction !== null}
-                    key={mode}
-                    onClick={() => void runOperatorAction("set-mode", mode)}
-                    variant={isActive ? "default" : "outline"}
-                  >
-                    {isActive ? <Check className="size-4" /> : <Radar className="size-4" />}
-                    {mode}
-                    {isActive && <span className="ml-auto text-[10px] font-normal uppercase tracking-[0.18em] opacity-70">active</span>}
-                  </Button>
-                );
-              })}
+              {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => (
+                <Button
+                  className="justify-start rounded-[20px] px-4 py-5"
+                  disabled={pendingOperatorAction !== null}
+                  key={mode}
+                  onClick={() => void runOperatorAction("set-mode", mode)}
+                  variant={snapshot.mode === mode ? "default" : "outline"}
+                >
+                  <Radar className="size-4" />
+                  {mode}
+                </Button>
+              ))}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <ActionButton action="status" icon={Activity} label="Stack status" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
@@ -1621,7 +1493,6 @@ function ExecutionPage({
               <ActionButton action="export-audit" icon={Download} label="Export audit" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="compact-audit-db" icon={Gauge} label="Compact audit DB" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="prune-legacy-incidents" icon={ShieldCheck} label="Normalize incidents" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
-              <ActionButton action="clear-maintenance-history" icon={Eraser} label="Clear maint. history" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <Button className="justify-start rounded-[20px] px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction("restart-supervisor")} variant="secondary">
                 <RotateCcw className={cn("size-4", pendingOperatorAction === "restart-supervisor" && "animate-spin")} />
                 Restart supervisor
@@ -2295,7 +2166,7 @@ function ReviewPage({
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{slice.family} · {slice.regime}</div>
                       </div>
                       <Badge className="rounded-full border border-(--success-border) bg-transparent text-(--success-foreground)" variant="outline">
                         {slice.tradeCount} trades
@@ -2365,7 +2236,7 @@ function ReviewPage({
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{slice.family} · {slice.regime}</div>
                       </div>
                       <Badge className="rounded-full border border-(--danger-border) bg-transparent text-(--danger-foreground)" variant="outline">
                         {slice.tradeCount} trades
@@ -3133,49 +3004,27 @@ function SettingsPage({
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <div className="space-y-2">
+              <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Cycle interval ms</span>
-                <div className="rounded-[20px] border border-border/70 bg-background px-4 py-3 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium tabular-nums text-foreground">{tradingSettings.supervisorIntervalMs} ms</span>
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                      {tradingSettings.supervisorIntervalMs <= 150 ? "Aggressive" : tradingSettings.supervisorIntervalMs <= 350 ? "Fast" : tradingSettings.supervisorIntervalMs <= 750 ? "Balanced" : tradingSettings.supervisorIntervalMs <= 1500 ? "Conservative" : "Slow"}
-                    </span>
-                  </div>
-                  <input
-                    className="w-full accent-primary"
-                    max={5000}
-                    min={100}
-                    onChange={(event) => {
-                      if (!Number.isFinite(event.target.valueAsNumber)) return;
-                      setTradingSettings((current) => ({
-                        ...current,
-                        supervisorIntervalMs: Math.max(100, Math.min(5000, Math.round(event.target.valueAsNumber))),
-                      }));
-                    }}
-                    step={50}
-                    type="range"
-                    value={tradingSettings.supervisorIntervalMs}
-                  />
-                  <div className="flex justify-between text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
-                    {[100, 250, 500, 1000, 2000, 5000].map((preset) => (
-                      <button
-                        className={cn(
-                          "rounded-md px-1 py-0.5 transition-colors",
-                          tradingSettings.supervisorIntervalMs === preset
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:text-foreground",
-                        )}
-                        key={preset}
-                        onClick={() => setTradingSettings((current) => ({ ...current, supervisorIntervalMs: preset }))}
-                        type="button"
-                      >
-                        {preset < 1000 ? `${preset}` : `${preset / 1000}k`}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                <input
+                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  max={5000}
+                  min={100}
+                  onChange={(event) => {
+                    if (!Number.isFinite(event.target.valueAsNumber)) {
+                      return;
+                    }
+
+                    setTradingSettings((current) => ({
+                      ...current,
+                      supervisorIntervalMs: Math.max(100, Math.min(5000, Math.round(event.target.valueAsNumber))),
+                    }));
+                  }}
+                  step={50}
+                  type="number"
+                  value={tradingSettings.supervisorIntervalMs}
+                />
+              </label>
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Research refresh min</span>
                 <input
@@ -3653,14 +3502,8 @@ function WatchlistRail({
       consensus: lastPoint?.signal_consensus ?? null,
       action: opportunity?.action ?? "NoSignal",
       family: opportunity?.family ?? "No family",
-      regime: opportunity?.regime ?? null,
-      confidence: opportunity?.confidence ? parseFloat(opportunity.confidence) : null,
       entryTimestampMs: entryTimesBySymbol.get(symbol) ?? null,
       position,
-      sparkPrices: symbolPoints.map((p) => p.price),
-      fundingRate: opportunity?.funding_rate ?? 0,
-      htfBias: opportunity?.htf_trend_bias ?? 0,
-      depthImbalance: opportunity?.depth_imbalance ?? 0,
     };
   });
 
@@ -3696,45 +3539,13 @@ function WatchlistRail({
                   type="button"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
-                        {item.regime && (
-                          <span className={cn("rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.18em]",
-                            active ? "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground/80"
-                              : item.regime.includes("NoTrade") || item.regime.includes("Disordered")
-                                ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
-                                : item.regime.includes("Trending") || item.regime.includes("Breakout")
-                                  ? "border-(--success-border) bg-(--success-surface) text-(--success-foreground)"
-                                  : "border-border/60 bg-muted/50 text-muted-foreground"
-                          )}>
-                            {item.regime.replace("BreakoutExpansion", "Breakout").replace("VolatilityCompression", "VolComp").replace("ReversalAttempt", "Reversal").slice(0, 9)}
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
                       <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
                     </div>
-                    <div className="flex flex-col items-end gap-1.5">
-                      <Badge className={cn("rounded-full border", active ? "border-primary-foreground/20 bg-primary-foreground/12 text-primary-foreground" : actionBadgeClasses(item.action))} variant="outline">
-                        {item.action}
-                      </Badge>
-                      {/* Mini sparkline */}
-                      {item.sparkPrices.length >= 3 && (() => {
-                        const spW = 64; const spH = 24; const spPad = 2;
-                        const spMin = Math.min(...item.sparkPrices);
-                        const spMax = Math.max(...item.sparkPrices);
-                        const spSpread = spMax - spMin || 1;
-                        const spScaleX = (i: number) => spPad + (i / Math.max(item.sparkPrices.length - 1, 1)) * (spW - spPad * 2);
-                        const spScaleY = (v: number) => spH - spPad - ((v - spMin) / spSpread) * (spH - spPad * 2);
-                        const pts = item.sparkPrices.map((v, i) => `${spScaleX(i)},${spScaleY(v)}`).join(" ");
-                        const isUp = item.sparkPrices.at(-1)! >= item.sparkPrices[0]!;
-                        return (
-                          <svg height={spH} viewBox={`0 0 ${spW} ${spH}`} width={spW}>
-                            <polyline fill="none" points={pts} stroke={isUp ? "#22c55e" : "#ef4444"} strokeOpacity={active ? "0.9" : "0.6"} strokeWidth="1.5" />
-                          </svg>
-                        );
-                      })()}
-                    </div>
+                    <Badge className={cn("rounded-full border", active ? "border-primary-foreground/20 bg-primary-foreground/12 text-primary-foreground" : actionBadgeClasses(item.action))} variant="outline">
+                      {item.action}
+                    </Badge>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <WatchMetric active={active} label="Last" value={formatUsd(item.lastPrice, 2)} />
@@ -3743,8 +3554,6 @@ function WatchlistRail({
                     <WatchMetric active={active} label="Consensus" value={formatSignedNumber(item.consensus, 3)} />
                     <WatchMetric active={active} label="Hold" value={item.entryTimestampMs !== null ? formatRelativeDuration(item.entryTimestampMs) : "Flat"} />
                     <WatchMetric active={active} label="Opened" value={item.entryTimestampMs !== null ? formatTimestampMs(item.entryTimestampMs) : "No data"} />
-                    <WatchMetric active={active} label="HTF bias" value={`${item.htfBias >= 0 ? "+" : ""}${item.htfBias.toFixed(2)}`} />
-                    <WatchMetric active={active} label="Funding" value={`${(item.fundingRate * 100).toFixed(4)}%`} />
                   </div>
                   <div className={cn("mt-3 text-sm leading-6", active ? "text-primary-foreground/75" : "text-muted-foreground")}>
                     {item.position
@@ -3815,22 +3624,6 @@ function MarketPane({
     onHoverIndex(nextIndex);
   }
 
-  // Build closed polygon path for area fill under close prices
-  const closePrices = normalizedCandles.map((c) => c.close);
-  const areaPath = closePrices.length > 1
-    ? `M ${scaleX(0)},${scaleY(closePrices[0]!)} ` +
-      closePrices.slice(1).map((p, i) => `L ${scaleX(i + 1)},${scaleY(p)}`).join(" ") +
-      ` L ${scaleX(closePrices.length - 1)},${height} L ${scaleX(0)},${height} Z`
-    : "";
-
-  // 5 Y-axis price labels
-  const yLabelCount = 5;
-  const yLabels = Array.from({ length: yLabelCount }, (_, i) => {
-    const value = minValue + (maxValue - minValue) * (i / (yLabelCount - 1));
-    const y = scaleY(value);
-    return { value, y };
-  });
-
   return (
     <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
       <svg
@@ -3843,36 +3636,8 @@ function MarketPane({
         preserveAspectRatio="none"
         viewBox={`0 0 ${width} ${height}`}
       >
-        <defs>
-          <linearGradient gradientUnits="userSpaceOnUse" id="marketAreaGrad" x1="0" x2="0" y1={paddingY} y2={height}>
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="candleUpGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity="1" />
-            <stop offset="100%" stopColor="#16a34a" stopOpacity="1" />
-          </linearGradient>
-          <linearGradient id="candleDownGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#ef4444" stopOpacity="1" />
-            <stop offset="100%" stopColor="#dc2626" stopOpacity="1" />
-          </linearGradient>
-        </defs>
         <ChartGrid height={height} width={width} />
-
-        {/* Y-axis price labels */}
-        {yLabels.map(({ value, y }, i) => (
-          <text key={`ylabel-${i}`} fill="rgba(148,163,184,0.7)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 4))}>
-            {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(value < 10 ? 2 : 0)}
-          </text>
-        ))}
-
-        {/* Area fill under close price */}
-        {areaPath && <path d={areaPath} fill="url(#marketAreaGrad)" />}
-
-        {/* Crosshair */}
         {activeCandle ? <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} /> : null}
-
-        {/* Candles */}
         {normalizedCandles.map((candle, index) => {
           const x = scaleX(index);
           const open = candle.open;
@@ -3881,19 +3646,15 @@ function MarketPane({
           const bodyBottom = scaleY(Math.min(open, close));
           const high = scaleY(candle.high);
           const low = scaleY(candle.low);
-          const isUp = close >= open;
-          const wickColor = isUp ? "#22c55e" : "#ef4444";
-          const bodyFill = isUp ? "url(#candleUpGrad)" : "url(#candleDownGrad)";
+          const candleColor = close >= open ? "#22c55e" : "#ef4444";
 
           return (
             <g key={`${candle.timestamp_ms}-${candle.symbol}-${index}`}>
-              <line stroke={wickColor} strokeOpacity="0.85" strokeWidth="1.4" x1={x} x2={x} y1={high} y2={low} />
-              <rect fill={bodyFill} height={Math.max(2, bodyBottom - bodyTop)} rx="1.5" width="8" x={x - 4} y={bodyTop} />
+              <line stroke={candleColor} strokeWidth="1.4" x1={x} x2={x} y1={high} y2={low} />
+              <rect fill={candleColor} height={Math.max(2, bodyBottom - bodyTop)} rx="1.5" width="8" x={x - 4} y={bodyTop} />
             </g>
           );
         })}
-
-        {/* Trade markers */}
         {tradeMarkers.map((marker, markerIndex) => {
           const entryX = scaleX(marker.entryCandleIndex);
           const exitX = scaleX(marker.exitCandleIndex);
@@ -3913,18 +3674,16 @@ function MarketPane({
             </g>
           );
         })}
-
-        {/* EMA lines */}
         <polyline fill="none" points={polylinePoints(emaFast, scaleX, scaleY)} stroke="#38bdf8" strokeWidth="2.4" />
         <polyline fill="none" points={polylinePoints(emaSlow, scaleX, scaleY)} stroke="#f59e0b" strokeWidth="2.2" />
       </svg>
       <div className="flex flex-wrap items-center gap-4 border-t border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#38bdf8]" />EMA Fast</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#f59e0b]" />EMA Slow</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Bullish candle</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#ef4444]" />Bearish candle</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--primary)" />Close</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[color-mix(in_srgb,var(--primary)_78%,white_22%)]" />EMA Fast</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--accent)" />EMA Slow</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[color-mix(in_srgb,var(--accent)_72%,white_28%)]" />Volume</span>
         <span className="flex items-center gap-2"><span className="size-2 rounded-full border border-border bg-transparent" />Entry marker</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Exit marker</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--success-foreground)" />Exit marker</span>
         <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-muted-foreground" />{candles.length > 0 ? "OHLC candles" : "Derived candles"}</span>
       </div>
     </div>
@@ -3987,7 +3746,7 @@ function VolumePane({
 
           return (
             <rect
-              fill={isUp ? "rgba(34,197,94,0.65)" : "rgba(239,68,68,0.65)"}
+              fill={isUp ? "rgba(34, 197, 94, 0.8)" : "rgba(239, 68, 68, 0.8)"}
               height={heightValue}
               key={`volume-${index}`}
               rx="1.4"
@@ -4088,14 +3847,6 @@ function IndicatorPane({
     onHoverIndex(nextIndex);
   }
 
-  const areaPoints = series.length > 1
-    ? `${scaleX(0)},${scaleY(series[0]!)} ` +
-      series.slice(1).map((v, i) => `${scaleX(i + 1)},${scaleY(v)}`).join(" ") +
-      ` ${scaleX(series.length - 1)},${height} ${scaleX(0)},${height}`
-    : "";
-  const lastValue = series.at(-1);
-  const lastY = lastValue !== undefined ? scaleY(lastValue) : null;
-
   return (
     <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
       <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
@@ -4109,23 +3860,11 @@ function IndicatorPane({
         preserveAspectRatio="none"
         viewBox={`0 0 ${width} ${height}`}
       >
-        <defs>
-          <linearGradient gradientUnits="userSpaceOnUse" id={`indGrad-${label}`} x1="0" x2="0" y1={padding} y2={height}>
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
-          </linearGradient>
-        </defs>
         <ChartGrid height={height} width={width} />
         <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
-        {typeof positiveThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
-        {typeof negativeThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
-        {areaPoints && <polygon fill={`url(#indGrad-${label})`} points={areaPoints} />}
+        {typeof positiveThreshold === "number" ? <line stroke="#334155" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
+        {typeof negativeThreshold === "number" ? <line stroke="#334155" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
         <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#22d3ee" strokeWidth="2.2" />
-        {lastValue !== undefined && lastY !== null && (
-          <text fill="#22d3ee" fontSize="9" textAnchor="end" x={width - 2} y={Math.max(10, lastY - 3)}>
-            {lastValue.toFixed(2)}
-          </text>
-        )}
       </svg>
     </div>
   );
@@ -4214,72 +3953,26 @@ function EquityCurve({
   const width = 860;
   const height = 280;
   const padding = 24;
-  const labelWidth = 52;
   const series = points.map((point) => point.cumulativePnl);
   const minValue = Math.min(...series);
   const maxValue = Math.max(...series);
-  const scaleX = createIndexScale(series.length, padding + labelWidth, width - padding);
+  const scaleX = createIndexScale(series.length, padding, width - padding);
   const scaleY = createScale(minValue, maxValue, height - padding, padding);
   const selectedPoint = selectedTrade === null ? null : points[selectedTrade.visibleIndex] ?? null;
   const selectedX = selectedPoint ? scaleX(selectedTrade!.visibleIndex) : null;
   const selectedY = selectedPoint ? scaleY(selectedPoint.cumulativePnl) : null;
-  const isPositive = (maxValue + minValue) / 2 >= 0;
-  const lineColor = isPositive ? "#14b8a6" : "#f87171";
-  const gradColor = isPositive ? "#14b8a6" : "#f87171";
-
-  // Area path
-  const areaPath = series.length > 1
-    ? `M ${scaleX(0)},${scaleY(series[0]!)} ` +
-      series.slice(1).map((v, i) => `L ${scaleX(i + 1)},${scaleY(v)}`).join(" ") +
-      ` L ${scaleX(series.length - 1)},${height - padding} L ${scaleX(0)},${height - padding} Z`
-    : "";
-
-  // Y-axis labels: 5 levels
-  const yLabelCount = 5;
-  const yLabels = Array.from({ length: yLabelCount }, (_, i) => {
-    const value = minValue + (maxValue - minValue) * (i / (yLabelCount - 1));
-    const y = scaleY(value);
-    return { value, y };
-  });
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border/70 bg-muted/25">
       <svg className="h-70 w-full" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
-        <defs>
-          <linearGradient gradientUnits="userSpaceOnUse" id="equityGrad" x1="0" x2="0" y1={padding} y2={height - padding}>
-            <stop offset="0%" stopColor={gradColor} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={gradColor} stopOpacity="0" />
-          </linearGradient>
-        </defs>
         <ChartGrid height={height} width={width} />
-
-        {/* Y-axis labels */}
-        {yLabels.map(({ value, y }, i) => (
-          <text key={`eqlabel-${i}`} fill="rgba(148,163,184,0.75)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 6))}>
-            {value >= 0 ? `+${value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}` : value <= -1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}
-          </text>
-        ))}
-
-        {/* Zero baseline */}
-        {minValue < 0 && maxValue > 0 && (
-          <line stroke="rgba(148,163,184,0.3)" strokeWidth="1" x1={padding + labelWidth} x2={width - padding} y1={scaleY(0)} y2={scaleY(0)} />
-        )}
-
-        {/* Area fill */}
-        {areaPath && <path d={areaPath} fill="url(#equityGrad)" />}
-
-        {/* Curve line */}
-        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke={lineColor} strokeWidth="2.5" />
-
-        {/* Selected trade marker */}
+        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#0f766e" strokeWidth="3" />
         {selectedPoint && selectedX !== null && selectedY !== null ? (
           <>
-            <line stroke={lineColor} strokeDasharray="4 6" strokeWidth="1.5" x1={selectedX} x2={selectedX} y1={padding} y2={height - padding} />
-            {/* Glow ring */}
-            <circle cx={selectedX} cy={selectedY} fill="none" r="12" stroke={lineColor} strokeOpacity="0.25" strokeWidth="8" />
-            <circle cx={selectedX} cy={selectedY} fill="#f8fafc" r="6" stroke={lineColor} strokeWidth="3" />
-            <g transform={`translate(${Math.min(Math.max(selectedX + 14, padding + labelWidth), width - 188)}, ${Math.max(selectedY - 46, padding + 4)})`}>
-              <rect fill="rgba(248,250,252,0.97)" height="38" rx="10" stroke={`${lineColor}55`} strokeWidth="1" width="176" />
+            <line stroke="#0f766e" strokeDasharray="4 6" strokeWidth="1.5" x1={selectedX} x2={selectedX} y1={padding} y2={height - padding} />
+            <circle cx={selectedX} cy={selectedY} fill="#f8fafc" r="6" stroke="#0f766e" strokeWidth="3" />
+            <g transform={`translate(${Math.min(Math.max(selectedX + 12, padding), width - 188)}, ${Math.max(selectedY - 46, padding + 4)})`}>
+              <rect fill="rgba(248,250,252,0.96)" height="38" rx="10" stroke="rgba(15,118,110,0.25)" width="176" />
               <text fill="#0f172a" fontSize="11" fontWeight="600" x="10" y="15">{selectedTrade?.label}</text>
               <text fill="#475569" fontSize="10" x="10" y="29">{formatTimestampMs(selectedTrade!.timestampMs)} · {formatSignedUsd(selectedTrade!.realizedPnl)}</text>
             </g>
@@ -4295,34 +3988,15 @@ function BalanceCalendar({ days, emptyMessage }: { days: AuditBalanceCalendarDay
     return <EmptyState message={emptyMessage ?? "No daily balance closes are available yet."} />;
   }
 
-  const maxAbsDelta = Math.max(...days.map((d) => Math.abs(d.delta ?? 0)), 1);
-
   return (
     <div className="grid grid-cols-5 gap-2 sm:grid-cols-7">
-      {days.map((day) => {
-        const pct = day.delta !== null ? Math.min(100, (Math.abs(day.delta) / maxAbsDelta) * 100) : 0;
-        const isGreen = day.tone === "green";
-        const isRed = day.tone === "red";
-        return (
-          <div
-            className={cn("relative overflow-hidden rounded-[18px] border px-3 py-3 text-xs", balanceToneClasses(day.tone))}
-            key={day.day}
-          >
-            <div className="relative z-10 font-semibold">{formatCalendarDay(day.day)}</div>
-            <div className="relative z-10 mt-1 text-[11px] opacity-80">{day.closeBalance !== null ? formatUsd(day.closeBalance, 0) : "No close"}</div>
-            <div className="relative z-10 mt-1 text-[11px] font-medium opacity-90">{day.delta !== null ? formatSignedUsd(day.delta, 0) : "—"}</div>
-            {(isGreen || isRed) && pct > 0 && (
-              <div
-                className="absolute bottom-0 left-0 h-[3px] rounded-full opacity-60 transition-all duration-500"
-                style={{
-                  width: `${pct}%`,
-                  background: isGreen ? "var(--cal-green-text)" : "var(--cal-red-text)",
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
+      {days.map((day) => (
+        <div className={cn("rounded-[18px] border px-3 py-3 text-xs", balanceToneClasses(day.tone))} key={day.day}>
+          <div className="font-medium">{formatCalendarDay(day.day)}</div>
+          <div className="mt-1 text-[11px] opacity-80">{day.closeBalance !== null ? formatUsd(day.closeBalance, 0) : "No close"}</div>
+          <div className="mt-1 text-[11px] opacity-80">{day.delta !== null ? formatSignedUsd(day.delta, 0) : "-"}</div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -4376,13 +4050,10 @@ function TerminalStat({ label, value }: { label: string; value: string }) {
 }
 
 function BotHealthBadge({ health, prominent = false }: { health: BotHealthReport; prominent?: boolean }) {
-  const isHealthy = health.level === "healthy";
   return (
-    <span className={cn("relative inline-flex items-center", isHealthy && "bot-healthy-pulse")}>
-      <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
-        {health.label}
-      </Badge>
-    </span>
+    <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
+      {health.label}
+    </Badge>
   );
 }
 
@@ -4408,18 +4079,10 @@ function ProvenExecutionCard({
 }
 
 function MetricCard({ label, value, tone, compact = false }: { label: string; value: string; tone: "positive" | "negative" | "neutral"; compact?: boolean }) {
-  const [flashKey, setFlashKey] = useState(0);
-  const prevValue = useRef(value);
-  useEffect(() => {
-    if (prevValue.current !== value) {
-      prevValue.current = value;
-      setFlashKey((k) => k + 1);
-    }
-  }, [value]);
   return (
     <div className={cn("rounded-[28px] border px-5 py-5", compact ? "min-h-28" : "min-h-32", metricCardClasses(tone))}>
       <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{label}</div>
-      <div key={flashKey} className={cn("mt-4 font-medium tracking-[-0.04em] value-flash", compact ? "text-xl" : "text-[1.75rem]")}>{value}</div>
+      <div className={cn("mt-4 font-medium tracking-[-0.04em]", compact ? "text-xl" : "text-[1.75rem]")}>{value}</div>
     </div>
   );
 }
@@ -4619,9 +4282,9 @@ function metricCardClasses(tone: "positive" | "negative" | "neutral") {
 function balanceToneClasses(tone: AuditBalanceCalendarDay["tone"]) {
   switch (tone) {
     case "green":
-      return "border-[color:var(--cal-green-border)] bg-[color:var(--cal-green-surface)] text-[color:var(--cal-green-text)]";
+      return "border-(--success-border) bg-(--success-surface) text-(--success-foreground)";
     case "red":
-      return "border-[color:var(--cal-red-border)] bg-[color:var(--cal-red-surface)] text-[color:var(--cal-red-text)]";
+      return "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)";
     case "flat":
       return "border-border/70 bg-muted/50 text-foreground/80";
     default:

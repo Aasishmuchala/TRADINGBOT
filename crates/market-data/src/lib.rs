@@ -167,6 +167,108 @@ pub struct RegimeFeatureVector {
     pub inferred_regime_hint: MarketRegime,
 }
 
+/// Additional market signals that improve decision quality beyond OHLCV.
+#[derive(Debug, Clone, PartialEq)]
+pub struct MarketExtras {
+    /// Funding rate: >0 = longs pay shorts (bullish over-extension), <0 = shorts pay longs.
+    /// Extreme values (abs > 0.001) signal over-leveraged positions ripe for reversal.
+    pub funding_rate: f64,
+    /// Change in open interest vs prior bar (positive = new money entering, negative = unwinding).
+    pub open_interest_delta: f64,
+    /// L2 depth imbalance within 0.5% of mid: +1 = heavy bids (buyers dominate), -1 = heavy asks.
+    pub depth_imbalance: f64,
+    /// True higher-timeframe trend bias from 4h candles: +1 strong bull, -1 strong bear, 0 neutral.
+    pub htf_trend_bias: f64,
+    /// Rolling 30-bar return correlation with BTC (benchmark). 1.0 = moves identically.
+    pub btc_correlation: f64,
+    /// Cross-portfolio correlation penalty (0-1). High = current positions highly correlated.
+    pub portfolio_correlation_penalty: f64,
+}
+
+impl Default for MarketExtras {
+    fn default() -> Self {
+        Self {
+            funding_rate: 0.0,
+            open_interest_delta: 0.0,
+            depth_imbalance: 0.0,
+            htf_trend_bias: 0.0,
+            btc_correlation: 0.5,
+            portfolio_correlation_penalty: 0.1,
+        }
+    }
+}
+
+impl MarketExtras {
+    /// Funding signal: positive = mean-reversion edge (crowded longs), negative = (crowded shorts).
+    /// Scaled to 0-1 where 0.5 is neutral.
+    pub fn funding_signal(&self) -> f64 {
+        // Extreme funding (abs > 0.001 per 8h) = over-leveraged side will be squeezed
+        let normalized = (self.funding_rate / 0.002).clamp(-1.0, 1.0);
+        // Positive funding = longs crowded = bearish pressure on mean reversion
+        // We return the squeeze pressure: high positive = short squeeze likely, high negative = long squeeze likely
+        normalized
+    }
+
+    /// Combined order flow score incorporating L2 depth and funding.
+    pub fn enhanced_order_flow_score(&self, base_order_flow: f64) -> f64 {
+        let depth_contribution = self.depth_imbalance * 0.35;
+        let htf_contribution = self.htf_trend_bias * 0.30;
+        let base_contribution = base_order_flow * 0.35;
+        (depth_contribution + htf_contribution + base_contribution).clamp(0.0, 1.0)
+    }
+
+    /// True higher timeframe alignment score (0-1).
+    pub fn real_htf_alignment(&self) -> f64 {
+        // Combines HTF trend with OI confirmation
+        let oi_confirmation = if self.open_interest_delta > 0.0 { 0.15 } else { -0.1 };
+        ((self.htf_trend_bias.abs() * 0.7) + oi_confirmation + 0.15).clamp(0.0, 1.0)
+    }
+}
+
+/// Compute HTF trend bias from 4h candles (returns -1 to +1).
+pub fn compute_htf_trend_bias(candles_4h: &[Candle]) -> f64 {
+    if candles_4h.len() < 10 {
+        return 0.0;
+    }
+    let closes: Vec<f64> = candles_4h.iter().map(|c| c.close).collect();
+    let ema_fast = ema(&closes, 9);
+    let ema_slow = ema(&closes, 21);
+    let last = closes.last().copied().unwrap_or(0.0);
+    if last <= 0.0 { return 0.0; }
+    ((ema_fast - ema_slow) / last * 50.0).clamp(-1.0, 1.0)
+}
+
+/// Compute rolling 30-bar return correlation between two price series.
+pub fn compute_return_correlation(prices_a: &[f64], prices_b: &[f64]) -> f64 {
+    let window = 30;
+    if prices_a.len() < window + 1 || prices_b.len() < window + 1 {
+        return 0.5; // neutral when insufficient data
+    }
+    let returns_a: Vec<f64> = prices_a.windows(2).rev().take(window)
+        .filter_map(|w| if w[0] > 0.0 { Some((w[1] - w[0]) / w[0]) } else { None })
+        .collect();
+    let returns_b: Vec<f64> = prices_b.windows(2).rev().take(window)
+        .filter_map(|w| if w[0] > 0.0 { Some((w[1] - w[0]) / w[0]) } else { None })
+        .collect();
+    let n = returns_a.len().min(returns_b.len()) as f64;
+    if n < 5.0 { return 0.5; }
+    let mean_a = returns_a.iter().sum::<f64>() / n;
+    let mean_b = returns_b.iter().sum::<f64>() / n;
+    let cov: f64 = returns_a.iter().zip(returns_b.iter())
+        .map(|(a, b)| (a - mean_a) * (b - mean_b))
+        .sum::<f64>() / n;
+    let std_a = (returns_a.iter().map(|a| (a - mean_a).powi(2)).sum::<f64>() / n).sqrt();
+    let std_b = (returns_b.iter().map(|b| (b - mean_b).powi(2)).sum::<f64>() / n).sqrt();
+    if std_a <= 0.0 || std_b <= 0.0 { return 0.5; }
+    (cov / (std_a * std_b)).clamp(-1.0, 1.0)
+}
+
+/// Compute open interest delta (change rate, normalised).
+pub fn compute_oi_delta(current_oi: f64, prior_oi: f64) -> f64 {
+    if prior_oi <= 0.0 { return 0.0; }
+    ((current_oi - prior_oi) / prior_oi).clamp(-0.5, 0.5)
+}
+
 pub fn compute_indicator_snapshot(candles: &[Candle]) -> IndicatorSnapshot {
     let closes = candles.iter().map(|candle| candle.close).collect::<Vec<_>>();
     let volumes = candles.iter().map(|candle| candle.volume).collect::<Vec<_>>();
@@ -358,7 +460,7 @@ fn simple_moving_average(values: &[f64], period: usize) -> f64 {
     average(&window)
 }
 
-fn ema(values: &[f64], period: usize) -> f64 {
+pub fn ema(values: &[f64], period: usize) -> f64 {
     if values.is_empty() {
         return 0.0;
     }

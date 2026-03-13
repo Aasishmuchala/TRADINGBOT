@@ -382,10 +382,9 @@ fn base_inputs(
         order_flow_score,
         confirmation_score,
         news: NewsSentimentSnapshot::default(),
+        extras: sthyra_market_data::MarketExtras::default(),
     }
-}
-
-fn trend_indicator_inputs(intensity: f64) -> IndicatorGeneInputs {
+}(intensity: f64) -> IndicatorGeneInputs {
     IndicatorGeneInputs {
         rsi_bias: 0.28 * intensity,
         macd_bias: 0.34 * intensity,

@@ -68,7 +68,18 @@ pub fn default_local_config() -> AppConfig {
         mode: RuntimeMode::Paper,
         exchange: ExchangeConfig {
             exchange_name: "binance".to_string(),
-            primary_symbols: vec!["BTCUSDT".to_string(), "ETHUSDT".to_string()],
+            primary_symbols: vec![
+                "BTCUSDT".to_string(),
+                "ETHUSDT".to_string(),
+                "SOLUSDT".to_string(),
+                "BNBUSDT".to_string(),
+                "XRPUSDT".to_string(),
+                "DOGEUSDT".to_string(),
+                "ADAUSDT".to_string(),
+                "AVAXUSDT".to_string(),
+                "LINKUSDT".to_string(),
+                "DOTUSDT".to_string(),
+            ],
             use_testnet: true,
         },
         risk_limits: RiskLimits {

@@ -32,6 +32,9 @@
     "build": "next build",
     "start": "next start -p 4173",
     "tauri:dev": "tauri dev",
-    "tauri:build": "bash ./scripts/tauri-build-macos.sh"
+    "tauri:build": "tauri build",
+    "tauri:build:macos": "bash ./scripts/tauri-build-macos.sh",
+    "tauri:build:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/tauri-build-windows.ps1",
+    "tauri:dev:windows": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"cd ../.. && .\\scripts\\stack.ps1 start\" && tauri dev"
   }
 }

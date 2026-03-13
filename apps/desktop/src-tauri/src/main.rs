@@ -16,25 +16,48 @@ const DASHBOARD_READY_PATH: &str = "/api/operator";
 const STARTUP_ATTEMPTS: usize = 80;
 const STARTUP_POLL_INTERVAL_MS: u64 = 250;
 
-fn start_local_stack() {
-    let Some(repo_root) = resolve_repo_root() else {
-        eprintln!("sthyra-desktop-shell: unable to locate repository root; skipping stack bootstrap");
-        return;
-    };
+fn start_local_stack(repo_root: &Path) {
+    #[cfg(target_os = "windows")]
+    {
+        let script = repo_root.join("scripts").join("stack.ps1");
+        let _ = Command::new("powershell")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                &script.to_string_lossy(),
+                "start",
+            ])
+            .env("STHYRA_AUTO_OPEN", "0")
+            .current_dir(repo_root)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
+    }
 
-    let _ = Command::new("./scripts/stack.sh")
-        .arg("start")
-        .env("STHYRA_AUTO_OPEN", "0")
-        .current_dir(repo_root)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn();
+    #[cfg(not(target_os = "windows"))]
+    {
+        let script = repo_root.join("scripts").join("stack.sh");
+        let _ = Command::new(script)
+            .arg("start")
+            .env("STHYRA_AUTO_OPEN", "0")
+            .current_dir(repo_root)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
+    }
 }
 
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            start_local_stack();
+            if let Some(repo_root) = resolve_repo_root() {
+                start_local_stack(&repo_root);
+            } else {
+                eprintln!("sthyra-desktop-shell: unable to locate repository root; skipping stack bootstrap");
+            }
 
             let app_handle = app.handle().clone();
             thread::spawn(move || {
@@ -132,7 +155,12 @@ fn resolve_repo_root() -> Option<PathBuf> {
 
 fn walk_for_repo_root(start: &Path) -> Option<PathBuf> {
     for candidate in start.ancestors() {
-        if candidate.join("scripts/stack.sh").exists() && candidate.join("apps/desktop").exists() {
+        // Accept the repo root if either platform stack script exists alongside apps/desktop
+        let has_apps_desktop = candidate.join("apps").join("desktop").exists();
+        let has_stack = candidate.join("scripts").join("stack.sh").exists()
+            || candidate.join("scripts").join("stack.ps1").exists();
+
+        if has_apps_desktop && has_stack {
             return Some(candidate.to_path_buf());
         }
     }

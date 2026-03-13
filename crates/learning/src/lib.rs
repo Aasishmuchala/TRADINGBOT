@@ -306,6 +306,9 @@ pub fn scoped_seed_models(symbols: &[String], regimes: &[MarketRegime]) -> Vec<S
                 StrategyFamily::MomentumContinuation,
                 StrategyFamily::VwapReversion,
                 StrategyFamily::SessionSetup,
+                StrategyFamily::GridTrading,
+                StrategyFamily::DeltaNeutral,
+                StrategyFamily::BollingerBandSqueeze,
             ] {
                 scoped.push(SignalModel {
                     id: format!("{}-{:?}-{:?}", symbol.to_lowercase(), regime, family),
@@ -795,6 +798,7 @@ mod tests {
                 order_flow_score: 0.7,
                 confirmation_score: 0.8,
                 news: NewsSentimentSnapshot::default(),
+                extras: sthyra_market_data::MarketExtras::default(),
             },
         }];
 
@@ -933,6 +937,7 @@ mod tests {
                 order_flow_score: 0.47,
                 confirmation_score: 0.49,
                 news: NewsSentimentSnapshot::default(),
+                extras: sthyra_market_data::MarketExtras::default(),
             },
         }];
 
