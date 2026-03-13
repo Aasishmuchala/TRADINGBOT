@@ -510,22 +510,27 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
   const mistakes = buildMistakes(snapshot, operator);
 
   return (
-    <div className="min-h-screen bg-(--background) text-(--foreground)">
+    <div className="t-shell min-h-screen bg-(--background) text-(--foreground)" style={{fontFamily:"'IBM Plex Mono','JetBrains Mono','Fira Code',ui-monospace,Consolas,monospace"}}>
       <div className="flex min-h-screen w-full">
-        {/* ── Slim dark sidebar ── */}
-        <aside className="hidden lg:flex w-[200px] xl:w-[220px] shrink-0 flex-col bg-[#1a1a1a] dark:bg-[#111111]">
-          <div className="sticky top-0 flex h-screen flex-col px-4 py-5">
-            {/* Logo */}
-            <div className="mb-6 flex items-center gap-2.5 px-2">
-              <img alt="NyraQ mark" className="size-6 object-contain invert dark:invert-0" src="/nyraq-mark.svg" />
-              <span className="text-[13px] font-semibold tracking-[-0.02em] text-white/90">NyraQ</span>
+
+        {/* ══ SIDEBAR ══ */}
+        <aside className="hidden lg:flex w-[176px] xl:w-[192px] shrink-0 flex-col border-r" style={{background:"var(--sidebar)",borderColor:"var(--t-line)"}}>
+          <div className="sticky top-0 flex h-screen flex-col">
+
+            {/* Logo bar */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b" style={{borderColor:"var(--t-line)",borderBottomColor:"var(--t-amber)",borderBottomWidth:"1px"}}>
+              <img alt="NyraQ" className="size-5 object-contain" src="/nyraq-mark.svg" style={{filter:"brightness(0) saturate(100%) invert(60%) sepia(60%) saturate(800%) hue-rotate(5deg)"}} />
+              <div>
+                <div className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{color:"var(--t-amber)"}}>NyraQ</div>
+                <div className="text-[9px] tracking-[0.10em] uppercase" style={{color:"var(--muted-foreground)"}}>Quant OS</div>
+              </div>
             </div>
 
-            {/* Nav groups */}
-            <nav className="flex-1 space-y-6">
-              <div>
-                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Monitor</div>
-                <div className="space-y-0.5">
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto py-3">
+              <div className="px-3 mb-1">
+                <div className="text-[9px] font-bold tracking-[0.20em] uppercase px-2 py-1" style={{color:"var(--t-amber)",opacity:0.5}}>[MONITOR]</div>
+                <div className="space-y-px">
                   {navItems.filter(i => ["overview","positions","markets"].includes(i.page)).map((item) => {
                     const Icon = item.icon;
                     const active = page === item.page;
@@ -533,23 +538,24 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                       <Link
                         key={item.page}
                         href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
+                        className={cn("t-nav-item flex items-center gap-2.5 px-2 py-1.5 text-[11px] font-medium transition-colors border-l-2",
                           active
-                            ? "bg-white/12 text-white"
-                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
+                            ? "border-l-[var(--t-amber)] text-[var(--t-amber)]"
+                            : "border-l-transparent hover:border-l-white/20",
                         )}
+                        style={active ? {background:"var(--t-amber-dim)",color:"var(--t-amber)"} : {color:"var(--sidebar-foreground)",opacity:0.65}}
                       >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="font-medium">{item.label}</span>
+                        <Icon className="size-3.5 shrink-0" />
+                        <span className="tracking-[0.02em]">{item.label.toUpperCase()}</span>
                       </Link>
                     );
                   })}
                 </div>
               </div>
-              <div>
-                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Operate</div>
-                <div className="space-y-0.5">
+
+              <div className="px-3 mt-3 mb-1">
+                <div className="text-[9px] font-bold tracking-[0.20em] uppercase px-2 py-1" style={{color:"var(--t-amber)",opacity:0.5}}>[OPERATE]</div>
+                <div className="space-y-px">
                   {navItems.filter(i => ["risk","execution","review","settings"].includes(i.page)).map((item) => {
                     const Icon = item.icon;
                     const active = page === item.page;
@@ -557,15 +563,15 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                       <Link
                         key={item.page}
                         href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
+                        className={cn("t-nav-item flex items-center gap-2.5 px-2 py-1.5 text-[11px] font-medium transition-colors border-l-2",
                           active
-                            ? "bg-white/12 text-white"
-                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
+                            ? "border-l-[var(--t-amber)] text-[var(--t-amber)]"
+                            : "border-l-transparent hover:border-l-white/20",
                         )}
+                        style={active ? {background:"var(--t-amber-dim)",color:"var(--t-amber)"} : {color:"var(--sidebar-foreground)",opacity:0.65}}
                       >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="font-medium">{item.label}</span>
+                        <Icon className="size-3.5 shrink-0" />
+                        <span className="tracking-[0.02em]">{item.label.toUpperCase()}</span>
                       </Link>
                     );
                   })}
@@ -573,26 +579,31 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
               </div>
             </nav>
 
-            {/* Runtime status footer */}
-            <div className="mt-4 rounded-lg border border-white/8 bg-white/4 p-3 space-y-2">
+            {/* Status footer */}
+            <div className="px-3 py-3 border-t space-y-1.5" style={{borderColor:"var(--t-line)"}}>
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{currentModeLabel}</Badge>
-                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{snapshot.venue}</Badge>
-                <BotHealthBadge health={botHealth} />
+                <span className="text-[9px] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 border" style={{color:"var(--t-amber)",borderColor:"var(--t-amber-border)",background:"var(--t-amber-dim)"}}>{currentModeLabel}</span>
+                <span className="text-[9px] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 border" style={{color:"var(--muted-foreground)",borderColor:"var(--t-line)"}}>{snapshot.venue}</span>
               </div>
-              <p className="text-[11px] leading-4 text-white/35 truncate">{refreshState}</p>
+              <div className="flex items-center gap-1.5">
+                <span className="t-live-dot shrink-0" />
+                <p className="text-[9px] truncate" style={{color:"var(--muted-foreground)",opacity:0.7}}>{refreshState}</p>
+              </div>
+              <BotHealthBadge health={botHealth} />
             </div>
+
           </div>
         </aside>
 
         <main className="min-w-0 flex-1 flex flex-col">
+
           {/* ── Mobile nav ── */}
-          <div className="lg:hidden border-b border-border/60 bg-(--background) px-4 py-3">
-            <div className="flex items-center gap-2 mb-3">
-              <img alt="NyraQ mark" className="size-5 object-contain" src="/nyraq-mark.svg" />
-              <span className="text-sm font-semibold tracking-[-0.02em]">NyraQ</span>
+          <div className="lg:hidden border-b px-3 py-2" style={{borderColor:"var(--t-line)"}}>
+            <div className="flex items-center gap-2 mb-2">
+              <img alt="NyraQ" className="size-4 object-contain" src="/nyraq-mark.svg" style={{filter:"brightness(0) saturate(100%) invert(60%) sepia(60%) saturate(800%) hue-rotate(5deg)"}} />
+              <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--t-amber)"}}>NyraQ</span>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const active = page === item.page;
@@ -600,14 +611,12 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                   <Link
                     key={item.page}
                     href={item.href}
-                    className={cn(
-                      "flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
-                      active
-                        ? "border-foreground/20 bg-foreground text-background"
-                        : "border-border/60 bg-card text-muted-foreground hover:text-foreground",
-                    )}
+                    className="flex shrink-0 items-center gap-1.5 border px-2.5 py-1.5 text-[10px] font-bold tracking-[0.10em] uppercase transition-colors"
+                    style={active
+                      ? {borderColor:"var(--t-amber)",background:"var(--t-amber-dim)",color:"var(--t-amber)"}
+                      : {borderColor:"var(--t-line)",color:"var(--muted-foreground)"}}
                   >
-                    <Icon className="size-3.5" />
+                    <Icon className="size-3" />
                     {item.label}
                   </Link>
                 );
@@ -615,25 +624,32 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
             </div>
           </div>
 
-          {/* ── Slim topbar ── */}
-          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-(--background) px-5 lg:px-6">
+          {/* ══ TOPBAR ══ */}
+          <header className="flex h-11 shrink-0 items-center justify-between px-4 lg:px-5 border-b" style={{borderColor:"var(--t-amber)",borderBottomWidth:"1px",background:"var(--background)"}}>
             <div className="flex items-center gap-3">
-              <h1 className="text-[15px] font-semibold tracking-[-0.02em] text-foreground">{headlineForPage(page)}</h1>
+              <h1 className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{color:"var(--t-amber)"}}>{headlineForPage(page)}</h1>
+              <span className="text-[10px]" style={{color:"var(--t-line-strong)"}}>│</span>
               <BotHealthBadge health={botHealth} />
             </div>
-            <div className="flex items-center gap-2">
-              <div className="hidden text-xs text-muted-foreground sm:block">
-                {pendingOperatorAction === null ? operatorState : `Running ${pendingOperatorAction}…`}
-              </div>
-              <Button className="h-8 rounded-md px-3 text-xs" disabled={isRefreshing} onClick={() => void refreshSnapshot(true)} variant="outline">
-                <RefreshCw className={cn("size-3.5", isRefreshing && "animate-spin")} />
-                Refresh
+            <div className="flex items-center gap-3">
+              <span className="hidden text-[10px] sm:block truncate max-w-64" style={{color:"var(--muted-foreground)"}}>
+                {pendingOperatorAction === null ? operatorState : `▶ ${pendingOperatorAction}…`}
+              </span>
+              <Button
+                className="h-7 px-3 text-[10px] font-bold tracking-[0.10em] uppercase border transition-colors"
+                style={{borderColor:"var(--t-line-strong)",background:"transparent",color:"var(--foreground)",borderRadius:"0"}}
+                disabled={isRefreshing}
+                onClick={() => void refreshSnapshot(true)}
+                variant="outline"
+              >
+                <RefreshCw className={cn("size-3 mr-1", isRefreshing && "animate-spin")} />
+                SYNC
               </Button>
             </div>
           </header>
 
-          {/* ── Page content ── */}
-          <div className="flex-1 overflow-auto px-5 py-5 lg:px-6 lg:py-6 space-y-5">
+          {/* ══ PAGE CONTENT ══ */}
+          <div className="flex-1 overflow-auto p-4 lg:p-5 space-y-4">
 
           {page === "overview" ? (
             <OverviewPage
@@ -710,7 +726,7 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
 function NyraQLockup({ compact = false }: { compact?: boolean }) {
   return (
     <div className={cn("flex items-center gap-4", compact && "gap-3")}>
-      <div className={cn("flex items-center justify-center rounded-xl border border-(--glass-border) bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_92%,var(--background)_8%),color-mix(in_srgb,var(--card)_98%,transparent_2%))] shadow-(--shadow-card) ring-1 ring-white/25 backdrop-blur-xl dark:ring-white/6", compact ? "size-14" : "size-16")}>
+      <div className={cn("flex items-center justify-center  border border-(--glass-border) bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_92%,var(--background)_8%),color-mix(in_srgb,var(--card)_98%,transparent_2%))] shadow-(--shadow-card) ring-1 ring-white/25 backdrop-blur-xl dark:ring-white/6", compact ? "size-14" : "size-16")}>
         <img alt="NyraQ mark" className={cn("object-contain", compact ? "size-10" : "size-12")} src="/nyraq-mark.svg" />
       </div>
       <div className="space-y-1.5">
@@ -723,7 +739,7 @@ function NyraQLockup({ compact = false }: { compact?: boolean }) {
 
 function NyraQHeaderBadge() {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/72 px-3 py-2 ">
+    <div className="inline-flex items-center gap-2 border border-[var(--t-line)] bg-background/72 px-3 py-2">
       <img alt="NyraQ mark" className="size-6 object-contain" src="/nyraq-mark.svg" />
       <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">NyraQ</span>
     </div>
@@ -759,76 +775,79 @@ function OverviewPage({
   const liveAccountFlat = liveAccountConnected && walletBalance === null && snapshot.positions.length === 0;
 
   return (
-    <div className="space-y-5">
-      {/* ── KPI strip ── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <MetricCard label="Wallet balance" tone="neutral" value={formatUsd(walletBalance)} />
-        <MetricCard label="Realized P&L" tone={realizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(realizedPnl)} />
-        <MetricCard label="Unrealized P&L" tone={unrealizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(unrealizedPnl)} />
-        <MetricCard label="Open exposure" tone="neutral" value={formatUsd(openRiskUsd)} />
+    <div className="space-y-3">
+
+      {/* ══ ROW 1: KPI STRIP ══ */}
+      <div className="grid grid-cols-2 gap-px sm:grid-cols-4" style={{background:"var(--t-line)"}}>
+        <MetricCard label="WALLET BAL" tone="neutral" value={formatUsd(walletBalance)} />
+        <MetricCard label="REALIZED P&L" tone={realizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(realizedPnl)} />
+        <MetricCard label="UNREALIZED P&L" tone={unrealizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(unrealizedPnl)} />
+        <MetricCard label="OPEN EXPOSURE" tone="neutral" value={formatUsd(openRiskUsd)} />
       </div>
 
       {liveAccountFlat ? (
-        <div className="rounded-xl border border-border/70 bg-muted/35 px-4 py-3 text-sm leading-6 text-muted-foreground">
-          Live account connected — no wallet balance or positions yet. Totals will appear once the futures wallet is funded.
+        <div className="border px-3 py-2 text-xs" style={{borderColor:"var(--t-amber-border)",background:"var(--t-amber-dim)",color:"var(--t-amber)"}}>
+          ▶ LIVE ACCOUNT CONNECTED — NO WALLET BALANCE OR POSITIONS YET
         </div>
       ) : null}
 
-      {/* ── Bot health chips + trade stats ── */}
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Bot health</span>
+      {/* ══ ROW 2: BOT STATUS + TRADE STATS + SYMBOL SCAN ══ */}
+      <div className="grid gap-px lg:grid-cols-[1fr_180px]" style={{background:"var(--t-line)"}}>
+
+        {/* Bot health panel */}
+        <div className="border-0 px-3 py-2.5 space-y-2" style={{background:"var(--card)"}}>
+          <div className="flex items-center justify-between gap-2 border-b pb-2" style={{borderColor:"var(--t-line)"}}>
+            <span className="text-[9px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--muted-foreground)"}}>BOT HEALTH</span>
             <BotHealthBadge health={botHealth} />
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <WatchMetric label="Paper posture" value={botHealth.paper_status} />
-            <WatchMetric label="Startup" value={botHealth.startup_status} />
-            <WatchMetric label="Execution" value={botHealth.execution_status} />
-            <WatchMetric label="Monitor" value={botHealth.monitor_status} />
+          <div className="grid grid-cols-2 gap-px sm:grid-cols-4" style={{background:"var(--t-line)"}}>
+            <WatchMetric label="PAPER" value={botHealth.paper_status} />
+            <WatchMetric label="STARTUP" value={botHealth.startup_status} />
+            <WatchMetric label="EXEC" value={botHealth.execution_status} />
+            <WatchMetric label="MONITOR" value={botHealth.monitor_status} />
           </div>
-          <p className="text-xs leading-5 text-muted-foreground">{botHealth.summary}</p>
+          <p className="text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>{botHealth.summary}</p>
         </div>
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2 lg:w-52">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Trade stats</span>
-          <div className="grid grid-cols-2 gap-2">
-            <MetricBlock compact label="Win rate" value={formatPercent(tradeSummary.winRate, 1)} />
-            <MetricBlock compact label="Profit factor" value={formatNumber(tradeSummary.profitFactor)} />
-            <MetricBlock compact label="Expectancy" value={formatSignedUsd(tradeSummary.expectancyPerTrade)} />
-            <MetricBlock compact label="Trades" value={String(tradeSummary.closedTrades)} />
+
+        {/* Trade stats */}
+        <div className="border-0 px-3 py-2.5 space-y-2" style={{background:"var(--card)"}}>
+          <span className="text-[9px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--muted-foreground)"}}>TRADE STATS</span>
+          <div className="grid grid-cols-2 gap-px" style={{background:"var(--t-line)"}}>
+            <MetricBlock compact label="WIN RATE" value={formatPercent(tradeSummary.winRate, 1)} />
+            <MetricBlock compact label="PROF FACTOR" value={formatNumber(tradeSummary.profitFactor)} />
+            <MetricBlock compact label="EXPECTANCY" value={formatSignedUsd(tradeSummary.expectancyPerTrade)} />
+            <MetricBlock compact label="TRADES" value={String(tradeSummary.closedTrades)} />
           </div>
         </div>
       </div>
 
-      {/* ── Symbol scan strip ── */}
-      <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Symbol scan</span>
-        <div className="grid gap-1.5 grid-cols-5 sm:grid-cols-10">
+      {/* ══ ROW 3: SYMBOL WATCHLIST ══ */}
+      <div className="border" style={{background:"var(--card)",borderColor:"var(--t-line)"}}>
+        <div className="flex items-center gap-2 px-3 py-1.5 border-b" style={{borderColor:"var(--t-line)"}}>
+          <span className="text-[9px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--muted-foreground)"}}>WATCHLIST</span>
+          <span className="text-[9px]" style={{color:"var(--t-line-strong)"}}>──</span>
+          <span className="text-[9px]" style={{color:"var(--muted-foreground)",opacity:0.6}}>10 SYMBOLS · LIVE SCAN</span>
+        </div>
+        <div className="grid gap-px grid-cols-5 sm:grid-cols-10" style={{background:"var(--t-line)"}}>
           {["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","DOTUSDT"].map((sym) => {
             const op = snapshot.opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
             const conf = op ? parseFloat(op.confidence) : 0;
             const isGood = op && !op.regime.includes("NoTrade") && !op.regime.includes("Disordered");
             const isBad = op && (op.regime.includes("NoTrade") || op.regime.includes("Disordered"));
+            const symColor = isGood ? "var(--t-green)" : isBad ? "var(--t-red)" : "var(--muted-foreground)";
+            const symBg = isGood ? "rgba(74,222,128,0.06)" : isBad ? "rgba(248,113,113,0.06)" : "var(--card)";
             return (
-              <div
-                className={cn(
-                  "relative overflow-hidden rounded-lg border px-2 py-2 text-center",
-                  isGood ? "border-(--success-border) bg-(--success-surface)" :
-                  isBad ? "border-(--danger-border) bg-(--danger-surface)" :
-                  "border-border/60 bg-muted/25",
-                )}
-                key={sym}
-              >
-                <div className="text-xs font-semibold tracking-[-0.02em] text-foreground">{sym.replace("USDT","")}</div>
-                <div className="mt-0.5 text-[9px] uppercase tracking-[0.1em] text-muted-foreground truncate">{op ? op.action : "—"}</div>
+              <div className="px-2 py-2 text-center border-0" key={sym} style={{background:symBg}}>
+                <div className="text-[11px] font-bold" style={{color:symColor}}>{sym.replace("USDT","")}</div>
+                <div className="text-[8px] font-bold uppercase tracking-[0.08em] mt-0.5" style={{color:symColor,opacity:0.8}}>{op ? op.action.slice(0,4) : "——"}</div>
                 {op && (
-                  <div className={cn("text-[8px] tabular-nums mt-0.5", (op.htf_trend_bias ?? 0) > 0.3 ? "text-(--success-foreground)" : (op.htf_trend_bias ?? 0) < -0.3 ? "text-(--danger-foreground)" : "text-muted-foreground")}>
-                    {(op.htf_trend_bias ?? 0) > 0.3 ? "↑" : (op.htf_trend_bias ?? 0) < -0.3 ? "↓" : "—"}
+                  <div className="text-[8px] tabular-nums" style={{color:(op.htf_trend_bias ?? 0) > 0.3 ? "var(--t-green)" : (op.htf_trend_bias ?? 0) < -0.3 ? "var(--t-red)" : "var(--muted-foreground)"}}>
+                    {(op.htf_trend_bias ?? 0) > 0.3 ? "▲" : (op.htf_trend_bias ?? 0) < -0.3 ? "▼" : "—"}
                   </div>
                 )}
                 {op && conf > 0 && (
-                  <div className="mt-1 h-[2px] w-full overflow-hidden rounded-full bg-black/10">
-                    <div className="h-full rounded-full" style={{ width: `${Math.min(100, conf * 100)}%`, background: isGood ? "var(--cal-green-text)" : isBad ? "var(--cal-red-text)" : "currentColor" }} />
+                  <div className="mt-1 h-px w-full overflow-hidden" style={{background:"var(--t-line)"}}>
+                    <div className="h-full" style={{width:`${Math.min(100, conf * 100)}%`,background:symColor}} />
                   </div>
                 )}
               </div>
@@ -837,38 +856,40 @@ function OverviewPage({
         </div>
       </div>
 
-      {/* ── Chart + side panel ── */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
+      {/* ══ ROW 4: CHART + SIDE PANEL ══ */}
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
         <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Current attention */}
-          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current attention</span>
-            <p className="text-sm leading-6 text-foreground">
+          <div className="border px-3 py-2.5 space-y-1.5" style={{background:"var(--card)",borderColor:"var(--t-line)"}}>
+            <span className="text-[9px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--muted-foreground)"}}>CURRENT POSITION</span>
+            <p className="text-xs leading-5" style={{color:"var(--foreground)"}}>
               {topPosition
-                ? `${topPosition.symbol} — ${formatSignedUsd(topPosition.unrealized_pnl)} unrealized P&L.${topPositionEntryTimestamp !== null ? ` Open ${formatRelativeDuration(topPositionEntryTimestamp)}.` : ""}`
-                : "No live position. Preserve capital instead of forcing exposure."}
+                ? `${topPosition.symbol}  ${formatSignedUsd(topPosition.unrealized_pnl)} P&L${topPositionEntryTimestamp !== null ? `  open ${formatRelativeDuration(topPositionEntryTimestamp)}` : ""}`
+                : "FLAT — no live position"}
             </p>
             {topOpportunity && (
-              <p className="text-xs leading-5 text-muted-foreground">
-                Best opp: {topOpportunity.symbol} {formatStrategyFamily(topOpportunity.family)} · {topOpportunity.action.toLowerCase()} · conf {topOpportunity.confidence} · HTF {(topOpportunity.htf_trend_bias ?? 0) >= 0 ? "+" : ""}{(topOpportunity.htf_trend_bias ?? 0).toFixed(2)}
+              <p className="text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>
+                BEST: {topOpportunity.symbol} {topOpportunity.action} conf={topOpportunity.confidence} HTF={((topOpportunity.htf_trend_bias ?? 0) >= 0 ? "+" : "")}{(topOpportunity.htf_trend_bias ?? 0).toFixed(2)}
               </p>
             )}
           </div>
           {/* Mistakes */}
-          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mistakes to avoid</span>
-            <div className="space-y-2">
+          <div className="border" style={{background:"var(--card)",borderColor:"var(--t-line)"}}>
+            <div className="px-3 py-1.5 border-b" style={{borderColor:"var(--t-line)"}}>
+              <span className="text-[9px] font-bold tracking-[0.16em] uppercase" style={{color:"var(--t-red)"}}>⚠ MISTAKES TO AVOID</span>
+            </div>
+            <div className="divide-y" style={{borderColor:"var(--t-line)"}}>
               {mistakes.map((mistake) => (
-                <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5" key={mistake.title}>
-                  <div className="text-xs font-semibold text-foreground">{mistake.title}</div>
-                  <div className="mt-1 text-xs leading-5 text-muted-foreground">{mistake.why}</div>
+                <div className="px-3 py-2" key={mistake.title} style={{borderColor:"var(--t-line)"}}>
+                  <div className="text-[10px] font-bold" style={{color:"var(--foreground)"}}>{mistake.title}</div>
+                  <div className="mt-0.5 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>{mistake.why}</div>
                 </div>
               ))}
             </div>
           </div>
           {/* Proven execution */}
-          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+          <div className="grid gap-px sm:grid-cols-2 xl:grid-cols-1" style={{background:"var(--t-line)"}}>
             <ProvenExecutionCard
               body={botHealth.last_paper_entry_at_ms !== null ? `Proven paper entry ${formatRelativeDuration(botHealth.last_paper_entry_at_ms)}.` : botHealth.awaiting_first_paper_fill ? "Warmup — waiting for first paper fill." : "No fresh paper entry proven yet."}
               label="Last proven entry"
@@ -910,24 +931,24 @@ function PositionsPage({
     : "No daily balance closes are available yet.";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {liveAccountFlat ? (
-        <div className="rounded-xl border border-border/70 bg-muted/35 px-5 py-4 text-sm leading-6 text-muted-foreground">
+        <div className="px-3 py-2.5 text-[10px] leading-4" style={{background:"var(--card)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
           Positions and balance history are live, but the connected Binance Futures account is currently flat: zero open positions and zero non-zero wallet balances.
         </div>
       ) : null}
 
-      <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Open positions</CardTitle>
+      <div className="grid gap-3 xl:grid-cols-[1.08fr_0.92fr]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Open positions</CardTitle>
             <CardDescription>Current exposure, leverage, and unrealized mark-to-market.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-3 pb-3">
             {snapshot.positions.length === 0 ? (
               <EmptyState message={emptyPositionsMessage} />
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border/70">
+              <div className="overflow-hidden border border-[var(--t-line)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -970,27 +991,27 @@ function PositionsPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Balance calendar</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Balance calendar</CardTitle>
             <CardDescription>Daily closes with the same green/red logic operators use to assess discipline.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-3 pb-3">
             <BalanceCalendar days={balanceSummary.calendar} emptyMessage={emptyBalanceMessage} />
           </CardContent>
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Recent closed trades</CardTitle>
+      <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+        <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+          <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Recent closed trades</CardTitle>
           <CardDescription>The last eight closures with source quality and realized result.</CardDescription>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-3 pb-3">
           {tradeSummary.recentTrades.length === 0 ? (
             <EmptyState message="No closed trades recorded yet." />
           ) : (
-            <div className="overflow-hidden rounded-xl border border-border/70">
+            <div className="overflow-hidden border border-[var(--t-line)]">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1064,12 +1085,12 @@ function SymbolHeatmap({
   }
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
-      <CardHeader className="pb-2 pt-4 px-4">
-        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Symbol heatmap</CardTitle>
+    <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+      <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+        <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Symbol heatmap</CardTitle>
         <CardDescription>Top candidate per symbol. Green = tradeable regime. Funding, HTF bias, and depth imbalance shown per cell.</CardDescription>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-3 pb-3">
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {displaySymbols.map((sym) => {
             const op = opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
@@ -1080,7 +1101,7 @@ function SymbolHeatmap({
                 ? "border-(--success-border) bg-(--success-surface)"
                 : tone === "negative"
                   ? "border-(--danger-border) bg-(--danger-surface)"
-                  : "border-border/60 bg-muted/25";
+                  : "border-[var(--t-line)] bg-[var(--muted)]";
 
             const fundingRate = op?.funding_rate ?? 0;
             const htf = op?.htf_trend_bias ?? 0;
@@ -1094,7 +1115,7 @@ function SymbolHeatmap({
 
             return (
               <div
-                className={cn("relative overflow-hidden rounded-lg border px-4 py-3 transition-all", toneClass)}
+                className={cn("relative overflow-hidden  border px-4 py-3 transition-all", toneClass)}
                 key={sym}
               >
                 <div className="text-sm font-semibold tracking-[-0.02em] text-foreground">
@@ -1131,9 +1152,9 @@ function SymbolHeatmap({
                       </div>
                     )}
                     {/* Confidence bar */}
-                    <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-black/10">
+                    <div className="mt-2 h-[3px] w-full overflow-hidden bg-black/10">
                       <div
-                        className="h-full rounded-full transition-all duration-500"
+                        className="h-full transition-all duration-500"
                         style={{
                           width: `${Math.min(100, conf * 100)}%`,
                           background: conf >= 0.75 ? "var(--cal-green-text)" : conf >= 0.55 ? "currentColor" : "rgba(148,163,184,0.6)",
@@ -1192,16 +1213,16 @@ function StrategiesPage({
   const latestCandle = scopedSnapshot.candle_points.at(-1) ?? null;
 
   return (
-    <div className="space-y-6">
-      <Card className="rounded-xl border-border/60 bg-card">
+    <div className="space-y-3">
+      <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
         <CardContent className="px-4 pb-4 grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
-              <Badge className="rounded-full" variant="secondary">{selectedSymbol === "All" ? "All symbols" : selectedSymbol}</Badge>
+              <Badge variant="outline">Markets workstation</Badge>
+              <Badge variant="secondary">{selectedSymbol === "All" ? "All symbols" : selectedSymbol}</Badge>
             </div>
             <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Signal intelligence, opportunity queue, and live chart in one surface.</div>
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Select a symbol from the watchlist to load its chart, indicators, and live signal context. Consensus, HTF bias, and funding rate update each cycle.</p>
+            <p className="max-w-3xl text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>Select a symbol from the watchlist to load its chart, indicators, and live signal context. Consensus, HTF bias, and funding rate update each cycle.</p>
           </div>
           <div className="space-y-2">
             <div className="grid gap-2 grid-cols-3">
@@ -1218,7 +1239,7 @@ function StrategiesPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)] 2xl:grid-cols-[minmax(0,1.24fr)_minmax(22rem,0.76fr)]">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)] 2xl:grid-cols-[minmax(0,1.24fr)_minmax(22rem,0.76fr)]">
         <div>
           <TradingViewPanel
             activePosition={selectedPosition}
@@ -1251,17 +1272,17 @@ function StrategiesPage({
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Opportunity queue</CardTitle>
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Opportunity queue</CardTitle>
             <CardDescription>All active candidates ranked by confluence score with full signal context — funding, HTF bias, OI delta, depth, and BTC correlation.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-3 pb-3">
             {scopedSnapshot.opportunities.length === 0 ? (
               <EmptyState message="No strategy candidates are currently queued." />
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border/70">
+              <div className="overflow-hidden border border-[var(--t-line)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1302,7 +1323,7 @@ function StrategiesPage({
                           <TableCell className={cn("text-right tabular-nums text-xs", depthTone)}>{depth >= 0 ? "+" : ""}{depth.toFixed(2)}</TableCell>
                           <TableCell className={cn("text-right tabular-nums text-xs", corrTone)}>{corr.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Badge className={cn("rounded-full border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
+                            <Badge className={cn("border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
                           </TableCell>
                         </TableRow>
                       );
@@ -1314,9 +1335,9 @@ function StrategiesPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research leaderboard</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Research leaderboard</CardTitle>
             <CardDescription>Top promoted models and their threshold posture.</CardDescription>
           </CardHeader>
           <CardContent className="px-4 pb-4 space-y-4">
@@ -1324,13 +1345,13 @@ function StrategiesPage({
               <EmptyState message="No research leaderboard is available yet." />
             ) : (
               scopedSnapshot.research_models.slice(0, 8).map((model) => (
-                <div className="rounded-xl border border-border/70 bg-muted/35 p-5" key={model.id}>
+                <div className="p-5" style={{background:"var(--card)",border:"1px solid var(--t-line)"}} key={model.id}>
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <div className="text-sm font-medium text-foreground">{model.id}</div>
                       <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{model.symbol} · {model.family} · {model.regime}</div>
                     </div>
-                    <Badge className="rounded-full border-border/70 bg-background text-foreground" variant="outline">score {model.score.toFixed(2)}</Badge>
+                    <Badge className="border-[var(--t-line)] bg-background text-foreground" variant="outline">score {model.score.toFixed(2)}</Badge>
                   </div>
                   <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-muted-foreground">
                     <MetricBlock label="Profitability" value={formatNumber(model.profitability)} compact />
@@ -1347,9 +1368,9 @@ function StrategiesPage({
 
       <SymbolHeatmap opportunities={snapshot.opportunities} symbols={availableSymbols} />
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">What this means for entries</CardTitle>
+      <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+        <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+          <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>What this means for entries</CardTitle>
           <CardDescription>Do not treat a queued candidate as a trade signal without confirming indicator posture and live trade quality.</CardDescription>
         </CardHeader>
         <CardContent className="px-4 pb-4 grid gap-4 md:grid-cols-3">
@@ -1367,37 +1388,37 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
   const retentionExecPct = percentUsed(operator.audit.retention.executionEvents.currentCount, operator.audit.retention.executionEvents.limit);
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Risk posture</CardTitle>
+    <div className="space-y-3">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Risk posture</CardTitle>
             <CardDescription>Live qualitative notes, system gate, and sentiment modifiers.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             <div className="grid gap-4 lg:grid-cols-2">
               <MetricBlock label="Execution summary" value={snapshot.execution_summary} />
               <MetricBlock label="Exchange gate" value={snapshot.exchange_gate} />
               <MetricBlock label="Sentiment" value={formatNumber(snapshot.news_sentiment.sentiment_score)} />
               <MetricBlock label="Risk-off flag" value={snapshot.news_sentiment.risk_off ? "True" : "False"} />
             </div>
-            <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
+            <div className="px-3 py-3 text-[10px] leading-4" style={{background:"var(--card)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
               {snapshot.risk_notes.length > 0 ? snapshot.risk_notes.join(" • ") : "No additional risk notes were emitted in the current snapshot."}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Audit pressure</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Audit pressure</CardTitle>
             <CardDescription>Retention and incident pressure that can quietly degrade launch quality.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             <RetentionBar label="Order intent retention" percent={retentionOrderPct} detail={`${operator.audit.retention.orderIntents.currentCount}/${operator.audit.retention.orderIntents.limit}`} />
             <RetentionBar label="Execution event retention" percent={retentionExecPct} detail={`${operator.audit.retention.executionEvents.currentCount}/${operator.audit.retention.executionEvents.limit}`} />
             <div className="space-y-3">
               {(operator.audit.incidents.length > 0 ? operator.audit.incidents : [{ id: 0, mode: snapshot.mode, message: "No active incidents in the audit feed." }]).slice(0, 6).map((incident) => (
-                <div className="rounded-lg border border-border/70 bg-muted/35 px-5 py-4 text-sm text-muted-foreground" key={`${incident.id}-${incident.message}`}>
+                <div className=" border border-[var(--t-line)] bg-[var(--muted)] px-5 py-4 text-sm text-muted-foreground" key={`${incident.id}-${incident.message}`}>
                   <span className="font-medium text-foreground">{incident.mode}</span>
                   <span className="mx-2 text-border">/</span>
                   {incident.message}
@@ -1408,21 +1429,21 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Overlay comparator</CardTitle>
+      <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+        <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+          <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Overlay comparator</CardTitle>
           <CardDescription>Scoped overlay validation belongs in risk because it explains how promoted indicators alter approvals.</CardDescription>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-3 pb-3">
           {operator.overlayCompare ? (
-            <div className="space-y-5">
+            <div className="space-y-3">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricCard label="Promoted indicator" tone="neutral" value={operator.overlayCompare.promoted_indicator ?? "None"} compact />
                 <MetricCard label="Changed candidates" tone={operator.overlayCompare.changed_candidates > 0 ? "positive" : "neutral"} value={String(operator.overlayCompare.changed_candidates)} compact />
                 <MetricCard label="Approvals without" tone="neutral" value={String(operator.overlayCompare.approvals_without_overlay)} compact />
                 <MetricCard label="Approvals with" tone="neutral" value={String(operator.overlayCompare.approvals_with_overlay)} compact />
               </div>
-              <div className="overflow-hidden rounded-xl border border-border/70">
+              <div className="overflow-hidden border border-[var(--t-line)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1455,12 +1476,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
                     <MetricCard label="Flat" tone="neutral" value={String(operator.overlayEffect.flat_candidates)} compact />
                     <MetricCard label="Insufficient" tone="neutral" value={String(operator.overlayEffect.insufficient_candidates)} compact />
                   </div>
-                  <div className="rounded-xl border border-border/70 bg-muted/20 p-4 text-sm leading-6 text-muted-foreground">
+                  <div className="px-3 py-3 text-[10px] leading-4" style={{background:"var(--muted)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
                     This is observational, not counterfactual. It prefers exact indicator-attributed closed trades when they exist and falls back to model-attributed trades only when indicator history is not yet available.
                   </div>
                   <div className="space-y-3">
                     {operator.overlayEffect.candidates.map((candidate) => (
-                      <div className="rounded-xl border border-border/70 bg-muted/35 p-5" key={`${candidate.scenario}-${candidate.selected_model_id ?? candidate.family}`}>
+                      <div className="p-5" style={{background:"var(--card)",border:"1px solid var(--t-line)"}} key={`${candidate.scenario}-${candidate.selected_model_id ?? candidate.family}`}>
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-medium text-foreground">{candidate.scenario}</div>
@@ -1468,7 +1489,7 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
                               {candidate.symbol} · {candidate.family} · {candidate.selected_model_id ?? "No model attribution"} · {candidate.selected_indicator_id ?? "No indicator attribution"}
                             </div>
                           </div>
-                          <Badge className={cn("rounded-full border", candidate.quality_trend === "improving" ? toneClasses("good") : candidate.quality_trend === "weakening" ? toneClasses("risk") : toneClasses("warn"))} variant="outline">
+                          <Badge className={cn(" border", candidate.quality_trend === "improving" ? toneClasses("good") : candidate.quality_trend === "weakening" ? toneClasses("risk") : toneClasses("warn"))} variant="outline">
                             {candidate.quality_trend}
                           </Badge>
                         </div>
@@ -1484,7 +1505,7 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
                           <MetricBlock label="Recent avg P&L" value={candidate.recent_average_pnl === null ? "N/A" : formatSignedUsd(candidate.recent_average_pnl)} compact />
                           <MetricBlock label="Prior avg P&L" value={candidate.prior_average_pnl === null ? "N/A" : formatSignedUsd(candidate.prior_average_pnl)} compact />
                         </div>
-                        <div className="mt-3 text-xs text-muted-foreground">
+                        <div className="mt-3 text-[10px]" style={{color:"var(--muted-foreground)"}}>
                           {candidate.last_trade_at !== null
                             ? `Last ${candidate.attribution_basis === "indicator" ? "indicator" : candidate.attribution_basis === "model" ? "model" : "attributed"} trade ${formatTimestampMs(candidate.last_trade_at)}.`
                             : "No attributed trades have closed yet for this changed candidate."}
@@ -1528,14 +1549,14 @@ function ExecutionPage({
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode and control plane</CardTitle>
+    <div className="space-y-3">
+      <div className="grid gap-3 xl:grid-cols-[0.9fr_1.1fr]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Mode and control plane</CardTitle>
             <CardDescription>Dedicated operator page with real actions instead of sharing space with charts and review.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             {(() => {
               const modeDescriptions: Record<string, { label: string; desc: string }> = {
                 Research: { label: "Research", desc: "No fills. Scores candidates and trains models in the background only." },
@@ -1551,10 +1572,10 @@ function ExecutionPage({
                     return (
                       <button
                         className={cn(
-                          "flex w-full flex-col items-start gap-1 rounded-lg border px-4 py-4 text-left transition-all",
+                          "flex w-full flex-col items-start gap-1  border px-4 py-4 text-left transition-all",
                           isActive
                             ? "border-foreground/25 bg-foreground text-background shadow-(--shadow-card)"
-                            : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
+                            : "border-[var(--t-line)] bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
                           pendingOperatorAction !== null && "cursor-not-allowed opacity-50",
                         )}
                         disabled={pendingOperatorAction !== null}
@@ -1574,9 +1595,9 @@ function ExecutionPage({
                 </div>
               );
             })()}
-            <div className="rounded-lg border border-border/60 bg-muted/20 px-4 py-3 mb-1">
+            <div className=" border border-[var(--t-line)] bg-muted/20 px-4 py-3 mb-1">
               <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Maintenance actions</p>
-              <p className="mt-1 text-xs text-muted-foreground">These run once and report back to the event feed. Safe to run at any time without affecting live positions.</p>
+              <p className="mt-1 text-[10px]" style={{color:"var(--muted-foreground)"}}>These run once and report back to the event feed. Safe to run at any time without affecting live positions.</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <ActionButton action="status" icon={Activity} label="Stack status" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
@@ -1586,12 +1607,12 @@ function ExecutionPage({
               <ActionButton action="compact-audit-db" icon={Gauge} label="Compact audit DB" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="prune-legacy-incidents" icon={ShieldCheck} label="Normalize incidents" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="clear-maintenance-history" icon={Eraser} label="Clear maint. history" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
-              <Button className="justify-start rounded-lg px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction("restart-supervisor")} variant="secondary">
+              <Button className="justify-start px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction("restart-supervisor")} variant="secondary">
                 <RotateCcw className={cn("size-4", pendingOperatorAction === "restart-supervisor" && "animate-spin")} />
                 Restart supervisor
               </Button>
               <Button
-                className="justify-start rounded-lg px-4 py-5"
+                className="justify-start px-4 py-5"
                 disabled={pendingOperatorAction !== null}
                 onClick={() => {
                   if (!stopArmed) {
@@ -1608,14 +1629,14 @@ function ExecutionPage({
               </Button>
             </div>
             {stopArmed ? (
-              <div className="rounded-lg border border-(--danger-border) bg-(--danger-surface) px-5 py-4 text-sm text-(--danger-foreground)">
+              <div className=" border border-(--danger-border) bg-(--danger-surface) px-5 py-4 text-sm text-(--danger-foreground)">
                 Emergency stop is armed for 6 seconds.
               </div>
             ) : null}
-            <div className="rounded-xl border border-border/70 bg-muted/35 p-5">
+            <div className="p-5" style={{background:"var(--card)",border:"1px solid var(--t-line)"}}>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Live execution posture</div>
               {livePositions.length === 0 ? (
-                <div className="mt-2 text-sm leading-6 text-muted-foreground">No live positions are open, so execution actions are currently operating from a flat book.</div>
+                <div className="mt-2 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>No live positions are open, so execution actions are currently operating from a flat book.</div>
               ) : (
                 <div className="mt-4 space-y-4">
                   <div className="grid gap-4 sm:grid-cols-3">
@@ -1625,7 +1646,7 @@ function ExecutionPage({
                   </div>
                   <div className="space-y-3">
                     {livePositions.slice(0, 4).map((position) => (
-                      <div className="rounded-lg border border-border/70 bg-background/80 px-5 py-4 text-sm" key={position.symbol}>
+                      <div className=" border border-[var(--t-line)] bg-background/80 px-5 py-4 text-sm" key={position.symbol}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="font-medium text-foreground">{position.symbol}</span>
                           <span className="text-muted-foreground">{formatNumber(position.quantity, 4)} @ {formatUsd(position.entry_price, 2)}</span>
@@ -1644,19 +1665,19 @@ function ExecutionPage({
           </CardContent>
         </Card>
 
-        <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
+        <div className="space-y-3">
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Runtime health</CardTitle>
+                  <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Runtime health</CardTitle>
                   <CardDescription>Execution-side status for mode, monitor freshness, and whether recent paper activity proves the bot is still working.</CardDescription>
                 </div>
                 <BotHealthBadge health={botHealth} prominent />
               </div>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-4">
-              <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
+              <div className="p-5 text-xs leading-5" style={{background:"var(--card)",border:"1px solid var(--t-line)"}}>{botHealth.summary}</div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock compact label="Paper posture" tone={botHealth.paper_ready ? "positive" : "negative"} value={botHealth.paper_status} />
                 <MetricBlock compact label="Week monitor" tone={botHealth.monitor_fresh ? "positive" : "negative"} value={botHealth.monitor_status} />
@@ -1669,10 +1690,10 @@ function ExecutionPage({
               </div>
               <div className="space-y-3">
                 {botHealth.reasons.slice(0, 4).map((reason) => (
-                  <div className="rounded-lg border border-border/70 bg-background/80 px-4 py-3 text-sm leading-6 text-muted-foreground" key={reason}>{reason}</div>
+                  <div className=" border border-[var(--t-line)] bg-background/80 px-4 py-3 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}} key={reason}>{reason}</div>
                 ))}
                 {botHealth.last_alert_message ? (
-                  <div className="rounded-lg border border-(--warning-border) bg-(--warning-surface) px-4 py-3 text-sm leading-6 text-(--warning-foreground)">
+                  <div className=" border border-(--warning-border) bg-(--warning-surface) px-4 py-3 text-sm leading-6 text-(--warning-foreground)">
                     Latest monitor alert: {botHealth.last_alert_message}
                   </div>
                 ) : null}
@@ -1680,9 +1701,9 @@ function ExecutionPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Operator event feed</CardTitle>
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+              <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Operator event feed</CardTitle>
               <CardDescription>Recent supervisor, maintenance, and mode-change events.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
@@ -1690,14 +1711,14 @@ function ExecutionPage({
                 <EmptyState message="No operator events are available." />
               ) : (
                 operator.events.map((event) => (
-                  <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={event.id}>
+                  <div className=" border border-[var(--t-line)] bg-[var(--muted)] p-4" key={event.id}>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge className={cn("rounded-full border", toneClasses(event.level))} variant="outline">{event.level}</Badge>
+                      <Badge className={cn("border", toneClasses(event.level))} variant="outline">{event.level}</Badge>
                       <span className="text-sm font-medium text-foreground">{event.action}</span>
-                      <span className="text-xs text-muted-foreground">{formatOperatorTimestamp(event.timestamp)}</span>
+                      <span className="text-[10px]" style={{color:"var(--muted-foreground)"}}>{formatOperatorTimestamp(event.timestamp)}</span>
                     </div>
                     <div className="mt-2 text-sm text-foreground">{event.message}</div>
-                    {event.detail ? <div className="mt-1 text-sm leading-6 text-muted-foreground">{event.detail}</div> : null}
+                    {event.detail ? <div className="mt-1 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>{event.detail}</div> : null}
                   </div>
                 ))
               )}
@@ -2124,14 +2145,14 @@ function ReviewPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Realized equity curve</CardTitle>
+    <div className="space-y-3">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Realized equity curve</CardTitle>
             <CardDescription>The equity curve now follows the same active review slice as the filters, metrics, and table.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             <div className="grid gap-4 md:grid-cols-3">
               <MetricBlock compact label="Curve points" value={String(filteredEquityCurve.length)} />
               <MetricBlock compact label="Slice net P&L" value={formatSignedUsd(reviewMetrics.realizedPnlTotal)} />
@@ -2144,7 +2165,7 @@ function ReviewPage({
               visibleIndex: selectedTradeIndexOnCurve,
             }} />
             {selectedTrade ? (
-              <div className={cn("rounded-lg border px-5 py-4 text-sm", selectedTradeIndexOnCurve >= 0 ? "border-border/70 bg-muted/25" : "border-(--warning-border) bg-(--warning-surface) text-(--warning-foreground)")}>
+              <div className={cn(" border px-5 py-4 text-sm", selectedTradeIndexOnCurve >= 0 ? "border-[var(--t-line)] bg-[var(--muted)]" : "border-(--warning-border) bg-(--warning-surface) text-(--warning-foreground)")}>
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Selected trade context</div>
                 {selectedTradeIndexOnCurve >= 0 ? (
                   <div className="mt-3 leading-6 text-muted-foreground">
@@ -2161,12 +2182,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review guardrails</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Review guardrails</CardTitle>
             <CardDescription>Filters now drive the review lens, so the metrics below reflect the current slice.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             <MetricBlock label="Filtered trades" value={String(reviewMetrics.closedTrades)} />
             <MetricBlock label="Exact coverage" value={formatPercent(reviewMetrics.exactCoverageRate ?? exactCoverage, 0)} />
             <MetricBlock label="Average win" value={formatSignedUsd(reviewMetrics.averageWinPnl)} />
@@ -2174,7 +2195,7 @@ function ReviewPage({
             <MetricBlock label="Avg P&L ratio" value={formatSignedNumber(reviewMetrics.averagePnlRatio)} />
             <MetricBlock label="Avg hold" value={formatDurationMs(averageTradeDurationMs)} />
             <MetricBlock label="Longest hold" value={formatDurationMs(longestTradeDurationMs)} />
-            <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
+            <div className="px-3 py-3 text-[10px] leading-4" style={{background:"var(--card)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
               {reviewError
                 ? `Review API degraded: ${reviewError}`
                 : (reviewMetrics.exactCoverageRate ?? exactCoverage) !== null && (reviewMetrics.exactCoverageRate ?? exactCoverage)! < 0.6
@@ -2187,18 +2208,18 @@ function ReviewPage({
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice versus full book</CardTitle>
+      <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+        <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+          <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Slice versus full book</CardTitle>
           <CardDescription>
             {isFocusedSlice
               ? `The current review slice ${currentSliceLabel} is compared directly against the full closed-trade history.`
               : "No focused slice is active yet. Click a ranked slice to compare it directly against the full closed-trade history."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="px-4 pb-4 space-y-5">
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-            <div className="rounded-xl border border-border/70 bg-muted/25 p-5">
+        <CardContent className="px-4 pb-4 space-y-3">
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+            <div className="bg-[var(--muted)] p-5" style={{border:"1px solid var(--t-line)"}}>
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Current slice</div>
               <div className="mt-2 text-sm font-medium text-foreground">{currentSliceLabel}</div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2212,10 +2233,10 @@ function ReviewPage({
             </div>
 
             <div className="hidden items-center justify-center lg:flex">
-              <div className="rounded-full border border-border/70 bg-background px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Vs</div>
+              <div className=" border border-[var(--t-line)] bg-background px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Vs</div>
             </div>
 
-            <div className="rounded-xl border border-border/70 bg-muted/10 p-5">
+            <div className="bg-muted/10 p-5" style={{border:"1px solid var(--t-line)"}}>
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Full book</div>
               <div className="mt-2 text-sm font-medium text-foreground">All closed trades</div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2239,13 +2260,13 @@ function ReviewPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-5 xl:grid-cols-[1.04fr_0.96fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice rankings</CardTitle>
+      <div className="grid gap-3 xl:grid-cols-[1.04fr_0.96fr]">
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Slice rankings</CardTitle>
             <CardDescription>Best and weakest model-regime-family combinations inside the current filtered review universe. Applying a slice resets the secondary filters so you review the exact cohort.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 grid gap-5 2xl:grid-cols-2">
+          <CardContent className="px-4 pb-4 grid gap-3 2xl:grid-cols-2">
             <div className="space-y-4">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Best slices</div>
               {sliceRankings.best.length === 0 ? (
@@ -2255,13 +2276,13 @@ function ReviewPage({
                   const active = isSliceActive(slice);
 
                   return (
-                  <div className={cn("min-w-0 rounded-xl border p-5 transition-colors", active ? "border-(--success-border) bg-(--success-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--success-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--success-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--success-surface)_82%,transparent_18%)]")} key={`best-${slice.key}`}>
+                  <div className={cn("min-w-0  border p-5 transition-colors", active ? "border-(--success-border) bg-(--success-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--success-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--success-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--success-surface)_82%,transparent_18%)]")} key={`best-${slice.key}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
                         <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
                       </div>
-                      <Badge className="rounded-full border border-(--success-border) bg-transparent text-(--success-foreground)" variant="outline">
+                      <Badge className=" border border-(--success-border) bg-transparent text-(--success-foreground)" variant="outline">
                         {slice.tradeCount} trades
                       </Badge>
                     </div>
@@ -2271,7 +2292,7 @@ function ReviewPage({
                       <MetricBlock compact label="Win rate" value={formatPercent(slice.winRate, 1)} />
                       <MetricBlock compact label="Profit factor" value={formatNumber(slice.profitFactor)} />
                     </div>
-                    <div className="mt-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3">
+                    <div className="mt-4 border border-[var(--t-line)] bg-background/70 px-4 py-3">
                       <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Why it ranks here</div>
                       <div className="mt-2.5 space-y-1.5">
                         <div className="flex items-center justify-between gap-2 text-xs">
@@ -2325,13 +2346,13 @@ function ReviewPage({
                   const active = isSliceActive(slice);
 
                   return (
-                  <div className={cn("min-w-0 rounded-xl border p-5 transition-colors", active ? "border-(--danger-border) bg-(--danger-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--danger-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--danger-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--danger-surface)_82%,transparent_18%)]")} key={`worst-${slice.key}`}>
+                  <div className={cn("min-w-0  border p-5 transition-colors", active ? "border-(--danger-border) bg-(--danger-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--danger-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--danger-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--danger-surface)_82%,transparent_18%)]")} key={`worst-${slice.key}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
                         <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
                       </div>
-                      <Badge className="rounded-full border border-(--danger-border) bg-transparent text-(--danger-foreground)" variant="outline">
+                      <Badge className=" border border-(--danger-border) bg-transparent text-(--danger-foreground)" variant="outline">
                         {slice.tradeCount} trades
                       </Badge>
                     </div>
@@ -2341,7 +2362,7 @@ function ReviewPage({
                       <MetricBlock compact label="Win rate" value={formatPercent(slice.winRate, 1)} />
                       <MetricBlock compact label="Profit factor" value={formatNumber(slice.profitFactor)} />
                     </div>
-                    <div className="mt-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3">
+                    <div className="mt-4 border border-[var(--t-line)] bg-background/70 px-4 py-3">
                       <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Why it ranks here</div>
                       <div className="mt-2.5 space-y-1.5">
                         <div className="flex items-center justify-between gap-2 text-xs">
@@ -2387,7 +2408,7 @@ function ReviewPage({
               )}
             </div>
             {inspectedSlice ? (
-              <div className="2xl:col-span-2 rounded-xl border border-border/70 bg-muted/20 p-5">
+              <div className="2xl:col-span-2 border border-[var(--t-line)] bg-muted/20 p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Inspected slice</div>
@@ -2411,7 +2432,7 @@ function ReviewPage({
                     <EmptyState message="No trades are available for this slice yet." />
                   </div>
                 ) : (
-                  <div className="mt-5 overflow-hidden rounded-lg border border-border/70 bg-background/80">
+                  <div className="mt-5 overflow-hidden border border-[var(--t-line)] bg-background/80">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -2427,7 +2448,7 @@ function ReviewPage({
                       <TableBody>
                         {inspectedSliceTrades.slice(0, 8).map((trade) => (
                           <TableRow
-                            className={cn("cursor-pointer", selectedTradeId === trade.id && "bg-muted/40")}
+                            className={cn("cursor-pointer", selectedTradeId === trade.id && "bg-[var(--muted)]")}
                             key={`slice-${inspectedSlice.key}-${trade.id}`}
                             onClick={() => focusReviewTrade(trade, inspectedSlice)}
                           >
@@ -2453,17 +2474,17 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Trade history</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Trade history</CardTitle>
             <CardDescription>Filter by symbol, model, family, regime, close reason, side, source quality, and hold duration, then sort the slice you actually want to review.</CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-3">
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Symbol</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setSymbolFilter(event.target.value)}
                   value={symbolFilter}
                 >
@@ -2476,7 +2497,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Model</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setModelFilter(event.target.value)}
                   value={modelFilter}
                 >
@@ -2489,7 +2510,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Family</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setFamilyFilter(event.target.value)}
                   value={familyFilter}
                 >
@@ -2502,7 +2523,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Regime</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setRegimeFilter(event.target.value)}
                   value={regimeFilter}
                 >
@@ -2515,7 +2536,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Reason</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setCloseReasonFilter(event.target.value)}
                   value={closeReasonFilter}
                 >
@@ -2572,7 +2593,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Sort</div>
                 <select
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setSortBy(event.target.value)}
                   value={sortBy}
                 >
@@ -2590,7 +2611,7 @@ function ReviewPage({
                 <div className="space-y-2">
                   <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Start date</div>
                   <input
-                    className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                    className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                     onChange={(event) => setCustomStartDate(event.target.value)}
                     type="date"
                     value={customStartDate}
@@ -2599,14 +2620,14 @@ function ReviewPage({
                 <div className="space-y-2">
                   <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">End date</div>
                   <input
-                    className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                    className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                     onChange={(event) => setCustomEndDate(event.target.value)}
                     type="date"
                     value={customEndDate}
                   />
                 </div>
                 <div className="flex items-end">
-                  <Button className="h-12 rounded-lg" onClick={() => {
+                  <Button className="h-12 " onClick={() => {
                     setCustomStartDate("");
                     setCustomEndDate("");
                   }} variant="outline">
@@ -2622,13 +2643,13 @@ function ReviewPage({
               <MetricBlock compact label="Slice expectancy" value={formatSignedUsd(reviewMetrics.expectancyPerTrade)} />
             </div>
             {selectedTrade ? (
-              <div className="rounded-lg border border-border/70 bg-muted/25 px-5 py-4 text-sm leading-6 text-muted-foreground">
+              <div className=" border border-[var(--t-line)] bg-[var(--muted)] px-5 py-4 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>
                 <span className="font-medium text-foreground">Selected review trade:</span>{" "}
                 {selectedTrade.symbol} {selectedTrade.side.toLowerCase()} closed {formatTimestampMs(selectedTrade.timestamp_ms)} with {formatSignedUsd(selectedTrade.realized_pnl)}.
                 {selectedTrade.entry_timestamp_ms !== null ? ` Hold time ${formatDurationMs(selectedTrade.timestamp_ms - selectedTrade.entry_timestamp_ms)}.` : " Hold time unavailable."}
               </div>
             ) : null}
-            <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-muted/25 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 border border-[var(--t-line)] bg-[var(--muted)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm text-muted-foreground">
                 {isReviewLoading
                   ? "Refreshing the current review slice..."
@@ -2636,18 +2657,18 @@ function ReviewPage({
                   ? "No trades match the current review slice."
                   : `${filteredTrades.length} trade${filteredTrades.length === 1 ? "" : "s"} in the current review slice.`}
               </div>
-              <Button className="rounded-lg" disabled={filteredTrades.length === 0 || isReviewLoading} onClick={() => void exportFilteredTradesCsv()} variant="outline">
+              <Button disabled={filteredTrades.length === 0 || isReviewLoading} onClick={() => void exportFilteredTradesCsv()} variant="outline">
                 <Download className="size-4" />
                 Export slice CSV
               </Button>
             </div>
             {exportState ? (
-              <div className="rounded-lg border border-border/70 bg-muted/20 px-5 py-4 text-sm text-muted-foreground">{exportState}</div>
+              <div className=" border border-[var(--t-line)] bg-muted/20 px-5 py-4 text-sm text-muted-foreground">{exportState}</div>
             ) : null}
             {filteredTrades.length === 0 ? (
               <EmptyState message={tradeSummary.tradeHistory.length === 0 ? "No trade history is available yet." : isReviewLoading ? "Loading review slice..." : "No trades match the current review filters."} />
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border/70">
+              <div className="overflow-hidden border border-[var(--t-line)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -2666,7 +2687,7 @@ function ReviewPage({
                   <TableBody>
                     {filteredTrades.slice(0, 20).map((trade) => (
                       <TableRow
-                        className={cn("cursor-pointer", selectedTradeId === trade.id && "bg-muted/40")}
+                        className={cn("cursor-pointer", selectedTradeId === trade.id && "bg-[var(--muted)]")}
                         key={trade.id}
                         onClick={() => setSelectedTradeId(trade.id)}
                       >
@@ -2693,16 +2714,16 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review mistakes</CardTitle>
+        <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Review mistakes</CardTitle>
             <CardDescription>Concrete actions to avoid and the reason they damage expectancy.</CardDescription>
           </CardHeader>
           <CardContent className="px-4 pb-4 space-y-3">
             {mistakes.map((mistake) => (
-              <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={mistake.title}>
+              <div className=" border border-[var(--t-line)] bg-[var(--muted)] p-4" key={mistake.title}>
                 <div className="text-sm font-medium text-foreground">{mistake.title}</div>
-                <div className="mt-1 text-sm leading-6 text-muted-foreground">{mistake.why}</div>
+                <div className="mt-1 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>{mistake.why}</div>
               </div>
             ))}
           </CardContent>
@@ -2887,17 +2908,17 @@ function SettingsPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <div className="grid gap-4 xl:grid-cols-3">
         <MetricCard compact label="Mode" tone="neutral" value={snapshot.mode} />
         <MetricCard compact label="Venue" tone="neutral" value={snapshot.venue} />
         <MetricCard compact label="Host" tone="neutral" value={snapshot.host} />
       </div>
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode requests</CardTitle>
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <div className="space-y-3">
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+              <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Mode requests</CardTitle>
               <CardDescription>Current request state and protected-mode posture.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-4">
@@ -2905,16 +2926,16 @@ function SettingsPage({
               <MetricBlock label="Promoted indicator" value={snapshot.promoted_indicator.id ?? "None"} />
               <MetricBlock label="Overlay enabled" value={snapshot.promoted_indicator.overlay_enabled ? "True" : "False"} />
               <MetricBlock label="Leaderboard count" value={String(snapshot.promoted_indicator.leaderboard_count)} />
-              <Button className="rounded-full px-5" onClick={() => void runOperatorAction("status")} variant="outline">
+              <Button className=" px-5" onClick={() => void runOperatorAction("status")} variant="outline">
                 <Activity className="size-4" />
                 Refresh stack status
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme</CardTitle>
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+              <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Theme</CardTitle>
               <CardDescription>Follow the system by default or force the dashboard into light or dark mode.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-2">
@@ -2928,13 +2949,13 @@ function SettingsPage({
                       "flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-2.5 text-left transition-all duration-150",
                       active
                         ? "border-border bg-card text-foreground shadow-(--shadow-card)"
-                        : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
+                        : "border-[var(--t-line)] bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
                     )}
                     key={mode}
                     onClick={() => setThemePreference(mode)}
                     type="button"
                   >
-                    <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full", active ? "bg-muted" : "bg-muted")}>
+                    <span className={cn("flex size-7 shrink-0 items-center justify-center ", active ? "bg-muted" : "bg-muted")}>
                       <Icon className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -2949,10 +2970,10 @@ function SettingsPage({
           </Card>
         </div>
 
-        <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Binance paper session</CardTitle>
+        <div className="space-y-3">
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+          <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+            <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Binance paper session</CardTitle>
             <CardDescription>Store Binance Futures credentials in the {tradingSettings.credentialBackend === "wincred" ? "Windows Credential Manager" : "macOS Keychain"}, choose mainnet or testnet transport, and run Paper mode with simulated fills.</CardDescription>
           </CardHeader>
           <CardContent className="px-4 pb-4 space-y-4">
@@ -2990,7 +3011,7 @@ function SettingsPage({
                 compact
               />
             </div>
-            <div className="rounded-lg border border-border/70 bg-muted/20 px-4 py-3">
+            <div className=" border border-[var(--t-line)] bg-muted/20 px-4 py-3">
               <div className="grid gap-3 md:grid-cols-3">
                 <MetricBlock label="Live mode" value={snapshot.mode} compact />
                 <MetricBlock label="Snapshot updated" value={new Date(snapshot.updated_at).toLocaleTimeString()} compact />
@@ -3013,15 +3034,15 @@ function SettingsPage({
                     type="button"
                     onClick={() => setTradingSettings((current) => ({ ...current, binanceEnvironment: environment }))}
                     className={cn(
-                      "rounded-lg border px-4 py-3 text-left transition-all",
-                      active ? "border-border bg-card shadow-sm" : "border-border/70 bg-background hover:bg-muted/35",
+                      " border px-4 py-3 text-left transition-all",
+                      active ? "border-border bg-card shadow-sm" : "border-[var(--t-line)] bg-background hover:bg-[var(--muted)]",
                     )}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-sm font-medium capitalize">{environment}</span>
                       {active ? <Check className="size-4 opacity-70" /> : null}
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="mt-2 text-[10px]" style={{color:"var(--muted-foreground)"}}>
                       {environment === "testnet"
                         ? "Binance Futures testnet private account access."
                         : "Binance Futures mainnet private account access with simulated fills while live orders stay off."}
@@ -3035,7 +3056,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Binance API key</span>
                 <input
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setApiKeyDraft(event.target.value)}
                   placeholder={tradingSettings.hasApiKey ? `Stored in ${tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"}. Paste only to replace.` : "Paste Binance Futures API key"}
                   type="password"
@@ -3045,7 +3066,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Binance API secret</span>
                 <input
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setApiSecretDraft(event.target.value)}
                   placeholder={tradingSettings.hasApiSecret ? `Stored in ${tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"}. Paste only to replace.` : "Paste Binance Futures API secret"}
                   type="password"
@@ -3054,11 +3075,11 @@ function SettingsPage({
               </label>
             </div>
             {tradingSettings.credentialBackend === "wincred" || (!tradingSettings.keychainAvailable && typeof window !== "undefined") ? (
-              <div className="rounded-lg border border-border/70 bg-muted/20 px-4 py-4 space-y-2">
+              <div className=" border border-[var(--t-line)] bg-muted/20 px-4 py-4 space-y-2">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Windows Credential Manager</p>
                 <p className="text-sm text-muted-foreground">Credentials are stored via <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">cmdkey</code>. To verify or remove them manually, run in Command Prompt:</p>
                 <pre className="overflow-x-auto rounded-[14px] bg-muted px-4 py-3 text-xs font-mono text-foreground leading-relaxed">{`cmdkey /list:sthyra.binance/api-key\ncmdkey /list:sthyra.binance/api-secret\ncmdkey /delete:sthyra.binance/api-key`}</pre>
-                <p className="text-xs text-muted-foreground">The app uses PowerShell <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">Get-StoredCredential</code> to read secrets at runtime. No plaintext is written to disk.</p>
+                <p className="text-[10px]" style={{color:"var(--muted-foreground)"}}>The app uses PowerShell <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">Get-StoredCredential</code> to read secrets at runtime. No plaintext is written to disk.</p>
               </div>
             ) : null}
             <div className="grid gap-3 md:grid-cols-3">
@@ -3099,10 +3120,10 @@ function SettingsPage({
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Cycle interval ms</span>
-                <div className="rounded-lg border border-border/70 bg-background px-4 py-3 space-y-3">
+                <div className=" border border-[var(--t-line)] bg-background px-4 py-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium tabular-nums text-foreground">{tradingSettings.supervisorIntervalMs} ms</span>
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{color:"var(--muted-foreground)"}}>
                       {tradingSettings.supervisorIntervalMs <= 150 ? "Aggressive" : tradingSettings.supervisorIntervalMs <= 350 ? "Fast" : tradingSettings.supervisorIntervalMs <= 750 ? "Balanced" : tradingSettings.supervisorIntervalMs <= 1500 ? "Conservative" : "Slow"}
                     </span>
                   </div>
@@ -3125,7 +3146,7 @@ function SettingsPage({
                     {[100, 250, 500, 1000, 2000, 5000].map((preset) => (
                       <button
                         className={cn(
-                          "rounded-md px-1 py-0.5 transition-colors",
+                          " px-1 py-0.5 transition-colors",
                           tradingSettings.supervisorIntervalMs === preset
                             ? "bg-muted text-foreground font-semibold"
                             : "hover:text-foreground",
@@ -3143,7 +3164,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Research refresh min</span>
                 <input
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   max={1440}
                   min={1}
                   onChange={(event) => {
@@ -3164,7 +3185,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Indicator min fitness</span>
                 <input
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   max={1}
                   min={-0.5}
                   onChange={(event) => {
@@ -3185,7 +3206,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Retention limit</span>
                 <input
-                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full border border-[var(--t-line)] bg-background px-4 text-sm text-foreground outline-none"
                   max={32}
                   min={1}
                   onChange={(event) => {
@@ -3204,23 +3225,23 @@ function SettingsPage({
                 />
               </label>
             </div>
-            <div className="rounded-xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
+            <div className="px-3 py-3 text-[10px] leading-4" style={{background:"var(--card)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
               {settingsState}
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button className="rounded-full px-5" disabled={isSavingSettings} onClick={() => void saveTradingSettings(false)} variant="outline">
+              <Button className=" px-5" disabled={isSavingSettings} onClick={() => void saveTradingSettings(false)} variant="outline">
                 <Download className={cn("size-4", isSavingSettings && "animate-pulse")} />
                 Save credentials and runtime flags
               </Button>
               <Button
-                className="rounded-full px-5"
+                className=" px-5"
                 disabled={isSavingSettings || !tradingSettings.transportEnabled || !tradingSettings.streamEnabled}
                 onClick={() => void saveTradingSettings(true)}
               >
                 <Radar className={cn("size-4", isSavingSettings && "animate-pulse")} />
                 Save and start paper trading
               </Button>
-              <Button className="rounded-full px-5" disabled={isSavingSettings} onClick={() => void refreshTradingSettings()} variant="secondary">
+              <Button className=" px-5" disabled={isSavingSettings} onClick={() => void refreshTradingSettings()} variant="secondary">
                 <RefreshCw className="size-4" />
                 Refresh trading settings
               </Button>
@@ -3228,19 +3249,19 @@ function SettingsPage({
           </CardContent>
         </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research policy and leaderboards</CardTitle>
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+              <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Research policy and leaderboards</CardTitle>
               <CardDescription>See why models survive, which indicator genomes are strong enough, and remove weak overlays before they touch approvals.</CardDescription>
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-5">
+            <CardContent className="px-4 pb-4 space-y-3">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock label="Promoted model" value={modelPacks.active.promoted_model?.model?.id ?? "None"} compact />
                 <MetricBlock label="Promoted indicator" value={modelPacks.active.promoted_indicator_pack?.genome?.id ?? "None"} compact />
                 <MetricBlock label="Signal leaderboard" value={String(modelPacks.signal_leaderboard.length)} compact />
                 <MetricBlock label="Blacklisted indicators" value={String(modelPacks.blacklisted_indicator_ids.length)} compact />
               </div>
-              <div className="rounded-xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
+              <div className="px-3 py-3 text-[10px] leading-4" style={{background:"var(--card)",border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>
                 {researchState}
                 <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <MetricBlock label="Refresh cadence" value={`${modelPacks.policy?.researchRefreshIntervalMinutes ?? tradingSettings.researchRefreshIntervalMinutes} min`} compact />
@@ -3249,17 +3270,17 @@ function SettingsPage({
                   <MetricBlock label="Retention cap" value={String(modelPacks.policy?.indicatorRetentionLimit ?? tradingSettings.indicatorRetentionLimit)} compact />
                 </div>
               </div>
-              <div className="grid gap-5 xl:grid-cols-2">
+              <div className="grid gap-3 xl:grid-cols-2">
                 <div className="space-y-3">
                   <div>
                     <div className="text-sm font-medium text-foreground">Signal model scores</div>
-                    <div className="mt-1 text-xs text-muted-foreground">Fitness, profitability, robustness, and risk-adjusted return for the leading signal models.</div>
+                    <div className="mt-1 text-[10px]" style={{color:"var(--muted-foreground)"}}>Fitness, profitability, robustness, and risk-adjusted return for the leading signal models.</div>
                   </div>
                   {modelPacks.signal_leaderboard.length === 0 ? (
                     <EmptyState message="No signal leaderboard is available yet." />
                   ) : (
                     modelPacks.signal_leaderboard.slice(0, 6).map((entry, index) => (
-                      <div className="rounded-xl border border-border/70 bg-muted/35 p-4" key={entry.model?.id ?? `signal-${index}`}>
+                      <div className="p-4" style={{background:"var(--card)",border:"1px solid var(--t-line)"}} key={entry.model?.id ?? `signal-${index}`}>
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-medium text-foreground">{entry.model?.id ?? "Unnamed model"}</div>
@@ -3267,7 +3288,7 @@ function SettingsPage({
                               {(entry.model?.target_symbol ?? "All")} · {(entry.model?.target_family ?? "All families")} · {(entry.model?.target_regime ?? "All regimes")}
                             </div>
                           </div>
-                          <Badge className="rounded-full border-border/70 bg-background text-foreground" variant="outline">
+                          <Badge className=" border-[var(--t-line)] bg-background text-foreground" variant="outline">
                             fit {formatNumber(entry.fitness_score ?? null)}
                           </Badge>
                         </div>
@@ -3284,7 +3305,7 @@ function SettingsPage({
                 <div className="space-y-3">
                   <div>
                     <div className="text-sm font-medium text-foreground">Indicator genome scores</div>
-                    <div className="mt-1 text-xs text-muted-foreground">Delete weak genomes from the active registry or blacklist them so they cannot be promoted again.</div>
+                    <div className="mt-1 text-[10px]" style={{color:"var(--muted-foreground)"}}>Delete weak genomes from the active registry or blacklist them so they cannot be promoted again.</div>
                   </div>
                   {modelPacks.indicator_leaderboard.length === 0 ? (
                     <EmptyState message={`No indicator genomes currently survive the active fitness floor of ${formatNumber(modelPacks.policy?.indicatorPruneMinFitness ?? tradingSettings.indicatorPruneMinFitness)}.`} />
@@ -3295,7 +3316,7 @@ function SettingsPage({
                       const blacklistKey = `blacklist-indicator:${indicatorId}`;
 
                       return (
-                        <div className="rounded-xl border border-border/70 bg-muted/35 p-4" key={indicatorId}>
+                        <div className="p-4" style={{background:"var(--card)",border:"1px solid var(--t-line)"}} key={indicatorId}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <div className="text-sm font-medium text-foreground">{indicatorId}</div>
@@ -3303,7 +3324,7 @@ function SettingsPage({
                                 {(entry.genome?.target_symbol ?? "All")} · {(entry.genome?.target_family ?? "All families")} · {(entry.genome?.target_regime ?? "All regimes")}
                               </div>
                             </div>
-                            <Badge className="rounded-full border-border/70 bg-background text-foreground" variant="outline">
+                            <Badge className=" border-[var(--t-line)] bg-background text-foreground" variant="outline">
                               fit {formatNumber(entry.fitness_score ?? null)}
                             </Badge>
                           </div>
@@ -3315,7 +3336,7 @@ function SettingsPage({
                           </div>
                           <div className="mt-4 flex flex-wrap gap-3">
                             <Button
-                              className="rounded-full px-4"
+                              className=" px-4"
                               disabled={pendingIndicatorAction !== null}
                               onClick={() => void runIndicatorRegistryAction("delete-indicator", indicatorId)}
                               variant="outline"
@@ -3324,7 +3345,7 @@ function SettingsPage({
                               Delete now
                             </Button>
                             <Button
-                              className="rounded-full px-4"
+                              className=" px-4"
                               disabled={pendingIndicatorAction !== null || entry.blacklisted}
                               onClick={() => void runIndicatorRegistryAction("blacklist-indicator", indicatorId)}
                               variant="secondary"
@@ -3338,17 +3359,17 @@ function SettingsPage({
                     })
                   )}
                   {modelPacks.blacklisted_indicator_ids.length > 0 ? (
-                    <div className="rounded-xl border border-border/70 bg-background/75 p-4">
+                    <div className="bg-background/75 p-4" style={{border:"1px solid var(--t-line)"}}>
                       <div className="text-sm font-medium text-foreground">Blocked indicator IDs</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {modelPacks.blacklisted_indicator_ids.map((indicatorId) => {
                           const actionKey = `unblacklist-indicator:${indicatorId}`;
 
                           return (
-                            <div className="flex items-center gap-2 rounded-full border border-border/70 bg-muted/35 px-3 py-2" key={indicatorId}>
+                            <div className="flex items-center gap-2 border border-[var(--t-line)] bg-[var(--muted)] px-3 py-2" key={indicatorId}>
                               <span className="text-xs text-foreground">{indicatorId}</span>
                               <button
-                                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                                className="text-[10px] transition-colors hover:text-foreground" style={{color:"var(--muted-foreground)"}}
                                 disabled={pendingIndicatorAction !== null}
                                 onClick={() => void runIndicatorRegistryAction("unblacklist-indicator", indicatorId)}
                                 type="button"
@@ -3366,9 +3387,9 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme rationale</CardTitle>
+          <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+            <CardHeader className="pb-1.5 pt-2.5 px-3 border-b" style={{borderColor:"var(--t-line)"}}>
+              <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Theme rationale</CardTitle>
               <CardDescription>This dashboard now uses a restrained trading workspace instead of high-saturation status cards.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 grid gap-3 md:grid-cols-2">
@@ -3397,26 +3418,31 @@ function ToggleSettingCard({
   onToggle: (checked: boolean) => void;
   tone?: "neutral" | "risk";
 }) {
+  const activeColor = tone === "risk" ? "var(--t-red)" : "var(--t-green)";
+  const activeBg   = tone === "risk" ? "rgba(248,113,113,0.08)" : "rgba(74,222,128,0.08)";
+  const activeBorder = tone === "risk" ? "rgba(248,113,113,0.30)" : "rgba(74,222,128,0.30)";
   return (
     <button
-      className={cn(
-        "rounded-xl border px-5 py-4 text-left transition-colors",
-        tone === "risk"
-          ? checked
-            ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
-            : "border-border/70 bg-background text-foreground"
-          : checked
-            ? "border-(--success-border) bg-(--success-surface) text-(--success-foreground)"
-            : "border-border/70 bg-background text-foreground",
-      )}
+      className="border px-3 py-3 text-left transition-colors w-full"
+      style={{
+        borderRadius:0,
+        borderColor: checked ? activeBorder : "var(--t-line)",
+        background: checked ? activeBg : "var(--card)",
+        borderLeftWidth: checked ? "2px" : "1px",
+        borderLeftColor: checked ? activeColor : "var(--t-line)",
+      }}
       onClick={() => onToggle(!checked)}
       type="button"
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-medium">{label}</div>
-        <Badge className="rounded-full" variant="outline">{checked ? "On" : "Off"}</Badge>
+        <div className="text-[11px] font-bold uppercase tracking-[0.08em]" style={{color: checked ? activeColor : "var(--foreground)"}}>{label}</div>
+        <span className="text-[9px] font-bold tracking-[0.14em] uppercase border px-1.5 py-0.5" style={{
+          color: checked ? activeColor : "var(--muted-foreground)",
+          borderColor: checked ? activeBorder : "var(--t-line)",
+          background: "transparent",
+        }}>{checked ? "ON" : "OFF"}</span>
       </div>
-      <div className="mt-2 text-sm leading-6 text-muted-foreground">{description}</div>
+      <div className="mt-1 text-[10px] leading-4" style={{color:"var(--muted-foreground)"}}>{description}</div>
     </button>
   );
 }
@@ -3490,42 +3516,24 @@ function TradingViewPanel({
   const lastTimestamp = activeCandle?.timestamp_ms ?? chartPoints.at(-1)?.timestamp_ms ?? null;
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
-      <CardHeader className="space-y-3 border-b border-border/50 pb-4">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-          <div className="space-y-2.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full border-border/70 bg-muted/40 text-foreground" variant="outline">Chart deck</Badge>
-              <Badge className="rounded-full border-border/70 bg-muted/40 text-foreground" variant="outline">{symbol ?? "All symbols"}</Badge>
-              <Badge className="rounded-full border-border/70 bg-muted/40 text-foreground" variant="outline">{requestedWindow} bars</Badge>
-            </div>
-            <CardTitle className="text-[1.2rem] font-semibold tracking-[-0.04em] text-foreground">{title}</CardTitle>
-            <CardDescription>Price, EMA stack, volume, RSI, and MACD in a disciplined trading-terminal frame.</CardDescription>
+    <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
+      <CardHeader className="pb-0 pt-0 px-0 border-b" style={{borderColor:"var(--t-line)"}}>
+        <div className="flex items-center justify-between gap-2 px-3 py-2 border-b" style={{borderColor:"var(--t-line)"}}>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>CHART DECK</span>
+            <span className="text-[9px]" style={{color:"var(--t-line-strong)"}}>│</span>
+            <span className="text-[9px] font-bold" style={{color:"var(--t-amber)"}}>{symbol ?? "ALL"}</span>
+            <span className="text-[9px]" style={{color:"var(--t-line-strong)"}}>│</span>
+            <span className="text-[9px]" style={{color:"var(--muted-foreground)"}}>{requestedWindow} BARS</span>
           </div>
           {symbolOptions && onSelectSymbol && onSelectWindow ? (
-            <div className="rounded-xl border border-border/70 bg-muted/35 p-2.5">
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <SegmentedControl
-                  activeValue={symbol ?? "All"}
-                  label="Symbol"
-                  options={symbolOptions.map((item) => ({ label: item, value: item }))}
-                  onSelect={onSelectSymbol}
-                />
-                <SegmentedControl
-                  activeValue={String(requestedWindow)}
-                  label="Window"
-                  options={[
-                    { label: "12 bars", value: "12" },
-                    { label: "24 bars", value: "24" },
-                    { label: "48 bars", value: "48" },
-                  ]}
-                  onSelect={(value) => onSelectWindow(Number(value))}
-                />
-              </div>
+            <div className="flex items-center gap-2">
+              <SegmentedControl activeValue={symbol ?? "All"} label="Symbol" options={symbolOptions.map((item) => ({ label: item, value: item }))} onSelect={onSelectSymbol} />
+              <SegmentedControl activeValue={String(requestedWindow)} label="Window" options={[{ label: "12", value: "12" },{ label: "24", value: "24" },{ label: "48", value: "48" }]} onSelect={(value) => onSelectWindow(Number(value))} />
             </div>
           ) : null}
         </div>
-        <div className="grid gap-2 rounded-xl border border-border/70 bg-muted/35 p-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+        <div className="grid gap-px border-b border-[var(--t-line)] sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5" style={{background:"var(--t-line)"}}>
           <TerminalStat label="Venue" value={venue ?? "Local"} />
           <TerminalStat label="Mode" value={mode ?? "Unknown"} />
           <TerminalStat label="Symbol" value={activeCandle?.symbol ?? symbol ?? "None"} />
@@ -3561,9 +3569,9 @@ function TradingViewPanel({
           <TerminalStat label="Updated" value={updatedAt ? formatOperatorTimestamp(updatedAt) : "No data"} />
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4 space-y-4 pt-4">
+      <CardContent className="px-3 pb-3 pt-3 space-y-3">
         {chartPoints.length < 2 ? (
-          <div className="rounded-xl border border-border/70 bg-muted/25 px-6 py-14 text-sm leading-6 text-muted-foreground">Not enough indicator data to render the market pane.</div>
+          <div className="bg-[var(--muted)] px-4 py-10 text-[10px] leading-4" style={{border:"1px solid var(--t-line)",color:"var(--muted-foreground)"}}>Not enough indicator data to render the market pane.</div>
         ) : (
           <>
             <MarketPane candles={chartCandles} points={chartPoints} hoverIndex={activeIndex} onHoverIndex={setHoverIndex} tradeMarkers={tradeMarkers} />
@@ -3629,9 +3637,9 @@ function WatchlistRail({
   });
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
+    <Card className="border-[var(--t-line)]" style={{background:"var(--card)",borderRadius:0}}>
       <CardHeader className="pb-4">
-        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Watchlist</CardTitle>
+        <CardTitle className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>Watchlist</CardTitle>
         <CardDescription>Compact symbol rail with price change, RSI, consensus, and live position state.</CardDescription>
       </CardHeader>
       <CardContent className="px-4 pb-4 space-y-3.5">
@@ -3650,10 +3658,10 @@ function WatchlistRail({
               return (
                 <button
                   className={cn(
-                    "block w-full rounded-xl border px-4 py-4 text-left transition-all duration-200",
+                    "block w-full  border px-4 py-4 text-left transition-all duration-200",
                     active
                       ? "border-border bg-card shadow-(--shadow-card) ring-1 ring-border"
-                      : "border-border/70 bg-muted/35 hover:border-border hover:bg-muted/55",
+                      : "border-[var(--t-line)] bg-[var(--muted)] hover:border-border hover:bg-muted/55",
                   )}
                   key={item.symbol}
                   onClick={() => setSelectedSymbol(item.symbol)}
@@ -3664,13 +3672,13 @@ function WatchlistRail({
                       <div className="flex items-center gap-2">
                         <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
                         {item.regime && (
-                          <span className={cn("rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.18em]",
-                            active ? "border-border/60 bg-muted text-muted-foreground"
+                          <span className={cn(" border px-2 py-0.5 text-[9px] uppercase tracking-[0.18em]",
+                            active ? "border-[var(--t-line)] bg-muted text-muted-foreground"
                               : item.regime.includes("NoTrade") || item.regime.includes("Disordered")
                                 ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
                                 : item.regime.includes("Trending") || item.regime.includes("Breakout")
                                   ? "border-(--success-border) bg-(--success-surface) text-(--success-foreground)"
-                                  : "border-border/60 bg-muted/50 text-muted-foreground"
+                                  : "border-[var(--t-line)] bg-muted/50 text-muted-foreground"
                           )}>
                             {item.regime.replace("BreakoutExpansion", "Breakout").replace("VolatilityCompression", "VolComp").replace("ReversalAttempt", "Reversal").slice(0, 9)}
                           </span>
@@ -3679,7 +3687,7 @@ function WatchlistRail({
                       <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-muted-foreground" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
-                      <Badge className={cn("rounded-full border", active ? "border-border bg-muted text-foreground" : actionBadgeClasses(item.action))} variant="outline">
+                      <Badge className={cn(" border", active ? "border-border bg-muted text-foreground" : actionBadgeClasses(item.action))} variant="outline">
                         {item.action}
                       </Badge>
                       {/* Mini sparkline */}
@@ -3796,7 +3804,7 @@ function MarketPane({
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden border border-[var(--t-line)] bg-[var(--muted)]">
       <svg
         className="h-80 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(normalizedCandles.length - 1, 0))}
@@ -3882,14 +3890,14 @@ function MarketPane({
         <polyline fill="none" points={polylinePoints(emaFast, scaleX, scaleY)} stroke="#38bdf8" strokeWidth="2.4" />
         <polyline fill="none" points={polylinePoints(emaSlow, scaleX, scaleY)} stroke="#f59e0b" strokeWidth="2.2" />
       </svg>
-      <div className="flex flex-wrap items-center gap-4 border-t border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#38bdf8]" />EMA Fast</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#f59e0b]" />EMA Slow</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Bullish candle</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#ef4444]" />Bearish candle</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full border border-border bg-transparent" />Entry marker</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Exit marker</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-muted-foreground" />{candles.length > 0 ? "OHLC candles" : "Derived candles"}</span>
+      <div className="flex flex-wrap items-center gap-4 border-t border-[var(--t-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="flex items-center gap-2"><span className="size-2 bg-[#38bdf8]" />EMA Fast</span>
+        <span className="flex items-center gap-2"><span className="size-2 bg-[#f59e0b]" />EMA Slow</span>
+        <span className="flex items-center gap-2"><span className="size-2 bg-[#22c55e]" />Bullish candle</span>
+        <span className="flex items-center gap-2"><span className="size-2 bg-[#ef4444]" />Bearish candle</span>
+        <span className="flex items-center gap-2"><span className="size-2 border border-border bg-transparent" />Entry marker</span>
+        <span className="flex items-center gap-2"><span className="size-2 bg-[#22c55e]" />Exit marker</span>
+        <span className="flex items-center gap-2"><span className="size-2 bg-muted-foreground" />{candles.length > 0 ? "OHLC candles" : "Derived candles"}</span>
       </div>
     </div>
   );
@@ -3928,8 +3936,8 @@ function VolumePane({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Volume</div>
+    <div className="overflow-hidden border border-[var(--t-line)] bg-[var(--muted)]">
+      <div className="border-b border-[var(--t-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Volume</div>
       <svg
         className="h-32.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(normalizedVolumes.length - 1, 0))}
@@ -3983,10 +3991,10 @@ function SegmentedControl({
     <div className="space-y-2.5">
       <div className={cn("text-[11px] uppercase tracking-[0.22em]", tone === "dark" ? "text-slate-500" : "text-muted-foreground")}>{label}</div>
       <div className={cn(
-        "flex flex-wrap gap-2 rounded-lg p-2.5",
+        "flex flex-wrap gap-2  p-2.5",
         tone === "dark"
           ? "border border-white/8 bg-white/4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-          : "border border-border/70 bg-background shadow-[inset_0_1px_0_rgba(15,23,42,0.02)]",
+          : "border border-[var(--t-line)] bg-background shadow-[inset_0_1px_0_rgba(15,23,42,0.02)]",
       )}>
         {options.map((option) => {
           const active = option.value === activeValue;
@@ -4061,8 +4069,8 @@ function IndicatorPane({
   const lastY = lastValue !== undefined ? scaleY(lastValue) : null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+    <div className="overflow-hidden border border-[var(--t-line)] bg-[var(--muted)]">
+      <div className="border-b border-[var(--t-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(series.length - 1, 0))}
@@ -4127,8 +4135,8 @@ function HistogramPane({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+    <div className="overflow-hidden border border-[var(--t-line)] bg-[var(--muted)]">
+      <div className="border-b border-[var(--t-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(series.length - 1, 0))}
@@ -4207,7 +4215,7 @@ function EquityCurve({
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden border border-[var(--t-line)] bg-[var(--muted)]">
       <svg className="h-70 w-full" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" id="equityGrad" x1="0" x2="0" y1={padding} y2={height - padding}>
@@ -4277,7 +4285,7 @@ function BalanceCalendar({ days, emptyMessage }: { days: AuditBalanceCalendarDay
             <div className="relative z-10 mt-1 text-[11px] font-medium opacity-90">{day.delta !== null ? formatSignedUsd(day.delta, 0) : "—"}</div>
             {(isGreen || isRed) && pct > 0 && (
               <div
-                className="absolute bottom-0 left-0 h-[3px] rounded-full opacity-60 transition-all duration-500"
+                className="absolute bottom-0 left-0 h-[3px] opacity-60 transition-all duration-500"
                 style={{
                   width: `${pct}%`,
                   background: isGreen ? "var(--cal-green-text)" : "var(--cal-red-text)",
@@ -4305,8 +4313,9 @@ function ActionButton({
   runOperatorAction: (action: OperatorAction, targetMode?: OperatorMode) => Promise<void>;
 }) {
   return (
-    <Button className="justify-start rounded-lg px-4 py-2" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction(action)} variant="outline">
-      <Icon className={cn("size-4", pendingOperatorAction === action && "animate-spin")} />
+    <Button className="justify-start px-3 py-2 text-xs font-bold tracking-[0.10em] uppercase border" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction(action)} variant="outline"
+      style={{borderRadius:0,borderColor:"var(--t-line)",background:"transparent",color:"var(--foreground)"}}>
+      <Icon className={cn("size-3 mr-1.5", pendingOperatorAction === action && "animate-spin")} />
       {label}
     </Button>
   );
@@ -4314,38 +4323,41 @@ function ActionButton({
 
 function StrategyNote({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-border/70 bg-muted/35 p-4">
-      <div className="text-sm font-semibold text-foreground">{title}</div>
-      <div className="mt-1.5 text-sm leading-6 text-muted-foreground">{detail}</div>
+    <div className="border p-3" style={{background:"var(--card)",borderColor:"var(--t-line)",borderLeft:"2px solid var(--t-amber-border)"}}>
+      <div className="text-xs font-bold uppercase tracking-[0.08em]" style={{color:"var(--t-amber)"}}>{title}</div>
+      <div className="mt-1 text-xs leading-5" style={{color:"var(--muted-foreground)"}}>{detail}</div>
     </div>
   );
 }
 
 function WatchMetric({ label, value }: { label: string; value: string; active?: boolean }) {
   return (
-    <div className="min-w-0 rounded-xl border border-border/60 bg-background/70 px-3 py-3">
-      <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
-      <div className="mt-1.5 wrap-break-word text-sm leading-5 font-semibold tracking-[-0.02em] text-foreground">{value}</div>
+    <div className="min-w-0 border px-2.5 py-2" style={{background:"var(--background)",borderColor:"var(--t-line)"}}>
+      <div className="text-[9px] font-bold uppercase tracking-[0.12em]" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <div className="mt-1 wrap-break-word text-xs font-semibold" style={{color:"var(--foreground)"}}>{value}</div>
     </div>
   );
 }
 
 function TerminalStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0 space-y-1 rounded-xl border border-border/60 bg-muted/40 px-3 py-2.5">
-      <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
-      <div className="wrap-break-word text-sm leading-5 font-semibold tracking-[-0.02em] text-foreground">{value}</div>
+    <div className="min-w-0 border px-2.5 py-2" style={{background:"var(--card)",borderColor:"var(--t-line)"}}>
+      <div className="text-[9px] font-bold uppercase tracking-[0.12em]" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <div className="mt-0.5 wrap-break-word text-xs font-semibold" style={{color:"var(--foreground)"}}>{value}</div>
     </div>
   );
 }
 
 function BotHealthBadge({ health, prominent = false }: { health: BotHealthReport; prominent?: boolean }) {
   const isHealthy = health.level === "healthy";
+  const color = isHealthy ? "var(--t-green)" : health.level === "degraded" ? "var(--t-amber)" : "var(--t-red)";
+  const bg   = isHealthy ? "rgba(74,222,128,0.08)" : health.level === "degraded" ? "var(--t-amber-dim)" : "rgba(248,113,113,0.08)";
+  const border = isHealthy ? "rgba(74,222,128,0.25)" : health.level === "degraded" ? "var(--t-amber-border)" : "rgba(248,113,113,0.25)";
   return (
-    <span className={cn("relative inline-flex items-center", isHealthy && "bot-healthy-pulse")}>
-      <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
-        {health.label}
-      </Badge>
+    <span className={cn("relative inline-flex items-center gap-1.5 border px-2 py-0.5", isHealthy && "bot-healthy-pulse")}
+      style={{background:bg,borderColor:border,color,borderRadius:0}}>
+      <span className="size-1.5 shrink-0" style={{background:color}} />
+      <span className="text-[9px] font-bold tracking-[0.14em] uppercase">{health.label}</span>
     </span>
   );
 }
@@ -4361,12 +4373,14 @@ function ProvenExecutionCard({
   body: string;
   tone: "positive" | "negative" | "neutral";
 }) {
+  const pColor = tone === 'positive' ? 'var(--t-green)' : tone === 'negative' ? 'var(--t-red)' : 'var(--muted-foreground)';
+  const pBorder = tone === 'positive' ? 'rgba(74,222,128,0.20)' : tone === 'negative' ? 'rgba(248,113,113,0.20)' : 'var(--t-line)';
   return (
-    <div className={cn("rounded-xl border p-4", metricCardClasses(tone))}>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-foreground">{timestampMs === null ? "Not proven yet" : formatTimestampMs(timestampMs)}</div>
-      <div className="mt-0.5 text-xs text-muted-foreground">{timestampMs === null ? "No timestamp available" : formatRelativeDuration(timestampMs)}</div>
-      <div className="mt-3 text-sm leading-6 text-foreground">{body}</div>
+    <div className="border p-3" style={{background:"var(--card)",borderColor:pBorder,borderRadius:0}}>
+      <div className="text-[9px] font-bold uppercase tracking-[0.12em] mb-1" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <div className="text-sm font-bold tabular-nums" style={{color:pColor}}>{timestampMs === null ? "— NOT PROVEN" : formatTimestampMs(timestampMs)}</div>
+      <div className="text-[10px] mt-0.5" style={{color:"var(--muted-foreground)"}}>{timestampMs === null ? "no timestamp" : formatRelativeDuration(timestampMs)}</div>
+      <div className="mt-2 text-xs leading-5" style={{color:"var(--foreground)"}}>{body}</div>
     </div>
   );
 }
@@ -4380,39 +4394,43 @@ function MetricCard({ label, value, tone, compact = false }: { label: string; va
       setFlashKey((k) => k + 1);
     }
   }, [value]);
+  const valueColor = tone === "positive" ? "var(--t-green)" : tone === "negative" ? "var(--t-red)" : "var(--t-amber)";
+  const borderColor = tone === "positive" ? "rgba(74,222,128,0.18)" : tone === "negative" ? "rgba(248,113,113,0.18)" : "var(--t-line)";
   return (
-    <div className={cn("rounded-xl border px-4 py-4", metricCardClasses(tone))}>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div key={flashKey} className={cn("mt-2.5 font-semibold tracking-[-0.03em] value-flash", compact ? "text-lg" : "text-2xl")}>{value}</div>
+    <div className="border px-3 py-3" style={{background:"var(--card)",borderColor,borderRadius:0}}>
+      <div className="text-[9px] font-bold tracking-[0.14em] uppercase mb-2" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <div key={flashKey} className={cn("font-bold tracking-[-0.01em] value-flash tabular-nums", compact ? "text-base" : "text-xl")} style={{color:valueColor}}>{value}</div>
     </div>
   );
 }
 
 function MetricBlock({ label, value, tone = "neutral", compact = false }: { label: string; value: string; tone?: "positive" | "negative" | "neutral"; compact?: boolean }) {
+  const valueColor = tone === "positive" ? "var(--t-green)" : tone === "negative" ? "var(--t-red)" : "var(--foreground)";
   return (
-    <div className={cn("min-w-0 rounded-xl border px-4 py-3", metricCardClasses(tone)) }>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className={cn("mt-1.5 wrap-break-word font-semibold leading-6 text-foreground", compact ? "text-sm" : "text-base")}>{value}</div>
+    <div className="min-w-0 border px-3 py-2" style={{background:"var(--card)",borderColor:"var(--t-line)",borderRadius:0}}>
+      <div className="text-[9px] font-bold uppercase tracking-[0.12em] mb-1" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <div className={cn("wrap-break-word font-semibold leading-5 tabular-nums", compact ? "text-xs" : "text-sm")} style={{color:valueColor}}>{value}</div>
     </div>
   );
 }
 
 function RetentionBar({ label, percent, detail }: { label: string; percent: number; detail: string }) {
+  const barColor = percent >= 90 ? "var(--t-red)" : percent >= 70 ? "var(--t-amber)" : "var(--t-green)";
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <span>{label}</span>
-        <span className="text-muted-foreground">{detail}</span>
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-[0.10em]" style={{color:"var(--foreground)"}}>{label}</span>
+        <span className="text-[10px] tabular-nums" style={{color:"var(--muted-foreground)"}}>{detail}</span>
       </div>
-      <div className="h-2 rounded-full bg-muted">
-        <div className={cn("h-2 rounded-full", percent >= 90 ? "bg-(--danger-foreground)" : percent >= 70 ? "bg-(--warning-foreground)" : "bg-(--success-foreground)")} style={{ width: `${percent}%` }} />
+      <div className="h-1.5 border" style={{background:"var(--muted)",borderColor:"var(--t-line)"}}>
+        <div className="h-full transition-all" style={{width:`${percent}%`,background:barColor}} />
       </div>
     </div>
   );
 }
 
 function EmptyState({ message }: { message: string }) {
-  return <div className="rounded-xl border border-border/70 bg-muted/35 px-5 py-10 text-sm leading-6 text-muted-foreground">{message}</div>;
+  return <div className="border px-4 py-8 text-xs" style={{borderColor:"var(--t-line)",color:"var(--muted-foreground)",background:"var(--card)"}}><span style={{color:"var(--t-amber)"}}>── </span>{message}</div>;
 }
 
 function buildMistakes(snapshot: RuntimeSnapshot, operator: DashboardOperatorData) {
@@ -4543,20 +4561,13 @@ function nearestCandleIndex(candles: RuntimeCandlePoint[], timestampMs: number) 
 
 function headlineForPage(page: DashboardPage) {
   switch (page) {
-    case "overview":
-      return "Simple main dashboard";
-    case "positions":
-      return "Positions and daily balance detail";
-    case "markets":
-      return "Strategy, chart, and indicator workspace";
-    case "risk":
-      return "Risk center and validation detail";
-    case "execution":
-      return "Execution terminal and operator controls";
-    case "review":
-      return "Trade review and mistakes";
-    case "settings":
-      return "System settings and launch posture";
+    case "overview":   return "OVERVIEW";
+    case "positions":  return "POSITIONS";
+    case "markets":    return "MARKETS";
+    case "risk":       return "RISK";
+    case "execution":  return "EXECUTION";
+    case "review":     return "REVIEW";
+    case "settings":   return "SETTINGS";
   }
 }
 
@@ -4590,7 +4601,7 @@ function metricCardClasses(tone: "positive" | "negative" | "neutral") {
     case "negative":
       return "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)";
     default:
-      return "border-border/70 bg-muted/30 text-foreground";
+      return "border-[var(--t-line)] bg-[var(--muted)] text-foreground";
   }
 }
 
@@ -4601,9 +4612,9 @@ function balanceToneClasses(tone: AuditBalanceCalendarDay["tone"]) {
     case "red":
       return "border-[color:var(--cal-red-border)] bg-[color:var(--cal-red-surface)] text-[color:var(--cal-red-text)]";
     case "flat":
-      return "border-border/70 bg-muted/50 text-foreground/80";
+      return "border-[var(--t-line)] bg-muted/50 text-foreground/80";
     default:
-      return "border-border/60 bg-background text-muted-foreground";
+      return "border-[var(--t-line)] bg-background text-muted-foreground";
   }
 }
 
@@ -4656,7 +4667,7 @@ function botHealthBadgeClasses(level: BotHealthReport["level"]) {
     case "degraded":
       return "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)";
     default:
-      return "border-border/70 bg-muted/40 text-foreground";
+      return "border-[var(--t-line)] bg-[var(--muted)] text-foreground";
   }
 }
 

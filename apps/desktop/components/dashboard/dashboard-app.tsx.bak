@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Activity,
   BrainCircuit,
   CandlestickChart,
   Check,
   Download,
+  Eraser,
   Gauge,
   Monitor,
   Moon,
@@ -510,138 +511,129 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
 
   return (
     <div className="min-h-screen bg-(--background) text-(--foreground)">
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-48 -top-56 size-120 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--primary)_20%,transparent_80%),transparent_68%)] blur-3xl" />
-        <div className="absolute -right-40 top-10 size-104 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--accent)_22%,transparent_78%),transparent_70%)] blur-3xl" />
-        <div className="absolute -bottom-64 left-1/2 size-128 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--primary)_12%,transparent_88%),transparent_72%)] blur-3xl" />
-      </div>
-      <div className="executive-shell mx-auto flex min-h-screen w-full max-w-440 gap-6 px-5 py-6 sm:px-6 lg:gap-10 lg:px-8 lg:py-8 xl:px-10">
-        <aside className="hidden w-[320px] shrink-0 lg:block xl:w-84">
-          <div className="sticky top-6 space-y-6 rounded-[34px] border border-(--glass-border) bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_90%,var(--background)_10%),color-mix(in_srgb,var(--card)_97%,transparent_3%))] p-6 shadow-(--shadow-shell) ring-1 ring-white/28 backdrop-blur-2xl xl:p-7 dark:ring-white/6">
-            <div className="space-y-3">
-              <NyraQLockup />
-              <h1 className="text-[2.1rem] font-semibold tracking-[-0.06em] text-foreground">Operator cockpit</h1>
-              <p className="text-sm leading-6 text-muted-foreground">Luxury-grade local trading shell with refined market surfaces, calmer spacing, and disciplined operator control.</p>
+      <div className="flex min-h-screen w-full">
+        {/* ── Slim dark sidebar ── */}
+        <aside className="hidden lg:flex w-[200px] xl:w-[220px] shrink-0 flex-col bg-[#1a1a1a] dark:bg-[#111111]">
+          <div className="sticky top-0 flex h-screen flex-col px-4 py-5">
+            {/* Logo */}
+            <div className="mb-6 flex items-center gap-2.5 px-2">
+              <img alt="NyraQ mark" className="size-6 object-contain invert dark:invert-0" src="/nyraq-mark.svg" />
+              <span className="text-[13px] font-semibold tracking-[-0.02em] text-white/90">NyraQ</span>
             </div>
-            <div className="space-y-3">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const active = page === item.page;
 
-                return (
-                  <Link
-                    key={item.page}
-                    className={cn(
-                      "executive-nav-item executive-clickable block rounded-[28px] border px-5 py-5 transition-colors",
-                      active
-                        ? "border-primary/18 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--primary)_92%,white_8%),var(--primary))] text-primary-foreground shadow-(--shadow-button) ring-1 ring-primary/10"
-                        : "border-border/60 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--background)_94%,white_6%),color-mix(in_srgb,var(--background)_99%,transparent_1%))] shadow-[0_10px_28px_rgba(15,23,42,0.04)] hover:border-border hover:bg-muted/40",
-                    )}
-                    href={item.href}
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className={cn("mt-0.5 rounded-full p-2.5", active ? "bg-primary-foreground/15" : "bg-muted") }>
-                        <Icon className="size-4" />
-                      </span>
-                      <div className="space-y-1.5">
-                        <div className="text-sm font-medium tracking-[-0.02em]">{item.label}</div>
-                        <div className={cn("text-xs leading-5", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{item.description}</div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-            <Separator />
-            <div className="space-y-4 rounded-[28px] border border-border/60 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--muted)_78%,var(--background)_22%),color-mix(in_srgb,var(--muted)_94%,transparent_6%))] p-5 shadow-(--shadow-card)">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Runtime</div>
-              <div className="flex flex-wrap gap-2.5">
-                <Badge className="rounded-full border-border/70 bg-background text-foreground" variant="outline">{currentModeLabel}</Badge>
-                <Badge className="rounded-full border-border/70 bg-background text-foreground" variant="outline">{snapshot.venue}</Badge>
+            {/* Nav groups */}
+            <nav className="flex-1 space-y-6">
+              <div>
+                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Monitor</div>
+                <div className="space-y-0.5">
+                  {navItems.filter(i => ["overview","positions","markets"].includes(i.page)).map((item) => {
+                    const Icon = item.icon;
+                    const active = page === item.page;
+                    return (
+                      <Link
+                        key={item.page}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
+                          active
+                            ? "bg-white/12 text-white"
+                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
+                        )}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Operate</div>
+                <div className="space-y-0.5">
+                  {navItems.filter(i => ["risk","execution","review","settings"].includes(i.page)).map((item) => {
+                    const Icon = item.icon;
+                    const active = page === item.page;
+                    return (
+                      <Link
+                        key={item.page}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
+                          active
+                            ? "bg-white/12 text-white"
+                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
+                        )}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </nav>
+
+            {/* Runtime status footer */}
+            <div className="mt-4 rounded-lg border border-white/8 bg-white/4 p-3 space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{currentModeLabel}</Badge>
+                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{snapshot.venue}</Badge>
                 <BotHealthBadge health={botHealth} />
               </div>
-              <p className="text-xs leading-5 text-foreground">{botHealth.summary}</p>
-              <p className="text-xs leading-5 text-muted-foreground">{refreshState}</p>
+              <p className="text-[11px] leading-4 text-white/35 truncate">{refreshState}</p>
             </div>
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1 space-y-6 lg:space-y-7">
-          <div className="lg:hidden">
-            <div className="mb-4 rounded-[28px] border border-(--glass-border) bg-[linear-gradient(145deg,color-mix(in_srgb,var(--card)_90%,var(--background)_10%),color-mix(in_srgb,var(--card)_97%,transparent_3%))] p-5 shadow-(--shadow-shell) ring-1 ring-white/25 backdrop-blur-2xl dark:ring-white/6">
-              <NyraQLockup compact />
+        <main className="min-w-0 flex-1 flex flex-col">
+          {/* ── Mobile nav ── */}
+          <div className="lg:hidden border-b border-border/60 bg-(--background) px-4 py-3">
+            <div className="flex items-center gap-2 mb-3">
+              <img alt="NyraQ mark" className="size-5 object-contain" src="/nyraq-mark.svg" />
+              <span className="text-sm font-semibold tracking-[-0.02em]">NyraQ</span>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const active = page === item.page;
-
                 return (
                   <Link
-                    className={cn(
-                      "executive-clickable min-w-48 rounded-3xl border px-5 py-4",
-                      active
-                        ? "border-primary/18 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--primary)_92%,white_8%),var(--primary))] text-primary-foreground shadow-(--shadow-button) ring-1 ring-primary/10"
-                        : "border-border/60 bg-card/94 shadow-[0_12px_34px_rgba(15,23,42,0.05)]",
-                    )}
-                    href={item.href}
                     key={item.page}
+                    href={item.href}
+                    className={cn(
+                      "flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                      active
+                        ? "border-foreground/20 bg-foreground text-background"
+                        : "border-border/60 bg-card text-muted-foreground hover:text-foreground",
+                    )}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={cn("rounded-full p-2.5", active ? "bg-primary-foreground/15" : "bg-muted") }>
-                        <Icon className="size-4" />
-                      </span>
-                      <div>
-                        <div className="text-sm font-medium">{item.label}</div>
-                        <div className={cn("text-xs", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{item.description}</div>
-                      </div>
-                    </div>
+                    <Icon className="size-3.5" />
+                    {item.label}
                   </Link>
                 );
               })}
             </div>
           </div>
 
-          <header className="executive-header rounded-[2.2rem] border border-(--glass-border) bg-[linear-gradient(140deg,color-mix(in_srgb,var(--card)_88%,var(--background)_12%),color-mix(in_srgb,var(--card)_97%,transparent_3%))] p-4 shadow-(--shadow-shell) ring-1 ring-white/30 backdrop-blur-2xl sm:p-5 xl:p-6 dark:ring-white/6">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <NyraQHeaderBadge />
-                  <BotHealthBadge health={botHealth} prominent />
-                </div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">{labelForPage(page)}</div>
-                <h2 className="text-[1.55rem] font-semibold tracking-[-0.05em] text-foreground sm:text-[1.75rem]">{headlineForPage(page)}</h2>
-                <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{descriptionForPage(page)}</p>
+          {/* ── Slim topbar ── */}
+          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-(--background) px-5 lg:px-6">
+            <div className="flex items-center gap-3">
+              <h1 className="text-[15px] font-semibold tracking-[-0.02em] text-foreground">{headlineForPage(page)}</h1>
+              <BotHealthBadge health={botHealth} />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden text-xs text-muted-foreground sm:block">
+                {pendingOperatorAction === null ? operatorState : `Running ${pendingOperatorAction}…`}
               </div>
-              <div className="flex flex-wrap items-center gap-3.5">
-                <Button className="rounded-full px-5" disabled={isRefreshing} onClick={() => void refreshSnapshot(true)} variant="outline">
-                  <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
-                  Refresh runtime
-                </Button>
-                <div className="rounded-full border border-border/60 bg-background/78 px-4 py-2.5 text-sm text-muted-foreground shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur-xl">
-                  {pendingOperatorAction === null ? operatorState : `Running ${pendingOperatorAction}...`}
-                </div>
-              </div>
+              <Button className="h-8 rounded-md px-3 text-xs" disabled={isRefreshing} onClick={() => void refreshSnapshot(true)} variant="outline">
+                <RefreshCw className={cn("size-3.5", isRefreshing && "animate-spin")} />
+                Refresh
+              </Button>
             </div>
           </header>
 
-          <section className="rounded-[1.8rem] border border-border/60 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--muted)_78%,var(--background)_22%),color-mix(in_srgb,var(--muted)_94%,transparent_6%))] px-4 py-4 shadow-(--shadow-card) sm:px-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0 space-y-2">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Bot health</div>
-                  <BotHealthBadge health={botHealth} />
-                </div>
-                <p className="text-sm leading-6 text-foreground">{botHealth.summary}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <WatchMetric label="Paper posture" value={botHealth.paper_status} active={botHealth.paper_ready} />
-                <WatchMetric label="Startup" value={botHealth.startup_status} active={!botHealth.awaiting_first_paper_fill} />
-                <WatchMetric label="Execution" value={botHealth.execution_status} active={botHealth.recent_paper_entry} />
-                <WatchMetric label="Monitor" value={botHealth.monitor_status} active={botHealth.monitor_fresh} />
-              </div>
-            </div>
-          </section>
+          {/* ── Page content ── */}
+          <div className="flex-1 overflow-auto px-5 py-5 lg:px-6 lg:py-6 space-y-5">
 
           {page === "overview" ? (
             <OverviewPage
@@ -708,6 +700,7 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
               themePreference={themePreference}
             />
           ) : null}
+          </div>
         </main>
       </div>
     </div>
@@ -717,7 +710,7 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
 function NyraQLockup({ compact = false }: { compact?: boolean }) {
   return (
     <div className={cn("flex items-center gap-4", compact && "gap-3")}>
-      <div className={cn("flex items-center justify-center rounded-[1.4rem] border border-(--glass-border) bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_92%,var(--background)_8%),color-mix(in_srgb,var(--card)_98%,transparent_2%))] shadow-(--shadow-card) ring-1 ring-white/25 backdrop-blur-xl dark:ring-white/6", compact ? "size-14" : "size-16")}>
+      <div className={cn("flex items-center justify-center rounded-xl border border-(--glass-border) bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_92%,var(--background)_8%),color-mix(in_srgb,var(--card)_98%,transparent_2%))] shadow-(--shadow-card) ring-1 ring-white/25 backdrop-blur-xl dark:ring-white/6", compact ? "size-14" : "size-16")}>
         <img alt="NyraQ mark" className={cn("object-contain", compact ? "size-10" : "size-12")} src="/nyraq-mark.svg" />
       </div>
       <div className="space-y-1.5">
@@ -730,7 +723,7 @@ function NyraQLockup({ compact = false }: { compact?: boolean }) {
 
 function NyraQHeaderBadge() {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/72 px-3 py-2 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+    <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/72 px-3 py-2 ">
       <img alt="NyraQ mark" className="size-6 object-contain" src="/nyraq-mark.svg" />
       <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">NyraQ</span>
     </div>
@@ -766,127 +759,130 @@ function OverviewPage({
   const liveAccountFlat = liveAccountConnected && walletBalance === null && snapshot.positions.length === 0;
 
   return (
-    <div className="space-y-6">
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader className="space-y-3 pb-3">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-5">
+      {/* ── KPI strip ── */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MetricCard label="Wallet balance" tone="neutral" value={formatUsd(walletBalance)} />
+        <MetricCard label="Realized P&L" tone={realizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(realizedPnl)} />
+        <MetricCard label="Unrealized P&L" tone={unrealizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(unrealizedPnl)} />
+        <MetricCard label="Open exposure" tone="neutral" value={formatUsd(openRiskUsd)} />
+      </div>
+
+      {liveAccountFlat ? (
+        <div className="rounded-xl border border-border/70 bg-muted/35 px-4 py-3 text-sm leading-6 text-muted-foreground">
+          Live account connected — no wallet balance or positions yet. Totals will appear once the futures wallet is funded.
+        </div>
+      ) : null}
+
+      {/* ── Bot health chips + trade stats ── */}
+      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Bot health</span>
+            <BotHealthBadge health={botHealth} />
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <WatchMetric label="Paper posture" value={botHealth.paper_status} />
+            <WatchMetric label="Startup" value={botHealth.startup_status} />
+            <WatchMetric label="Execution" value={botHealth.execution_status} />
+            <WatchMetric label="Monitor" value={botHealth.monitor_status} />
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">{botHealth.summary}</p>
+        </div>
+        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2 lg:w-52">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Trade stats</span>
+          <div className="grid grid-cols-2 gap-2">
+            <MetricBlock compact label="Win rate" value={formatPercent(tradeSummary.winRate, 1)} />
+            <MetricBlock compact label="Profit factor" value={formatNumber(tradeSummary.profitFactor)} />
+            <MetricBlock compact label="Expectancy" value={formatSignedUsd(tradeSummary.expectancyPerTrade)} />
+            <MetricBlock compact label="Trades" value={String(tradeSummary.closedTrades)} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Symbol scan strip ── */}
+      <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Symbol scan</span>
+        <div className="grid gap-1.5 grid-cols-5 sm:grid-cols-10">
+          {["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","DOTUSDT"].map((sym) => {
+            const op = snapshot.opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
+            const conf = op ? parseFloat(op.confidence) : 0;
+            const isGood = op && !op.regime.includes("NoTrade") && !op.regime.includes("Disordered");
+            const isBad = op && (op.regime.includes("NoTrade") || op.regime.includes("Disordered"));
+            return (
+              <div
+                className={cn(
+                  "relative overflow-hidden rounded-lg border px-2 py-2 text-center",
+                  isGood ? "border-(--success-border) bg-(--success-surface)" :
+                  isBad ? "border-(--danger-border) bg-(--danger-surface)" :
+                  "border-border/60 bg-muted/25",
+                )}
+                key={sym}
+              >
+                <div className="text-xs font-semibold tracking-[-0.02em] text-foreground">{sym.replace("USDT","")}</div>
+                <div className="mt-0.5 text-[9px] uppercase tracking-[0.1em] text-muted-foreground truncate">{op ? op.action : "—"}</div>
+                {op && (
+                  <div className={cn("text-[8px] tabular-nums mt-0.5", (op.htf_trend_bias ?? 0) > 0.3 ? "text-(--success-foreground)" : (op.htf_trend_bias ?? 0) < -0.3 ? "text-(--danger-foreground)" : "text-muted-foreground")}>
+                    {(op.htf_trend_bias ?? 0) > 0.3 ? "↑" : (op.htf_trend_bias ?? 0) < -0.3 ? "↓" : "—"}
+                  </div>
+                )}
+                {op && conf > 0 && (
+                  <div className="mt-1 h-[2px] w-full overflow-hidden rounded-full bg-black/10">
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(100, conf * 100)}%`, background: isGood ? "var(--cal-green-text)" : isBad ? "var(--cal-red-text)" : "currentColor" }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Chart + side panel ── */}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
+        <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
+        <div className="space-y-4">
+          {/* Current attention */}
+          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current attention</span>
+            <p className="text-sm leading-6 text-foreground">
+              {topPosition
+                ? `${topPosition.symbol} — ${formatSignedUsd(topPosition.unrealized_pnl)} unrealized P&L.${topPositionEntryTimestamp !== null ? ` Open ${formatRelativeDuration(topPositionEntryTimestamp)}.` : ""}`
+                : "No live position. Preserve capital instead of forcing exposure."}
+            </p>
+            {topOpportunity && (
+              <p className="text-xs leading-5 text-muted-foreground">
+                Best opp: {topOpportunity.symbol} {formatStrategyFamily(topOpportunity.family)} · {topOpportunity.action.toLowerCase()} · conf {topOpportunity.confidence} · HTF {(topOpportunity.htf_trend_bias ?? 0) >= 0 ? "+" : ""}{(topOpportunity.htf_trend_bias ?? 0).toFixed(2)}
+              </p>
+            )}
+          </div>
+          {/* Mistakes */}
+          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mistakes to avoid</span>
             <div className="space-y-2">
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Bot health</CardTitle>
-              <CardDescription>One place to answer whether the paper bot is healthy, active, and still proving its path.</CardDescription>
+              {mistakes.map((mistake) => (
+                <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5" key={mistake.title}>
+                  <div className="text-xs font-semibold text-foreground">{mistake.title}</div>
+                  <div className="mt-1 text-xs leading-5 text-muted-foreground">{mistake.why}</div>
+                </div>
+              ))}
             </div>
-            <BotHealthBadge health={botHealth} prominent />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="rounded-3xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricBlock compact label="Paper posture" tone={botHealth.paper_ready ? "positive" : "negative"} value={botHealth.paper_status} />
-            <MetricBlock compact label="Week monitor" tone={botHealth.monitor_fresh ? "positive" : "negative"} value={botHealth.monitor_status} />
-            <MetricBlock compact label="Execution proof" tone={botHealth.recent_paper_entry ? (botHealth.recent_paper_exit ? "positive" : "neutral") : "negative"} value={botHealth.execution_status} />
-            <MetricBlock compact label="Pending mode" value={botHealth.pending_mode_request ?? "None"} tone={botHealth.pending_mode_request ? "negative" : "neutral"} />
-            <MetricBlock compact label="Snapshot updated" value={botHealth.last_snapshot_at ? formatOperatorTimestamp(botHealth.last_snapshot_at) : "No data"} />
-            <MetricBlock compact label="Last monitor check" value={formatHealthTimestamp(botHealth.last_monitor_check_at_ms)} />
-            <MetricBlock compact label="Last paper fill" value={formatHealthTimestamp(botHealth.last_paper_entry_at_ms)} tone={botHealth.recent_paper_entry ? "positive" : "negative"} />
-            <MetricBlock compact label="Last paper close" value={formatHealthTimestamp(botHealth.last_paper_exit_at_ms)} tone={botHealth.recent_paper_exit ? "positive" : "neutral"} />
-          </div>
-          <div className="grid gap-4 lg:grid-cols-2">
+          {/* Proven execution */}
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
             <ProvenExecutionCard
-              body={botHealth.last_paper_entry_at_ms !== null
-                ? `Latest proven paper entry was recorded ${formatRelativeDuration(botHealth.last_paper_entry_at_ms)}.`
-                : botHealth.awaiting_first_paper_fill
-                  ? "The runtime is in warmup after restart and is waiting for the first new paper fill."
-                  : "No fresh paper entry has been proven yet."}
+              body={botHealth.last_paper_entry_at_ms !== null ? `Proven paper entry ${formatRelativeDuration(botHealth.last_paper_entry_at_ms)}.` : botHealth.awaiting_first_paper_fill ? "Warmup — waiting for first paper fill." : "No fresh paper entry proven yet."}
               label="Last proven entry"
               timestampMs={botHealth.last_paper_entry_at_ms}
               tone={botHealth.recent_paper_entry ? "positive" : botHealth.awaiting_first_paper_fill ? "neutral" : "negative"}
             />
             <ProvenExecutionCard
-              body={botHealth.last_paper_exit_at_ms !== null
-                ? `Latest proven paper exit was recorded ${formatRelativeDuration(botHealth.last_paper_exit_at_ms)}.`
-                : "No fresh paper close has been proven yet, so exit health is still observational rather than confirmed."}
+              body={botHealth.last_paper_exit_at_ms !== null ? `Proven paper exit ${formatRelativeDuration(botHealth.last_paper_exit_at_ms)}.` : "No fresh paper close proven yet."}
               label="Last proven exit"
               timestampMs={botHealth.last_paper_exit_at_ms}
               tone={botHealth.recent_paper_exit ? "positive" : "neutral"}
             />
           </div>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {botHealth.reasons.slice(0, 4).map((reason) => (
-              <div className="rounded-3xl border border-border/70 bg-muted/30 px-4 py-3 text-sm leading-6 text-muted-foreground" key={reason}>{reason}</div>
-            ))}
-            {botHealth.last_alert_message ? (
-              <div className="rounded-3xl border border-(--warning-border) bg-(--warning-surface) px-4 py-3 text-sm leading-6 text-(--warning-foreground)">
-                Latest monitor alert: {botHealth.last_alert_message}
-              </div>
-            ) : null}
-          </div>
-        </CardContent>
-      </Card>
-
-      {liveAccountFlat ? (
-        <div className="rounded-3xl border border-border/70 bg-muted/35 px-5 py-4 text-sm leading-6 text-muted-foreground">
-          Live Binance Futures account transport is connected, but the account currently has no non-zero wallet balances and no open positions. Overview totals will stay blank or flat until the futures wallet is funded or a position opens.
         </div>
-      ) : null}
-
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader className="space-y-3 pb-3">
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Main dashboard</CardTitle>
-            <CardDescription>Keep this page focused on money, exposure, and the next mistake to avoid.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="Wallet balance" tone="neutral" value={formatUsd(walletBalance)} />
-            <MetricCard label="Realized P&L" tone={realizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(realizedPnl)} />
-            <MetricCard label="Unrealized P&L" tone={unrealizedPnl >= 0 ? "positive" : "negative"} value={formatSignedUsd(unrealizedPnl)} />
-            <MetricCard label="Open exposure" tone="neutral" value={formatUsd(openRiskUsd)} />
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Trade review snapshot</CardTitle>
-            <CardDescription>Current live posture and whether the recent book supports taking more risk.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <MetricBlock label="Win rate" value={formatPercent(tradeSummary.winRate, 1)} />
-              <MetricBlock label="Profit factor" value={formatNumber(tradeSummary.profitFactor)} />
-              <MetricBlock label="Expectancy" value={formatSignedUsd(tradeSummary.expectancyPerTrade)} />
-              <MetricBlock label="Closed trades" value={String(tradeSummary.closedTrades)} />
-            </div>
-            <div className="rounded-3xl border border-border/70 bg-muted/35 p-5">
-              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Current attention</div>
-              <div className="mt-2 text-sm leading-6 text-foreground">
-                {topPosition
-                  ? `${topPosition.symbol} is the primary live position with ${formatSignedUsd(topPosition.unrealized_pnl)} unrealized P&L.${topPositionEntryTimestamp !== null ? ` Open ${formatRelativeDuration(topPositionEntryTimestamp)} from ${formatTimestampMs(topPositionEntryTimestamp)}.` : ""}`
-                  : "No live position is open right now. Preserve capital instead of forcing exposure."}
-              </div>
-              <div className="mt-2 text-sm leading-6 text-muted-foreground">
-                {topOpportunity
-                  ? `Best queued opportunity is ${topOpportunity.symbol} ${formatStrategyFamily(topOpportunity.family)} with ${topOpportunity.action.toLowerCase()} confidence ${topOpportunity.confidence}.`
-                  : "No opportunity is strong enough to act on. That is valid market feedback, not inactivity."}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)]">
-        <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Mistakes not to do</CardTitle>
-            <CardDescription>What to avoid right now and why it damages the book.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {mistakes.map((mistake) => (
-              <div className="rounded-3xl border border-border/70 bg-muted/35 p-5" key={mistake.title}>
-                <div className="text-sm font-medium text-foreground">{mistake.title}</div>
-                <div className="mt-1 text-sm leading-6 text-muted-foreground">{mistake.why}</div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
@@ -916,22 +912,22 @@ function PositionsPage({
   return (
     <div className="space-y-6">
       {liveAccountFlat ? (
-        <div className="rounded-3xl border border-border/70 bg-muted/35 px-5 py-4 text-sm leading-6 text-muted-foreground">
+        <div className="rounded-xl border border-border/70 bg-muted/35 px-5 py-4 text-sm leading-6 text-muted-foreground">
           Positions and balance history are live, but the connected Binance Futures account is currently flat: zero open positions and zero non-zero wallet balances.
         </div>
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Open positions</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Open positions</CardTitle>
             <CardDescription>Current exposure, leverage, and unrealized mark-to-market.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             {snapshot.positions.length === 0 ? (
               <EmptyState message={emptyPositionsMessage} />
             ) : (
-              <div className="overflow-hidden rounded-3xl border border-border/70">
+              <div className="overflow-hidden rounded-xl border border-border/70">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -974,27 +970,27 @@ function PositionsPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Balance calendar</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Balance calendar</CardTitle>
             <CardDescription>Daily closes with the same green/red logic operators use to assess discipline.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             <BalanceCalendar days={balanceSummary.calendar} emptyMessage={emptyBalanceMessage} />
           </CardContent>
         </Card>
       </div>
 
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Recent closed trades</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Recent closed trades</CardTitle>
           <CardDescription>The last eight closures with source quality and realized result.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           {tradeSummary.recentTrades.length === 0 ? (
             <EmptyState message="No closed trades recorded yet." />
           ) : (
-            <div className="overflow-hidden rounded-3xl border border-border/70">
+            <div className="overflow-hidden rounded-xl border border-border/70">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1068,12 +1064,12 @@ function SymbolHeatmap({
   }
 
   return (
-    <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Symbol heatmap</CardTitle>
-        <CardDescription>Top candidate per symbol across the full watchlist. Green = tradeable regime, red = no-trade or disordered.</CardDescription>
+    <Card className="rounded-xl border-border/60 bg-card">
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Symbol heatmap</CardTitle>
+        <CardDescription>Top candidate per symbol. Green = tradeable regime. Funding, HTF bias, and depth imbalance shown per cell.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 pb-4">
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {displaySymbols.map((sym) => {
             const op = opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
@@ -1086,9 +1082,19 @@ function SymbolHeatmap({
                   ? "border-(--danger-border) bg-(--danger-surface)"
                   : "border-border/60 bg-muted/25";
 
+            const fundingRate = op?.funding_rate ?? 0;
+            const htf = op?.htf_trend_bias ?? 0;
+            const depth = op?.depth_imbalance ?? 0;
+            const oi = op?.oi_delta ?? 0;
+
+            const htfLabel = htf > 0.3 ? "↑ Bull" : htf < -0.3 ? "↓ Bear" : "— Flat";
+            const htfColor = htf > 0.3 ? "text-(--success-foreground)" : htf < -0.3 ? "text-(--danger-foreground)" : "text-muted-foreground";
+            const fundingColor = fundingRate > 0.0005 ? "text-(--danger-foreground)" : fundingRate < -0.0005 ? "text-(--success-foreground)" : "text-muted-foreground";
+            const depthColor = depth > 0.15 ? "text-(--success-foreground)" : depth < -0.15 ? "text-(--danger-foreground)" : "text-muted-foreground";
+
             return (
               <div
-                className={cn("rounded-[20px] border px-4 py-3 transition-all", toneClass)}
+                className={cn("relative overflow-hidden rounded-lg border px-4 py-3 transition-all", toneClass)}
                 key={sym}
               >
                 <div className="text-sm font-semibold tracking-[-0.02em] text-foreground">
@@ -1105,6 +1111,34 @@ function SymbolHeatmap({
                     </div>
                     <div className="mt-0.5 text-[11px] text-muted-foreground">
                       conf {op.confidence} · {op.action}
+                    </div>
+                    {/* Signal row: HTF · Funding · Depth */}
+                    <div className="mt-1.5 flex items-center gap-2 text-[10px] tabular-nums">
+                      <span className={htfColor}>{htfLabel}</span>
+                      <span className="text-border/60">·</span>
+                      <span className={fundingColor} title="Funding rate per 8h">
+                        F:{(fundingRate * 100).toFixed(3)}%
+                      </span>
+                      <span className="text-border/60">·</span>
+                      <span className={depthColor} title="L2 depth imbalance">
+                        D:{depth >= 0 ? "+" : ""}{depth.toFixed(2)}
+                      </span>
+                    </div>
+                    {/* OI delta micro badge */}
+                    {Math.abs(oi) > 0.01 && (
+                      <div className={cn("mt-1 text-[10px]", oi > 0 ? "text-(--success-foreground)" : "text-(--danger-foreground)")}>
+                        OI {oi > 0 ? "▲" : "▼"} {Math.abs(oi).toFixed(3)}
+                      </div>
+                    )}
+                    {/* Confidence bar */}
+                    <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-black/10">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(100, conf * 100)}%`,
+                          background: conf >= 0.75 ? "var(--cal-green-text)" : conf >= 0.55 ? "currentColor" : "rgba(148,163,184,0.6)",
+                        }}
+                      />
                     </div>
                   </>
                 ) : (
@@ -1159,20 +1193,27 @@ function StrategiesPage({
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardContent className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)] xl:p-5">
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardContent className="px-4 pb-4 grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
               <Badge className="rounded-full" variant="secondary">{selectedSymbol === "All" ? "All symbols" : selectedSymbol}</Badge>
             </div>
-            <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Market structure, opportunity ranking, and live posture in one view.</div>
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Chart first, watchlist second, and research context close enough to act without scanning disconnected panels.</p>
+            <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Signal intelligence, opportunity queue, and live chart in one surface.</div>
+            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Select a symbol from the watchlist to load its chart, indicators, and live signal context. Consensus, HTF bias, and funding rate update each cycle.</p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <MetricBlock compact label="Last price" value={latestCandle ? formatUsd(latestCandle.close, 2) : "No data"} />
-            <MetricBlock compact label="Consensus" tone={(latestIndicatorPoint?.signal_consensus ?? 0) > 0 ? "positive" : (latestIndicatorPoint?.signal_consensus ?? 0) < 0 ? "negative" : "neutral"} value={latestIndicatorPoint ? formatSignedNumber(latestIndicatorPoint.signal_consensus, 3) : "No data"} />
-            <MetricBlock compact label="Queued action" tone={selectedOpportunity?.action === "Buy" ? "positive" : selectedOpportunity?.action === "Sell" ? "negative" : "neutral"} value={selectedOpportunity ? `${selectedOpportunity.action} · ${selectedOpportunity.family}` : "NoSignal"} />
+          <div className="space-y-2">
+            <div className="grid gap-2 grid-cols-3">
+              <MetricBlock compact label="Last price" value={latestCandle ? formatUsd(latestCandle.close, 2) : "No data"} />
+              <MetricBlock compact label="Consensus" tone={(latestIndicatorPoint?.signal_consensus ?? 0) > 0 ? "positive" : (latestIndicatorPoint?.signal_consensus ?? 0) < 0 ? "negative" : "neutral"} value={latestIndicatorPoint ? formatSignedNumber(latestIndicatorPoint.signal_consensus, 3) : "No data"} />
+              <MetricBlock compact label="Queued action" tone={selectedOpportunity?.action === "Buy" ? "positive" : selectedOpportunity?.action === "Sell" ? "negative" : "neutral"} value={selectedOpportunity ? `${selectedOpportunity.action} · ${selectedOpportunity.family}` : "No signal"} />
+            </div>
+            <div className="grid gap-2 grid-cols-3">
+              <MetricBlock compact label="Funding rate" tone={(selectedOpportunity?.funding_rate ?? 0) > 0.0005 ? "negative" : (selectedOpportunity?.funding_rate ?? 0) < -0.0005 ? "positive" : "neutral"} value={selectedOpportunity ? `${((selectedOpportunity.funding_rate ?? 0) * 100).toFixed(4)}%` : "—"} />
+              <MetricBlock compact label="HTF bias" tone={(selectedOpportunity?.htf_trend_bias ?? 0) > 0.2 ? "positive" : (selectedOpportunity?.htf_trend_bias ?? 0) < -0.2 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.htf_trend_bias ?? 0, 2) : "—"} />
+              <MetricBlock compact label="Depth imbal." tone={(selectedOpportunity?.depth_imbalance ?? 0) > 0.1 ? "positive" : (selectedOpportunity?.depth_imbalance ?? 0) < -0.1 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.depth_imbalance ?? 0, 2) : "—"} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -1211,38 +1252,61 @@ function StrategiesPage({
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Opportunity queue</CardTitle>
-            <CardDescription>Current candidates with regime and model scope. This page is now strategy-only detail.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Opportunity queue</CardTitle>
+            <CardDescription>All active candidates ranked by confluence score with full signal context — funding, HTF bias, OI delta, depth, and BTC correlation.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             {scopedSnapshot.opportunities.length === 0 ? (
               <EmptyState message="No strategy candidates are currently queued." />
             ) : (
-              <div className="overflow-hidden rounded-3xl border border-border/70">
+              <div className="overflow-hidden rounded-xl border border-border/70">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Symbol</TableHead>
                       <TableHead>Family</TableHead>
                       <TableHead>Regime</TableHead>
-                      <TableHead>Confidence</TableHead>
+                      <TableHead>Conf</TableHead>
+                      <TableHead className="text-right">Funding</TableHead>
+                      <TableHead className="text-right">HTF</TableHead>
+                      <TableHead className="text-right">OI Δ</TableHead>
+                      <TableHead className="text-right">Depth</TableHead>
+                      <TableHead className="text-right">BTC corr</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {scopedSnapshot.opportunities.map((item) => (
-                      <TableRow key={`${item.symbol}-${item.model_id}`}>
-                        <TableCell className="font-medium">{item.symbol}</TableCell>
-                        <TableCell>{formatStrategyFamily(item.family)}</TableCell>
-                        <TableCell>{item.regime}</TableCell>
-                        <TableCell>{item.confidence}</TableCell>
-                        <TableCell>
-                          <Badge className={cn("rounded-full border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {scopedSnapshot.opportunities.map((item, idx) => {
+                      const fundingRate = item.funding_rate ?? 0;
+                      const htf = item.htf_trend_bias ?? 0;
+                      const oi = item.oi_delta ?? 0;
+                      const depth = item.depth_imbalance ?? 0;
+                      const corr = item.btc_correlation ?? 0;
+                      const fundingPct = (fundingRate * 100).toFixed(4);
+                      const fundingTone = fundingRate > 0.0005 ? "text-(--danger-foreground)" : fundingRate < -0.0005 ? "text-(--success-foreground)" : "text-muted-foreground";
+                      const htfTone = htf > 0.2 ? "text-(--success-foreground)" : htf < -0.2 ? "text-(--danger-foreground)" : "text-muted-foreground";
+                      const oiTone = oi > 0.02 ? "text-(--success-foreground)" : oi < -0.02 ? "text-(--danger-foreground)" : "text-muted-foreground";
+                      const depthTone = depth > 0.1 ? "text-(--success-foreground)" : depth < -0.1 ? "text-(--danger-foreground)" : "text-muted-foreground";
+                      const corrTone = corr > 0.8 ? "text-(--warning-foreground)" : "text-muted-foreground";
+                      return (
+                        <TableRow key={`${item.symbol}-${item.model_id}-${idx}`}>
+                          <TableCell className="font-medium">{item.symbol}</TableCell>
+                          <TableCell>{formatStrategyFamily(item.family)}</TableCell>
+                          <TableCell>{item.regime}</TableCell>
+                          <TableCell className="tabular-nums">{item.confidence}</TableCell>
+                          <TableCell className={cn("text-right tabular-nums text-xs", fundingTone)}>{fundingPct}%</TableCell>
+                          <TableCell className={cn("text-right tabular-nums text-xs", htfTone)}>{htf >= 0 ? "+" : ""}{htf.toFixed(2)}</TableCell>
+                          <TableCell className={cn("text-right tabular-nums text-xs", oiTone)}>{oi >= 0 ? "+" : ""}{oi.toFixed(3)}</TableCell>
+                          <TableCell className={cn("text-right tabular-nums text-xs", depthTone)}>{depth >= 0 ? "+" : ""}{depth.toFixed(2)}</TableCell>
+                          <TableCell className={cn("text-right tabular-nums text-xs", corrTone)}>{corr.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Badge className={cn("rounded-full border", actionBadgeClasses(item.action))} variant="outline">{item.action}</Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -1250,17 +1314,17 @@ function StrategiesPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Research leaderboard</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research leaderboard</CardTitle>
             <CardDescription>Top promoted models and their threshold posture.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="px-4 pb-4 space-y-4">
             {scopedSnapshot.research_models.length === 0 ? (
               <EmptyState message="No research leaderboard is available yet." />
             ) : (
               scopedSnapshot.research_models.slice(0, 8).map((model) => (
-                <div className="rounded-3xl border border-border/70 bg-muted/35 p-5" key={model.id}>
+                <div className="rounded-xl border border-border/70 bg-muted/35 p-5" key={model.id}>
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <div className="text-sm font-medium text-foreground">{model.id}</div>
@@ -1283,12 +1347,12 @@ function StrategiesPage({
 
       <SymbolHeatmap opportunities={snapshot.opportunities} symbols={availableSymbols} />
 
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">What this means for entries</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">What this means for entries</CardTitle>
           <CardDescription>Do not treat a queued candidate as a trade signal without confirming indicator posture and live trade quality.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
+        <CardContent className="px-4 pb-4 grid gap-4 md:grid-cols-3">
           <StrategyNote title="Wait for structure" detail="Use price and EMA relationship first. A model score without structure alignment is not enough." />
           <StrategyNote title="Respect recent P&L" detail={`Recent expectancy is ${formatSignedUsd(tradeSummary.expectancyPerTrade)}. If it degrades, lower aggressiveness instead of searching for more trades.`} />
           <StrategyNote title="Confirm momentum regime" detail={`RSI, MACD, and volume should support ${selectedSymbol === "All" ? "the active symbol" : selectedSymbol}. Range logic in a trend pane is where forced errors begin.`} />
@@ -1305,35 +1369,35 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Risk posture</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Risk posture</CardTitle>
             <CardDescription>Live qualitative notes, system gate, and sentiment modifiers.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 lg:grid-cols-2">
               <MetricBlock label="Execution summary" value={snapshot.execution_summary} />
               <MetricBlock label="Exchange gate" value={snapshot.exchange_gate} />
               <MetricBlock label="Sentiment" value={formatNumber(snapshot.news_sentiment.sentiment_score)} />
               <MetricBlock label="Risk-off flag" value={snapshot.news_sentiment.risk_off ? "True" : "False"} />
             </div>
-            <div className="rounded-3xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
+            <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
               {snapshot.risk_notes.length > 0 ? snapshot.risk_notes.join(" • ") : "No additional risk notes were emitted in the current snapshot."}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Audit pressure</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Audit pressure</CardTitle>
             <CardDescription>Retention and incident pressure that can quietly degrade launch quality.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <RetentionBar label="Order intent retention" percent={retentionOrderPct} detail={`${operator.audit.retention.orderIntents.currentCount}/${operator.audit.retention.orderIntents.limit}`} />
             <RetentionBar label="Execution event retention" percent={retentionExecPct} detail={`${operator.audit.retention.executionEvents.currentCount}/${operator.audit.retention.executionEvents.limit}`} />
             <div className="space-y-3">
               {(operator.audit.incidents.length > 0 ? operator.audit.incidents : [{ id: 0, mode: snapshot.mode, message: "No active incidents in the audit feed." }]).slice(0, 6).map((incident) => (
-                <div className="rounded-[20px] border border-border/70 bg-muted/35 px-5 py-4 text-sm text-muted-foreground" key={`${incident.id}-${incident.message}`}>
+                <div className="rounded-lg border border-border/70 bg-muted/35 px-5 py-4 text-sm text-muted-foreground" key={`${incident.id}-${incident.message}`}>
                   <span className="font-medium text-foreground">{incident.mode}</span>
                   <span className="mx-2 text-border">/</span>
                   {incident.message}
@@ -1344,12 +1408,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
         </Card>
       </div>
 
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Overlay comparator</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Overlay comparator</CardTitle>
           <CardDescription>Scoped overlay validation belongs in risk because it explains how promoted indicators alter approvals.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           {operator.overlayCompare ? (
             <div className="space-y-5">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1358,7 +1422,7 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
                 <MetricCard label="Approvals without" tone="neutral" value={String(operator.overlayCompare.approvals_without_overlay)} compact />
                 <MetricCard label="Approvals with" tone="neutral" value={String(operator.overlayCompare.approvals_with_overlay)} compact />
               </div>
-              <div className="overflow-hidden rounded-3xl border border-border/70">
+              <div className="overflow-hidden rounded-xl border border-border/70">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1391,12 +1455,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
                     <MetricCard label="Flat" tone="neutral" value={String(operator.overlayEffect.flat_candidates)} compact />
                     <MetricCard label="Insufficient" tone="neutral" value={String(operator.overlayEffect.insufficient_candidates)} compact />
                   </div>
-                  <div className="rounded-3xl border border-border/70 bg-muted/20 p-4 text-sm leading-6 text-muted-foreground">
+                  <div className="rounded-xl border border-border/70 bg-muted/20 p-4 text-sm leading-6 text-muted-foreground">
                     This is observational, not counterfactual. It prefers exact indicator-attributed closed trades when they exist and falls back to model-attributed trades only when indicator history is not yet available.
                   </div>
                   <div className="space-y-3">
                     {operator.overlayEffect.candidates.map((candidate) => (
-                      <div className="rounded-3xl border border-border/70 bg-muted/35 p-5" key={`${candidate.scenario}-${candidate.selected_model_id ?? candidate.family}`}>
+                      <div className="rounded-xl border border-border/70 bg-muted/35 p-5" key={`${candidate.scenario}-${candidate.selected_model_id ?? candidate.family}`}>
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-medium text-foreground">{candidate.scenario}</div>
@@ -1466,25 +1530,53 @@ function ExecutionPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Mode and control plane</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode and control plane</CardTitle>
             <CardDescription>Dedicated operator page with real actions instead of sharing space with charts and review.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => (
-                <Button
-                  className="justify-start rounded-[20px] px-4 py-5"
-                  disabled={pendingOperatorAction !== null}
-                  key={mode}
-                  onClick={() => void runOperatorAction("set-mode", mode)}
-                  variant={snapshot.mode === mode ? "default" : "outline"}
-                >
-                  <Radar className="size-4" />
-                  {mode}
-                </Button>
-              ))}
+          <CardContent className="px-4 pb-4 space-y-5">
+            {(() => {
+              const modeDescriptions: Record<string, { label: string; desc: string }> = {
+                Research: { label: "Research", desc: "No fills. Scores candidates and trains models in the background only." },
+                Paper: { label: "Paper", desc: "Simulated fills at live prices. Full strategy execution without real capital." },
+                Protected: { label: "Protected", desc: "Live capital, reduced size. Extra confluence required before any fill." },
+                SemiAuto: { label: "Semi-auto", desc: "Live capital, full size. Operator confirms each order before submission." },
+              };
+              return (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => {
+                    const isActive = snapshot.mode === mode;
+                    const meta = modeDescriptions[mode]!;
+                    return (
+                      <button
+                        className={cn(
+                          "flex w-full flex-col items-start gap-1 rounded-lg border px-4 py-4 text-left transition-all",
+                          isActive
+                            ? "border-foreground/25 bg-foreground text-background shadow-(--shadow-card)"
+                            : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
+                          pendingOperatorAction !== null && "cursor-not-allowed opacity-50",
+                        )}
+                        disabled={pendingOperatorAction !== null}
+                        key={mode}
+                        onClick={() => void runOperatorAction("set-mode", mode)}
+                        type="button"
+                      >
+                        <div className="flex w-full items-center gap-2">
+                          {isActive ? <Check className="size-3.5 shrink-0" /> : <Radar className="size-3.5 shrink-0 opacity-50" />}
+                          <span className="text-sm font-semibold tracking-[-0.02em]">{meta.label}</span>
+                          {isActive && <span className="ml-auto text-[9px] font-normal uppercase tracking-[0.2em] opacity-60">active</span>}
+                        </div>
+                        <p className={cn("text-[11px] leading-4", isActive ? "opacity-60" : "text-muted-foreground")}>{meta.desc}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <div className="rounded-lg border border-border/60 bg-muted/20 px-4 py-3 mb-1">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Maintenance actions</p>
+              <p className="mt-1 text-xs text-muted-foreground">These run once and report back to the event feed. Safe to run at any time without affecting live positions.</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <ActionButton action="status" icon={Activity} label="Stack status" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
@@ -1493,12 +1585,13 @@ function ExecutionPage({
               <ActionButton action="export-audit" icon={Download} label="Export audit" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="compact-audit-db" icon={Gauge} label="Compact audit DB" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="prune-legacy-incidents" icon={ShieldCheck} label="Normalize incidents" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
-              <Button className="justify-start rounded-[20px] px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction("restart-supervisor")} variant="secondary">
+              <ActionButton action="clear-maintenance-history" icon={Eraser} label="Clear maint. history" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
+              <Button className="justify-start rounded-lg px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction("restart-supervisor")} variant="secondary">
                 <RotateCcw className={cn("size-4", pendingOperatorAction === "restart-supervisor" && "animate-spin")} />
                 Restart supervisor
               </Button>
               <Button
-                className="justify-start rounded-[20px] px-4 py-5"
+                className="justify-start rounded-lg px-4 py-5"
                 disabled={pendingOperatorAction !== null}
                 onClick={() => {
                   if (!stopArmed) {
@@ -1515,11 +1608,11 @@ function ExecutionPage({
               </Button>
             </div>
             {stopArmed ? (
-              <div className="rounded-[20px] border border-(--danger-border) bg-(--danger-surface) px-5 py-4 text-sm text-(--danger-foreground)">
+              <div className="rounded-lg border border-(--danger-border) bg-(--danger-surface) px-5 py-4 text-sm text-(--danger-foreground)">
                 Emergency stop is armed for 6 seconds.
               </div>
             ) : null}
-            <div className="rounded-3xl border border-border/70 bg-muted/35 p-5">
+            <div className="rounded-xl border border-border/70 bg-muted/35 p-5">
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Live execution posture</div>
               {livePositions.length === 0 ? (
                 <div className="mt-2 text-sm leading-6 text-muted-foreground">No live positions are open, so execution actions are currently operating from a flat book.</div>
@@ -1532,7 +1625,7 @@ function ExecutionPage({
                   </div>
                   <div className="space-y-3">
                     {livePositions.slice(0, 4).map((position) => (
-                      <div className="rounded-[20px] border border-border/70 bg-background/80 px-5 py-4 text-sm" key={position.symbol}>
+                      <div className="rounded-lg border border-border/70 bg-background/80 px-5 py-4 text-sm" key={position.symbol}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="font-medium text-foreground">{position.symbol}</span>
                           <span className="text-muted-foreground">{formatNumber(position.quantity, 4)} @ {formatUsd(position.entry_price, 2)}</span>
@@ -1552,18 +1645,18 @@ function ExecutionPage({
         </Card>
 
         <div className="space-y-5">
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Runtime health</CardTitle>
+                  <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Runtime health</CardTitle>
                   <CardDescription>Execution-side status for mode, monitor freshness, and whether recent paper activity proves the bot is still working.</CardDescription>
                 </div>
                 <BotHealthBadge health={botHealth} prominent />
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-3xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
+            <CardContent className="px-4 pb-4 space-y-4">
+              <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock compact label="Paper posture" tone={botHealth.paper_ready ? "positive" : "negative"} value={botHealth.paper_status} />
                 <MetricBlock compact label="Week monitor" tone={botHealth.monitor_fresh ? "positive" : "negative"} value={botHealth.monitor_status} />
@@ -1576,10 +1669,10 @@ function ExecutionPage({
               </div>
               <div className="space-y-3">
                 {botHealth.reasons.slice(0, 4).map((reason) => (
-                  <div className="rounded-[20px] border border-border/70 bg-background/80 px-4 py-3 text-sm leading-6 text-muted-foreground" key={reason}>{reason}</div>
+                  <div className="rounded-lg border border-border/70 bg-background/80 px-4 py-3 text-sm leading-6 text-muted-foreground" key={reason}>{reason}</div>
                 ))}
                 {botHealth.last_alert_message ? (
-                  <div className="rounded-[20px] border border-(--warning-border) bg-(--warning-surface) px-4 py-3 text-sm leading-6 text-(--warning-foreground)">
+                  <div className="rounded-lg border border-(--warning-border) bg-(--warning-surface) px-4 py-3 text-sm leading-6 text-(--warning-foreground)">
                     Latest monitor alert: {botHealth.last_alert_message}
                   </div>
                 ) : null}
@@ -1587,17 +1680,17 @@ function ExecutionPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Operator event feed</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Operator event feed</CardTitle>
               <CardDescription>Recent supervisor, maintenance, and mode-change events.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="px-4 pb-4 space-y-3">
               {operator.events.length === 0 ? (
                 <EmptyState message="No operator events are available." />
               ) : (
                 operator.events.map((event) => (
-                  <div className="rounded-[20px] border border-border/70 bg-muted/35 p-4" key={event.id}>
+                  <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={event.id}>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge className={cn("rounded-full border", toneClasses(event.level))} variant="outline">{event.level}</Badge>
                       <span className="text-sm font-medium text-foreground">{event.action}</span>
@@ -2033,12 +2126,12 @@ function ReviewPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Realized equity curve</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Realized equity curve</CardTitle>
             <CardDescription>The equity curve now follows the same active review slice as the filters, metrics, and table.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 md:grid-cols-3">
               <MetricBlock compact label="Curve points" value={String(filteredEquityCurve.length)} />
               <MetricBlock compact label="Slice net P&L" value={formatSignedUsd(reviewMetrics.realizedPnlTotal)} />
@@ -2051,7 +2144,7 @@ function ReviewPage({
               visibleIndex: selectedTradeIndexOnCurve,
             }} />
             {selectedTrade ? (
-              <div className={cn("rounded-[20px] border px-5 py-4 text-sm", selectedTradeIndexOnCurve >= 0 ? "border-border/70 bg-muted/25" : "border-(--warning-border) bg-(--warning-surface) text-(--warning-foreground)")}>
+              <div className={cn("rounded-lg border px-5 py-4 text-sm", selectedTradeIndexOnCurve >= 0 ? "border-border/70 bg-muted/25" : "border-(--warning-border) bg-(--warning-surface) text-(--warning-foreground)")}>
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Selected trade context</div>
                 {selectedTradeIndexOnCurve >= 0 ? (
                   <div className="mt-3 leading-6 text-muted-foreground">
@@ -2068,12 +2161,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Review guardrails</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review guardrails</CardTitle>
             <CardDescription>Filters now drive the review lens, so the metrics below reflect the current slice.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <MetricBlock label="Filtered trades" value={String(reviewMetrics.closedTrades)} />
             <MetricBlock label="Exact coverage" value={formatPercent(reviewMetrics.exactCoverageRate ?? exactCoverage, 0)} />
             <MetricBlock label="Average win" value={formatSignedUsd(reviewMetrics.averageWinPnl)} />
@@ -2081,7 +2174,7 @@ function ReviewPage({
             <MetricBlock label="Avg P&L ratio" value={formatSignedNumber(reviewMetrics.averagePnlRatio)} />
             <MetricBlock label="Avg hold" value={formatDurationMs(averageTradeDurationMs)} />
             <MetricBlock label="Longest hold" value={formatDurationMs(longestTradeDurationMs)} />
-            <div className="rounded-3xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
+            <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-muted-foreground">
               {reviewError
                 ? `Review API degraded: ${reviewError}`
                 : (reviewMetrics.exactCoverageRate ?? exactCoverage) !== null && (reviewMetrics.exactCoverageRate ?? exactCoverage)! < 0.6
@@ -2094,18 +2187,18 @@ function ReviewPage({
         </Card>
       </div>
 
-      <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Slice versus full book</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice versus full book</CardTitle>
           <CardDescription>
             {isFocusedSlice
               ? `The current review slice ${currentSliceLabel} is compared directly against the full closed-trade history.`
               : "No focused slice is active yet. Click a ranked slice to compare it directly against the full closed-trade history."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="px-4 pb-4 space-y-5">
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-            <div className="rounded-3xl border border-border/70 bg-muted/25 p-5">
+            <div className="rounded-xl border border-border/70 bg-muted/25 p-5">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Current slice</div>
               <div className="mt-2 text-sm font-medium text-foreground">{currentSliceLabel}</div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2122,7 +2215,7 @@ function ReviewPage({
               <div className="rounded-full border border-border/70 bg-background px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Vs</div>
             </div>
 
-            <div className="rounded-3xl border border-border/70 bg-muted/10 p-5">
+            <div className="rounded-xl border border-border/70 bg-muted/10 p-5">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Full book</div>
               <div className="mt-2 text-sm font-medium text-foreground">All closed trades</div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2147,12 +2240,12 @@ function ReviewPage({
       </Card>
 
       <div className="grid gap-5 xl:grid-cols-[1.04fr_0.96fr]">
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Slice rankings</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice rankings</CardTitle>
             <CardDescription>Best and weakest model-regime-family combinations inside the current filtered review universe. Applying a slice resets the secondary filters so you review the exact cohort.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-5 2xl:grid-cols-2">
+          <CardContent className="px-4 pb-4 grid gap-5 2xl:grid-cols-2">
             <div className="space-y-4">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Best slices</div>
               {sliceRankings.best.length === 0 ? (
@@ -2162,11 +2255,11 @@ function ReviewPage({
                   const active = isSliceActive(slice);
 
                   return (
-                  <div className={cn("min-w-0 rounded-3xl border p-5 transition-colors", active ? "border-(--success-border) bg-(--success-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--success-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--success-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--success-surface)_82%,transparent_18%)]")} key={`best-${slice.key}`}>
+                  <div className={cn("min-w-0 rounded-xl border p-5 transition-colors", active ? "border-(--success-border) bg-(--success-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--success-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--success-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--success-surface)_82%,transparent_18%)]")} key={`best-${slice.key}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{slice.family} · {slice.regime}</div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
                       </div>
                       <Badge className="rounded-full border border-(--success-border) bg-transparent text-(--success-foreground)" variant="outline">
                         {slice.tradeCount} trades
@@ -2178,7 +2271,7 @@ function ReviewPage({
                       <MetricBlock compact label="Win rate" value={formatPercent(slice.winRate, 1)} />
                       <MetricBlock compact label="Profit factor" value={formatNumber(slice.profitFactor)} />
                     </div>
-                    <div className="mt-4 rounded-[20px] border border-border/60 bg-background/70 px-4 py-3">
+                    <div className="mt-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3">
                       <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Why it ranks here</div>
                       <div className="mt-2.5 space-y-1.5">
                         <div className="flex items-center justify-between gap-2 text-xs">
@@ -2232,11 +2325,11 @@ function ReviewPage({
                   const active = isSliceActive(slice);
 
                   return (
-                  <div className={cn("min-w-0 rounded-3xl border p-5 transition-colors", active ? "border-(--danger-border) bg-(--danger-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--danger-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--danger-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--danger-surface)_82%,transparent_18%)]")} key={`worst-${slice.key}`}>
+                  <div className={cn("min-w-0 rounded-xl border p-5 transition-colors", active ? "border-(--danger-border) bg-(--danger-surface) shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--danger-border)_70%,transparent_30%)]" : "border-[color-mix(in_srgb,var(--danger-border)_72%,transparent_28%)] bg-[color-mix(in_srgb,var(--danger-surface)_82%,transparent_18%)]")} key={`worst-${slice.key}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-medium text-foreground">{slice.modelId}</div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{slice.family} · {slice.regime}</div>
+                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">{formatStrategyFamily(slice.family)} · {slice.regime}</div>
                       </div>
                       <Badge className="rounded-full border border-(--danger-border) bg-transparent text-(--danger-foreground)" variant="outline">
                         {slice.tradeCount} trades
@@ -2248,7 +2341,7 @@ function ReviewPage({
                       <MetricBlock compact label="Win rate" value={formatPercent(slice.winRate, 1)} />
                       <MetricBlock compact label="Profit factor" value={formatNumber(slice.profitFactor)} />
                     </div>
-                    <div className="mt-4 rounded-[20px] border border-border/60 bg-background/70 px-4 py-3">
+                    <div className="mt-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3">
                       <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Why it ranks here</div>
                       <div className="mt-2.5 space-y-1.5">
                         <div className="flex items-center justify-between gap-2 text-xs">
@@ -2294,7 +2387,7 @@ function ReviewPage({
               )}
             </div>
             {inspectedSlice ? (
-              <div className="2xl:col-span-2 rounded-3xl border border-border/70 bg-muted/20 p-5">
+              <div className="2xl:col-span-2 rounded-xl border border-border/70 bg-muted/20 p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Inspected slice</div>
@@ -2318,7 +2411,7 @@ function ReviewPage({
                     <EmptyState message="No trades are available for this slice yet." />
                   </div>
                 ) : (
-                  <div className="mt-5 overflow-hidden rounded-[20px] border border-border/70 bg-background/80">
+                  <div className="mt-5 overflow-hidden rounded-lg border border-border/70 bg-background/80">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -2360,17 +2453,17 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Trade history</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Trade history</CardTitle>
             <CardDescription>Filter by symbol, model, family, regime, close reason, side, source quality, and hold duration, then sort the slice you actually want to review.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Symbol</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setSymbolFilter(event.target.value)}
                   value={symbolFilter}
                 >
@@ -2383,7 +2476,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Model</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setModelFilter(event.target.value)}
                   value={modelFilter}
                 >
@@ -2396,7 +2489,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Family</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setFamilyFilter(event.target.value)}
                   value={familyFilter}
                 >
@@ -2409,7 +2502,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Regime</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setRegimeFilter(event.target.value)}
                   value={regimeFilter}
                 >
@@ -2422,7 +2515,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Reason</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setCloseReasonFilter(event.target.value)}
                   value={closeReasonFilter}
                 >
@@ -2479,7 +2572,7 @@ function ReviewPage({
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Sort</div>
                 <select
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setSortBy(event.target.value)}
                   value={sortBy}
                 >
@@ -2497,7 +2590,7 @@ function ReviewPage({
                 <div className="space-y-2">
                   <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Start date</div>
                   <input
-                    className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                    className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                     onChange={(event) => setCustomStartDate(event.target.value)}
                     type="date"
                     value={customStartDate}
@@ -2506,14 +2599,14 @@ function ReviewPage({
                 <div className="space-y-2">
                   <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">End date</div>
                   <input
-                    className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                    className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                     onChange={(event) => setCustomEndDate(event.target.value)}
                     type="date"
                     value={customEndDate}
                   />
                 </div>
                 <div className="flex items-end">
-                  <Button className="h-12 rounded-[20px]" onClick={() => {
+                  <Button className="h-12 rounded-lg" onClick={() => {
                     setCustomStartDate("");
                     setCustomEndDate("");
                   }} variant="outline">
@@ -2529,13 +2622,13 @@ function ReviewPage({
               <MetricBlock compact label="Slice expectancy" value={formatSignedUsd(reviewMetrics.expectancyPerTrade)} />
             </div>
             {selectedTrade ? (
-              <div className="rounded-[20px] border border-border/70 bg-muted/25 px-5 py-4 text-sm leading-6 text-muted-foreground">
+              <div className="rounded-lg border border-border/70 bg-muted/25 px-5 py-4 text-sm leading-6 text-muted-foreground">
                 <span className="font-medium text-foreground">Selected review trade:</span>{" "}
                 {selectedTrade.symbol} {selectedTrade.side.toLowerCase()} closed {formatTimestampMs(selectedTrade.timestamp_ms)} with {formatSignedUsd(selectedTrade.realized_pnl)}.
                 {selectedTrade.entry_timestamp_ms !== null ? ` Hold time ${formatDurationMs(selectedTrade.timestamp_ms - selectedTrade.entry_timestamp_ms)}.` : " Hold time unavailable."}
               </div>
             ) : null}
-            <div className="flex flex-col gap-4 rounded-3xl border border-border/70 bg-muted/25 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-muted/25 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm text-muted-foreground">
                 {isReviewLoading
                   ? "Refreshing the current review slice..."
@@ -2543,18 +2636,18 @@ function ReviewPage({
                   ? "No trades match the current review slice."
                   : `${filteredTrades.length} trade${filteredTrades.length === 1 ? "" : "s"} in the current review slice.`}
               </div>
-              <Button className="rounded-[20px]" disabled={filteredTrades.length === 0 || isReviewLoading} onClick={() => void exportFilteredTradesCsv()} variant="outline">
+              <Button className="rounded-lg" disabled={filteredTrades.length === 0 || isReviewLoading} onClick={() => void exportFilteredTradesCsv()} variant="outline">
                 <Download className="size-4" />
                 Export slice CSV
               </Button>
             </div>
             {exportState ? (
-              <div className="rounded-[20px] border border-border/70 bg-muted/20 px-5 py-4 text-sm text-muted-foreground">{exportState}</div>
+              <div className="rounded-lg border border-border/70 bg-muted/20 px-5 py-4 text-sm text-muted-foreground">{exportState}</div>
             ) : null}
             {filteredTrades.length === 0 ? (
               <EmptyState message={tradeSummary.tradeHistory.length === 0 ? "No trade history is available yet." : isReviewLoading ? "Loading review slice..." : "No trades match the current review filters."} />
             ) : (
-              <div className="overflow-hidden rounded-3xl border border-border/70">
+              <div className="overflow-hidden rounded-xl border border-border/70">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -2600,14 +2693,14 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Review mistakes</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review mistakes</CardTitle>
             <CardDescription>Concrete actions to avoid and the reason they damage expectancy.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="px-4 pb-4 space-y-3">
             {mistakes.map((mistake) => (
-              <div className="rounded-[20px] border border-border/70 bg-muted/35 p-4" key={mistake.title}>
+              <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={mistake.title}>
                 <div className="text-sm font-medium text-foreground">{mistake.title}</div>
                 <div className="mt-1 text-sm leading-6 text-muted-foreground">{mistake.why}</div>
               </div>
@@ -2802,12 +2895,12 @@ function SettingsPage({
       </div>
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         <div className="space-y-5">
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Mode requests</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode requests</CardTitle>
               <CardDescription>Current request state and protected-mode posture.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="px-4 pb-4 space-y-4">
               <MetricBlock label="Pending request" value={operator.pendingModeRequest ?? "None"} />
               <MetricBlock label="Promoted indicator" value={snapshot.promoted_indicator.id ?? "None"} />
               <MetricBlock label="Overlay enabled" value={snapshot.promoted_indicator.overlay_enabled ? "True" : "False"} />
@@ -2819,12 +2912,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Theme</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme</CardTitle>
               <CardDescription>Follow the system by default or force the dashboard into light or dark mode.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="px-4 pb-4 space-y-2">
               {(["system", "light", "dark"] as ThemePreference[]).map((mode) => {
                 const active = themePreference === mode;
                 const Icon = mode === "system" ? Monitor : mode === "light" ? Sun : Moon;
@@ -2834,19 +2927,19 @@ function SettingsPage({
                     className={cn(
                       "flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-2.5 text-left transition-all duration-150",
                       active
-                        ? "border-primary/25 bg-primary text-primary-foreground shadow-(--shadow-card)"
+                        ? "border-border bg-card text-foreground shadow-(--shadow-card)"
                         : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
                     )}
                     key={mode}
                     onClick={() => setThemePreference(mode)}
                     type="button"
                   >
-                    <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full", active ? "bg-primary-foreground/15" : "bg-muted")}>
+                    <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full", active ? "bg-muted" : "bg-muted")}>
                       <Icon className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className={cn("block text-sm font-medium capitalize")}>{mode}</span>
-                      <span className={cn("block text-[11px]", active ? "text-primary-foreground/65" : "text-muted-foreground")}>{sub}</span>
+                      <span className={cn("block text-[11px]", active ? "text-muted-foreground" : "text-muted-foreground")}>{sub}</span>
                     </span>
                     {active ? <Check className="size-3.5 shrink-0 opacity-70" /> : null}
                   </button>
@@ -2857,13 +2950,13 @@ function SettingsPage({
         </div>
 
         <div className="space-y-5">
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Binance paper session</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Binance paper session</CardTitle>
             <CardDescription>Store Binance Futures credentials in the {tradingSettings.credentialBackend === "wincred" ? "Windows Credential Manager" : "macOS Keychain"}, choose mainnet or testnet transport, and run Paper mode with simulated fills.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <CardContent className="px-4 pb-4 space-y-4">
+            <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
               <MetricBlock label="Environment" value={tradingSettings.binanceEnvironment === "testnet" ? "Testnet" : "Mainnet"} compact />
               <MetricBlock label={tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"} value={tradingSettings.keychainAvailable ? "Available" : "Unavailable"} compact />
               <MetricBlock label="API key" value={tradingSettings.hasApiKey ? "Stored" : "Missing"} compact />
@@ -2897,7 +2990,7 @@ function SettingsPage({
                 compact
               />
             </div>
-            <div className="rounded-[20px] border border-border/70 bg-muted/20 px-4 py-3">
+            <div className="rounded-lg border border-border/70 bg-muted/20 px-4 py-3">
               <div className="grid gap-3 md:grid-cols-3">
                 <MetricBlock label="Live mode" value={snapshot.mode} compact />
                 <MetricBlock label="Snapshot updated" value={new Date(snapshot.updated_at).toLocaleTimeString()} compact />
@@ -2920,8 +3013,8 @@ function SettingsPage({
                     type="button"
                     onClick={() => setTradingSettings((current) => ({ ...current, binanceEnvironment: environment }))}
                     className={cn(
-                      "rounded-[20px] border px-4 py-3 text-left transition-all",
-                      active ? "border-primary/30 bg-primary/10" : "border-border/70 bg-background hover:bg-muted/35",
+                      "rounded-lg border px-4 py-3 text-left transition-all",
+                      active ? "border-border bg-card shadow-sm" : "border-border/70 bg-background hover:bg-muted/35",
                     )}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -2933,7 +3026,7 @@ function SettingsPage({
                         ? "Binance Futures testnet private account access."
                         : "Binance Futures mainnet private account access with simulated fills while live orders stay off."}
                     </p>
-                    {detected ? <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-primary">Matches stored credentials</p> : null}
+                    {detected ? <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">· matches stored credentials</p> : null}
                   </button>
                 );
               })}
@@ -2942,7 +3035,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Binance API key</span>
                 <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setApiKeyDraft(event.target.value)}
                   placeholder={tradingSettings.hasApiKey ? `Stored in ${tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"}. Paste only to replace.` : "Paste Binance Futures API key"}
                   type="password"
@@ -2952,7 +3045,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Binance API secret</span>
                 <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   onChange={(event) => setApiSecretDraft(event.target.value)}
                   placeholder={tradingSettings.hasApiSecret ? `Stored in ${tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"}. Paste only to replace.` : "Paste Binance Futures API secret"}
                   type="password"
@@ -2961,7 +3054,7 @@ function SettingsPage({
               </label>
             </div>
             {tradingSettings.credentialBackend === "wincred" || (!tradingSettings.keychainAvailable && typeof window !== "undefined") ? (
-              <div className="rounded-[20px] border border-border/70 bg-muted/20 px-4 py-4 space-y-2">
+              <div className="rounded-lg border border-border/70 bg-muted/20 px-4 py-4 space-y-2">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Windows Credential Manager</p>
                 <p className="text-sm text-muted-foreground">Credentials are stored via <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">cmdkey</code>. To verify or remove them manually, run in Command Prompt:</p>
                 <pre className="overflow-x-auto rounded-[14px] bg-muted px-4 py-3 text-xs font-mono text-foreground leading-relaxed">{`cmdkey /list:sthyra.binance/api-key\ncmdkey /list:sthyra.binance/api-secret\ncmdkey /delete:sthyra.binance/api-key`}</pre>
@@ -3004,31 +3097,53 @@ function SettingsPage({
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <label className="space-y-2">
+              <div className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Cycle interval ms</span>
-                <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
-                  max={5000}
-                  min={100}
-                  onChange={(event) => {
-                    if (!Number.isFinite(event.target.valueAsNumber)) {
-                      return;
-                    }
-
-                    setTradingSettings((current) => ({
-                      ...current,
-                      supervisorIntervalMs: Math.max(100, Math.min(5000, Math.round(event.target.valueAsNumber))),
-                    }));
-                  }}
-                  step={50}
-                  type="number"
-                  value={tradingSettings.supervisorIntervalMs}
-                />
-              </label>
+                <div className="rounded-lg border border-border/70 bg-background px-4 py-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium tabular-nums text-foreground">{tradingSettings.supervisorIntervalMs} ms</span>
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                      {tradingSettings.supervisorIntervalMs <= 150 ? "Aggressive" : tradingSettings.supervisorIntervalMs <= 350 ? "Fast" : tradingSettings.supervisorIntervalMs <= 750 ? "Balanced" : tradingSettings.supervisorIntervalMs <= 1500 ? "Conservative" : "Slow"}
+                    </span>
+                  </div>
+                  <input
+                    className="w-full"
+                    max={5000}
+                    min={100}
+                    onChange={(event) => {
+                      if (!Number.isFinite(event.target.valueAsNumber)) return;
+                      setTradingSettings((current) => ({
+                        ...current,
+                        supervisorIntervalMs: Math.max(100, Math.min(5000, Math.round(event.target.valueAsNumber))),
+                      }));
+                    }}
+                    step={50}
+                    type="range"
+                    value={tradingSettings.supervisorIntervalMs}
+                  />
+                  <div className="flex justify-between text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {[100, 250, 500, 1000, 2000, 5000].map((preset) => (
+                      <button
+                        className={cn(
+                          "rounded-md px-1 py-0.5 transition-colors",
+                          tradingSettings.supervisorIntervalMs === preset
+                            ? "bg-muted text-foreground font-semibold"
+                            : "hover:text-foreground",
+                        )}
+                        key={preset}
+                        onClick={() => setTradingSettings((current) => ({ ...current, supervisorIntervalMs: preset }))}
+                        type="button"
+                      >
+                        {preset < 1000 ? `${preset}` : `${preset / 1000}k`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Research refresh min</span>
                 <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   max={1440}
                   min={1}
                   onChange={(event) => {
@@ -3049,7 +3164,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Indicator min fitness</span>
                 <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   max={1}
                   min={-0.5}
                   onChange={(event) => {
@@ -3070,7 +3185,7 @@ function SettingsPage({
               <label className="space-y-2">
                 <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Retention limit</span>
                 <input
-                  className="h-12 w-full rounded-[20px] border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
+                  className="h-12 w-full rounded-lg border border-border/70 bg-background px-4 text-sm text-foreground outline-none"
                   max={32}
                   min={1}
                   onChange={(event) => {
@@ -3089,7 +3204,7 @@ function SettingsPage({
                 />
               </label>
             </div>
-            <div className="rounded-3xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
+            <div className="rounded-xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
               {settingsState}
             </div>
             <div className="flex flex-wrap gap-3">
@@ -3113,19 +3228,19 @@ function SettingsPage({
           </CardContent>
         </Card>
 
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Research policy and leaderboards</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research policy and leaderboards</CardTitle>
               <CardDescription>See why models survive, which indicator genomes are strong enough, and remove weak overlays before they touch approvals.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="px-4 pb-4 space-y-5">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock label="Promoted model" value={modelPacks.active.promoted_model?.model?.id ?? "None"} compact />
                 <MetricBlock label="Promoted indicator" value={modelPacks.active.promoted_indicator_pack?.genome?.id ?? "None"} compact />
                 <MetricBlock label="Signal leaderboard" value={String(modelPacks.signal_leaderboard.length)} compact />
                 <MetricBlock label="Blacklisted indicators" value={String(modelPacks.blacklisted_indicator_ids.length)} compact />
               </div>
-              <div className="rounded-3xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
+              <div className="rounded-xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
                 {researchState}
                 <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <MetricBlock label="Refresh cadence" value={`${modelPacks.policy?.researchRefreshIntervalMinutes ?? tradingSettings.researchRefreshIntervalMinutes} min`} compact />
@@ -3144,7 +3259,7 @@ function SettingsPage({
                     <EmptyState message="No signal leaderboard is available yet." />
                   ) : (
                     modelPacks.signal_leaderboard.slice(0, 6).map((entry, index) => (
-                      <div className="rounded-3xl border border-border/70 bg-muted/35 p-4" key={entry.model?.id ?? `signal-${index}`}>
+                      <div className="rounded-xl border border-border/70 bg-muted/35 p-4" key={entry.model?.id ?? `signal-${index}`}>
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-medium text-foreground">{entry.model?.id ?? "Unnamed model"}</div>
@@ -3180,7 +3295,7 @@ function SettingsPage({
                       const blacklistKey = `blacklist-indicator:${indicatorId}`;
 
                       return (
-                        <div className="rounded-3xl border border-border/70 bg-muted/35 p-4" key={indicatorId}>
+                        <div className="rounded-xl border border-border/70 bg-muted/35 p-4" key={indicatorId}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <div className="text-sm font-medium text-foreground">{indicatorId}</div>
@@ -3223,7 +3338,7 @@ function SettingsPage({
                     })
                   )}
                   {modelPacks.blacklisted_indicator_ids.length > 0 ? (
-                    <div className="rounded-3xl border border-border/70 bg-background/75 p-4">
+                    <div className="rounded-xl border border-border/70 bg-background/75 p-4">
                       <div className="text-sm font-medium text-foreground">Blocked indicator IDs</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {modelPacks.blacklisted_indicator_ids.map((indicatorId) => {
@@ -3251,12 +3366,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Theme rationale</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme rationale</CardTitle>
               <CardDescription>This dashboard now uses a restrained trading workspace instead of high-saturation status cards.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-2">
+            <CardContent className="px-4 pb-4 grid gap-3 md:grid-cols-2">
               <StrategyNote title="Neutral shell" detail="Whitespace and slate tones keep attention on price, P&L, and risk instead of decorative gradients." />
               <StrategyNote title="Separate pages" detail="Each navigation item now owns a route and a detailed context instead of scrolling through a single overloaded page." />
               <StrategyNote title="Indicator-first panes" detail="Price, EMA, RSI, and MACD are grouped like a trading terminal instead of mixing them with maintenance controls." />
@@ -3285,7 +3400,7 @@ function ToggleSettingCard({
   return (
     <button
       className={cn(
-        "rounded-3xl border px-5 py-4 text-left transition-colors",
+        "rounded-xl border px-5 py-4 text-left transition-colors",
         tone === "risk"
           ? checked
             ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
@@ -3375,7 +3490,7 @@ function TradingViewPanel({
   const lastTimestamp = activeCandle?.timestamp_ms ?? chartPoints.at(-1)?.timestamp_ms ?? null;
 
   return (
-    <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
+    <Card className="rounded-xl border-border/60 bg-card">
       <CardHeader className="space-y-3 border-b border-border/50 pb-4">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-2.5">
@@ -3388,7 +3503,7 @@ function TradingViewPanel({
             <CardDescription>Price, EMA stack, volume, RSI, and MACD in a disciplined trading-terminal frame.</CardDescription>
           </div>
           {symbolOptions && onSelectSymbol && onSelectWindow ? (
-            <div className="rounded-4xl border border-border/70 bg-muted/35 p-2.5">
+            <div className="rounded-xl border border-border/70 bg-muted/35 p-2.5">
               <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <SegmentedControl
                   activeValue={symbol ?? "All"}
@@ -3410,7 +3525,7 @@ function TradingViewPanel({
             </div>
           ) : null}
         </div>
-        <div className="grid gap-2 rounded-4xl border border-border/70 bg-muted/35 p-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+        <div className="grid gap-2 rounded-xl border border-border/70 bg-muted/35 p-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           <TerminalStat label="Venue" value={venue ?? "Local"} />
           <TerminalStat label="Mode" value={mode ?? "Unknown"} />
           <TerminalStat label="Symbol" value={activeCandle?.symbol ?? symbol ?? "None"} />
@@ -3446,9 +3561,9 @@ function TradingViewPanel({
           <TerminalStat label="Updated" value={updatedAt ? formatOperatorTimestamp(updatedAt) : "No data"} />
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 pt-4">
+      <CardContent className="px-4 pb-4 space-y-4 pt-4">
         {chartPoints.length < 2 ? (
-          <div className="rounded-4xl border border-border/70 bg-muted/25 px-6 py-14 text-sm leading-6 text-muted-foreground">Not enough indicator data to render the market pane.</div>
+          <div className="rounded-xl border border-border/70 bg-muted/25 px-6 py-14 text-sm leading-6 text-muted-foreground">Not enough indicator data to render the market pane.</div>
         ) : (
           <>
             <MarketPane candles={chartCandles} points={chartPoints} hoverIndex={activeIndex} onHoverIndex={setHoverIndex} tradeMarkers={tradeMarkers} />
@@ -3502,18 +3617,24 @@ function WatchlistRail({
       consensus: lastPoint?.signal_consensus ?? null,
       action: opportunity?.action ?? "NoSignal",
       family: opportunity?.family ?? "No family",
+      regime: opportunity?.regime ?? null,
+      confidence: opportunity?.confidence ? parseFloat(opportunity.confidence) : null,
       entryTimestampMs: entryTimesBySymbol.get(symbol) ?? null,
       position,
+      sparkPrices: symbolPoints.map((p) => p.price),
+      fundingRate: opportunity?.funding_rate ?? 0,
+      htfBias: opportunity?.htf_trend_bias ?? 0,
+      depthImbalance: opportunity?.depth_imbalance ?? 0,
     };
   });
 
   return (
-    <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
+    <Card className="rounded-xl border-border/60 bg-card">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Watchlist</CardTitle>
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Watchlist</CardTitle>
         <CardDescription>Compact symbol rail with price change, RSI, consensus, and live position state.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3.5">
+      <CardContent className="px-4 pb-4 space-y-3.5">
         <div className="grid gap-3 sm:grid-cols-3">
           <MetricBlock compact label="Symbols" value={String(watchlist.length)} />
           <MetricBlock compact label="Live positions" value={String(watchlist.filter((item) => item.position !== null).length)} />
@@ -3529,9 +3650,9 @@ function WatchlistRail({
               return (
                 <button
                   className={cn(
-                    "block w-full rounded-4xl border px-4 py-4 text-left transition-all duration-200",
+                    "block w-full rounded-xl border px-4 py-4 text-left transition-all duration-200",
                     active
-                      ? "border-primary/25 bg-primary text-primary-foreground shadow-(--shadow-card)"
+                      ? "border-border bg-card shadow-(--shadow-card) ring-1 ring-border"
                       : "border-border/70 bg-muted/35 hover:border-border hover:bg-muted/55",
                   )}
                   key={item.symbol}
@@ -3539,13 +3660,45 @@ function WatchlistRail({
                   type="button"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
-                      <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
+                        {item.regime && (
+                          <span className={cn("rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.18em]",
+                            active ? "border-border/60 bg-muted text-muted-foreground"
+                              : item.regime.includes("NoTrade") || item.regime.includes("Disordered")
+                                ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
+                                : item.regime.includes("Trending") || item.regime.includes("Breakout")
+                                  ? "border-(--success-border) bg-(--success-surface) text-(--success-foreground)"
+                                  : "border-border/60 bg-muted/50 text-muted-foreground"
+                          )}>
+                            {item.regime.replace("BreakoutExpansion", "Breakout").replace("VolatilityCompression", "VolComp").replace("ReversalAttempt", "Reversal").slice(0, 9)}
+                          </span>
+                        )}
+                      </div>
+                      <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-muted-foreground" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
                     </div>
-                    <Badge className={cn("rounded-full border", active ? "border-primary-foreground/20 bg-primary-foreground/12 text-primary-foreground" : actionBadgeClasses(item.action))} variant="outline">
-                      {item.action}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <Badge className={cn("rounded-full border", active ? "border-border bg-muted text-foreground" : actionBadgeClasses(item.action))} variant="outline">
+                        {item.action}
+                      </Badge>
+                      {/* Mini sparkline */}
+                      {item.sparkPrices.length >= 3 && (() => {
+                        const spW = 64; const spH = 24; const spPad = 2;
+                        const spMin = Math.min(...item.sparkPrices);
+                        const spMax = Math.max(...item.sparkPrices);
+                        const spSpread = spMax - spMin || 1;
+                        const spScaleX = (i: number) => spPad + (i / Math.max(item.sparkPrices.length - 1, 1)) * (spW - spPad * 2);
+                        const spScaleY = (v: number) => spH - spPad - ((v - spMin) / spSpread) * (spH - spPad * 2);
+                        const pts = item.sparkPrices.map((v, i) => `${spScaleX(i)},${spScaleY(v)}`).join(" ");
+                        const isUp = item.sparkPrices.at(-1)! >= item.sparkPrices[0]!;
+                        return (
+                          <svg height={spH} viewBox={`0 0 ${spW} ${spH}`} width={spW}>
+                            <polyline fill="none" points={pts} stroke={isUp ? "#22c55e" : "#ef4444"} strokeOpacity={active ? "0.9" : "0.6"} strokeWidth="1.5" />
+                          </svg>
+                        );
+                      })()}
+                    </div>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <WatchMetric active={active} label="Last" value={formatUsd(item.lastPrice, 2)} />
@@ -3554,8 +3707,10 @@ function WatchlistRail({
                     <WatchMetric active={active} label="Consensus" value={formatSignedNumber(item.consensus, 3)} />
                     <WatchMetric active={active} label="Hold" value={item.entryTimestampMs !== null ? formatRelativeDuration(item.entryTimestampMs) : "Flat"} />
                     <WatchMetric active={active} label="Opened" value={item.entryTimestampMs !== null ? formatTimestampMs(item.entryTimestampMs) : "No data"} />
+                    <WatchMetric active={active} label="HTF bias" value={`${item.htfBias >= 0 ? "+" : ""}${item.htfBias.toFixed(2)}`} />
+                    <WatchMetric active={active} label="Funding" value={`${(item.fundingRate * 100).toFixed(4)}%`} />
                   </div>
-                  <div className={cn("mt-3 text-sm leading-6", active ? "text-primary-foreground/75" : "text-muted-foreground")}>
+                  <div className={cn("mt-3 text-sm leading-6", active ? "text-muted-foreground" : "text-muted-foreground")}>
                     {item.position
                       ? `Live position ${formatNumber(item.position.quantity, 4)} at ${formatUsd(item.position.entry_price, 2)} with ${formatSignedUsd(item.position.unrealized_pnl)} unrealized.${item.entryTimestampMs !== null ? ` Open since ${formatTimestampMs(item.entryTimestampMs)}.` : ""}`
                       : "No open position on this symbol."}
@@ -3624,8 +3779,24 @@ function MarketPane({
     onHoverIndex(nextIndex);
   }
 
+  // Build closed polygon path for area fill under close prices
+  const closePrices = normalizedCandles.map((c) => c.close);
+  const areaPath = closePrices.length > 1
+    ? `M ${scaleX(0)},${scaleY(closePrices[0]!)} ` +
+      closePrices.slice(1).map((p, i) => `L ${scaleX(i + 1)},${scaleY(p)}`).join(" ") +
+      ` L ${scaleX(closePrices.length - 1)},${height} L ${scaleX(0)},${height} Z`
+    : "";
+
+  // 5 Y-axis price labels
+  const yLabelCount = 5;
+  const yLabels = Array.from({ length: yLabelCount }, (_, i) => {
+    const value = minValue + (maxValue - minValue) * (i / (yLabelCount - 1));
+    const y = scaleY(value);
+    return { value, y };
+  });
+
   return (
-    <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
       <svg
         className="h-80 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(normalizedCandles.length - 1, 0))}
@@ -3636,8 +3807,36 @@ function MarketPane({
         preserveAspectRatio="none"
         viewBox={`0 0 ${width} ${height}`}
       >
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="marketAreaGrad" x1="0" x2="0" y1={paddingY} y2={height}>
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="candleUpGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#22c55e" stopOpacity="1" />
+            <stop offset="100%" stopColor="#16a34a" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="candleDownGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity="1" />
+            <stop offset="100%" stopColor="#dc2626" stopOpacity="1" />
+          </linearGradient>
+        </defs>
         <ChartGrid height={height} width={width} />
+
+        {/* Y-axis price labels */}
+        {yLabels.map(({ value, y }, i) => (
+          <text key={`ylabel-${i}`} fill="rgba(148,163,184,0.7)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 4))}>
+            {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(value < 10 ? 2 : 0)}
+          </text>
+        ))}
+
+        {/* Area fill under close price */}
+        {areaPath && <path d={areaPath} fill="url(#marketAreaGrad)" />}
+
+        {/* Crosshair */}
         {activeCandle ? <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} /> : null}
+
+        {/* Candles */}
         {normalizedCandles.map((candle, index) => {
           const x = scaleX(index);
           const open = candle.open;
@@ -3646,15 +3845,19 @@ function MarketPane({
           const bodyBottom = scaleY(Math.min(open, close));
           const high = scaleY(candle.high);
           const low = scaleY(candle.low);
-          const candleColor = close >= open ? "#22c55e" : "#ef4444";
+          const isUp = close >= open;
+          const wickColor = isUp ? "#22c55e" : "#ef4444";
+          const bodyFill = isUp ? "url(#candleUpGrad)" : "url(#candleDownGrad)";
 
           return (
             <g key={`${candle.timestamp_ms}-${candle.symbol}-${index}`}>
-              <line stroke={candleColor} strokeWidth="1.4" x1={x} x2={x} y1={high} y2={low} />
-              <rect fill={candleColor} height={Math.max(2, bodyBottom - bodyTop)} rx="1.5" width="8" x={x - 4} y={bodyTop} />
+              <line stroke={wickColor} strokeOpacity="0.85" strokeWidth="1.4" x1={x} x2={x} y1={high} y2={low} />
+              <rect fill={bodyFill} height={Math.max(2, bodyBottom - bodyTop)} rx="1.5" width="8" x={x - 4} y={bodyTop} />
             </g>
           );
         })}
+
+        {/* Trade markers */}
         {tradeMarkers.map((marker, markerIndex) => {
           const entryX = scaleX(marker.entryCandleIndex);
           const exitX = scaleX(marker.exitCandleIndex);
@@ -3674,16 +3877,18 @@ function MarketPane({
             </g>
           );
         })}
+
+        {/* EMA lines */}
         <polyline fill="none" points={polylinePoints(emaFast, scaleX, scaleY)} stroke="#38bdf8" strokeWidth="2.4" />
         <polyline fill="none" points={polylinePoints(emaSlow, scaleX, scaleY)} stroke="#f59e0b" strokeWidth="2.2" />
       </svg>
       <div className="flex flex-wrap items-center gap-4 border-t border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--primary)" />Close</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[color-mix(in_srgb,var(--primary)_78%,white_22%)]" />EMA Fast</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--accent)" />EMA Slow</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[color-mix(in_srgb,var(--accent)_72%,white_28%)]" />Volume</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#38bdf8]" />EMA Fast</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#f59e0b]" />EMA Slow</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Bullish candle</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#ef4444]" />Bearish candle</span>
         <span className="flex items-center gap-2"><span className="size-2 rounded-full border border-border bg-transparent" />Entry marker</span>
-        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-(--success-foreground)" />Exit marker</span>
+        <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#22c55e]" />Exit marker</span>
         <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-muted-foreground" />{candles.length > 0 ? "OHLC candles" : "Derived candles"}</span>
       </div>
     </div>
@@ -3723,7 +3928,7 @@ function VolumePane({
   }
 
   return (
-    <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
       <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Volume</div>
       <svg
         className="h-32.5 w-full"
@@ -3746,7 +3951,7 @@ function VolumePane({
 
           return (
             <rect
-              fill={isUp ? "rgba(34, 197, 94, 0.8)" : "rgba(239, 68, 68, 0.8)"}
+              fill={isUp ? "rgba(34,197,94,0.65)" : "rgba(239,68,68,0.65)"}
               height={heightValue}
               key={`volume-${index}`}
               rx="1.4"
@@ -3778,7 +3983,7 @@ function SegmentedControl({
     <div className="space-y-2.5">
       <div className={cn("text-[11px] uppercase tracking-[0.22em]", tone === "dark" ? "text-slate-500" : "text-muted-foreground")}>{label}</div>
       <div className={cn(
-        "flex flex-wrap gap-2 rounded-[20px] p-2.5",
+        "flex flex-wrap gap-2 rounded-lg p-2.5",
         tone === "dark"
           ? "border border-white/8 bg-white/4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
           : "border border-border/70 bg-background shadow-[inset_0_1px_0_rgba(15,23,42,0.02)]",
@@ -3795,7 +4000,7 @@ function SegmentedControl({
                     ? "bg-white text-slate-950 shadow-[0_10px_24px_rgba(255,255,255,0.12)]"
                     : "bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
                   : active
-                    ? "bg-primary text-primary-foreground shadow-(--shadow-card)"
+                    ? "bg-foreground text-background shadow-(--shadow-card)"
                     : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
               key={option.value}
@@ -3847,8 +4052,16 @@ function IndicatorPane({
     onHoverIndex(nextIndex);
   }
 
+  const areaPoints = series.length > 1
+    ? `${scaleX(0)},${scaleY(series[0]!)} ` +
+      series.slice(1).map((v, i) => `${scaleX(i + 1)},${scaleY(v)}`).join(" ") +
+      ` ${scaleX(series.length - 1)},${height} ${scaleX(0)},${height}`
+    : "";
+  const lastValue = series.at(-1);
+  const lastY = lastValue !== undefined ? scaleY(lastValue) : null;
+
   return (
-    <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
       <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
@@ -3860,11 +4073,23 @@ function IndicatorPane({
         preserveAspectRatio="none"
         viewBox={`0 0 ${width} ${height}`}
       >
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id={`indGrad-${label}`} x1="0" x2="0" y1={padding} y2={height}>
+            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
+          </linearGradient>
+        </defs>
         <ChartGrid height={height} width={width} />
         <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
-        {typeof positiveThreshold === "number" ? <line stroke="#334155" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
-        {typeof negativeThreshold === "number" ? <line stroke="#334155" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
+        {typeof positiveThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
+        {typeof negativeThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
+        {areaPoints && <polygon fill={`url(#indGrad-${label})`} points={areaPoints} />}
         <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#22d3ee" strokeWidth="2.2" />
+        {lastValue !== undefined && lastY !== null && (
+          <text fill="#22d3ee" fontSize="9" textAnchor="end" x={width - 2} y={Math.max(10, lastY - 3)}>
+            {lastValue.toFixed(2)}
+          </text>
+        )}
       </svg>
     </div>
   );
@@ -3902,7 +4127,7 @@ function HistogramPane({
   }
 
   return (
-    <div className="overflow-hidden rounded-4xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
       <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
@@ -3953,26 +4178,72 @@ function EquityCurve({
   const width = 860;
   const height = 280;
   const padding = 24;
+  const labelWidth = 52;
   const series = points.map((point) => point.cumulativePnl);
   const minValue = Math.min(...series);
   const maxValue = Math.max(...series);
-  const scaleX = createIndexScale(series.length, padding, width - padding);
+  const scaleX = createIndexScale(series.length, padding + labelWidth, width - padding);
   const scaleY = createScale(minValue, maxValue, height - padding, padding);
   const selectedPoint = selectedTrade === null ? null : points[selectedTrade.visibleIndex] ?? null;
   const selectedX = selectedPoint ? scaleX(selectedTrade!.visibleIndex) : null;
   const selectedY = selectedPoint ? scaleY(selectedPoint.cumulativePnl) : null;
+  const isPositive = (maxValue + minValue) / 2 >= 0;
+  const lineColor = isPositive ? "#14b8a6" : "#f87171";
+  const gradColor = isPositive ? "#14b8a6" : "#f87171";
+
+  // Area path
+  const areaPath = series.length > 1
+    ? `M ${scaleX(0)},${scaleY(series[0]!)} ` +
+      series.slice(1).map((v, i) => `L ${scaleX(i + 1)},${scaleY(v)}`).join(" ") +
+      ` L ${scaleX(series.length - 1)},${height - padding} L ${scaleX(0)},${height - padding} Z`
+    : "";
+
+  // Y-axis labels: 5 levels
+  const yLabelCount = 5;
+  const yLabels = Array.from({ length: yLabelCount }, (_, i) => {
+    const value = minValue + (maxValue - minValue) * (i / (yLabelCount - 1));
+    const y = scaleY(value);
+    return { value, y };
+  });
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
       <svg className="h-70 w-full" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="equityGrad" x1="0" x2="0" y1={padding} y2={height - padding}>
+            <stop offset="0%" stopColor={gradColor} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={gradColor} stopOpacity="0" />
+          </linearGradient>
+        </defs>
         <ChartGrid height={height} width={width} />
-        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#0f766e" strokeWidth="3" />
+
+        {/* Y-axis labels */}
+        {yLabels.map(({ value, y }, i) => (
+          <text key={`eqlabel-${i}`} fill="rgba(148,163,184,0.75)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 6))}>
+            {value >= 0 ? `+${value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}` : value <= -1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}
+          </text>
+        ))}
+
+        {/* Zero baseline */}
+        {minValue < 0 && maxValue > 0 && (
+          <line stroke="rgba(148,163,184,0.3)" strokeWidth="1" x1={padding + labelWidth} x2={width - padding} y1={scaleY(0)} y2={scaleY(0)} />
+        )}
+
+        {/* Area fill */}
+        {areaPath && <path d={areaPath} fill="url(#equityGrad)" />}
+
+        {/* Curve line */}
+        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke={lineColor} strokeWidth="2.5" />
+
+        {/* Selected trade marker */}
         {selectedPoint && selectedX !== null && selectedY !== null ? (
           <>
-            <line stroke="#0f766e" strokeDasharray="4 6" strokeWidth="1.5" x1={selectedX} x2={selectedX} y1={padding} y2={height - padding} />
-            <circle cx={selectedX} cy={selectedY} fill="#f8fafc" r="6" stroke="#0f766e" strokeWidth="3" />
-            <g transform={`translate(${Math.min(Math.max(selectedX + 12, padding), width - 188)}, ${Math.max(selectedY - 46, padding + 4)})`}>
-              <rect fill="rgba(248,250,252,0.96)" height="38" rx="10" stroke="rgba(15,118,110,0.25)" width="176" />
+            <line stroke={lineColor} strokeDasharray="4 6" strokeWidth="1.5" x1={selectedX} x2={selectedX} y1={padding} y2={height - padding} />
+            {/* Glow ring */}
+            <circle cx={selectedX} cy={selectedY} fill="none" r="12" stroke={lineColor} strokeOpacity="0.25" strokeWidth="8" />
+            <circle cx={selectedX} cy={selectedY} fill="#f8fafc" r="6" stroke={lineColor} strokeWidth="3" />
+            <g transform={`translate(${Math.min(Math.max(selectedX + 14, padding + labelWidth), width - 188)}, ${Math.max(selectedY - 46, padding + 4)})`}>
+              <rect fill="rgba(248,250,252,0.97)" height="38" rx="10" stroke={`${lineColor}55`} strokeWidth="1" width="176" />
               <text fill="#0f172a" fontSize="11" fontWeight="600" x="10" y="15">{selectedTrade?.label}</text>
               <text fill="#475569" fontSize="10" x="10" y="29">{formatTimestampMs(selectedTrade!.timestampMs)} · {formatSignedUsd(selectedTrade!.realizedPnl)}</text>
             </g>
@@ -3988,15 +4259,34 @@ function BalanceCalendar({ days, emptyMessage }: { days: AuditBalanceCalendarDay
     return <EmptyState message={emptyMessage ?? "No daily balance closes are available yet."} />;
   }
 
+  const maxAbsDelta = Math.max(...days.map((d) => Math.abs(d.delta ?? 0)), 1);
+
   return (
     <div className="grid grid-cols-5 gap-2 sm:grid-cols-7">
-      {days.map((day) => (
-        <div className={cn("rounded-[18px] border px-3 py-3 text-xs", balanceToneClasses(day.tone))} key={day.day}>
-          <div className="font-medium">{formatCalendarDay(day.day)}</div>
-          <div className="mt-1 text-[11px] opacity-80">{day.closeBalance !== null ? formatUsd(day.closeBalance, 0) : "No close"}</div>
-          <div className="mt-1 text-[11px] opacity-80">{day.delta !== null ? formatSignedUsd(day.delta, 0) : "-"}</div>
-        </div>
-      ))}
+      {days.map((day) => {
+        const pct = day.delta !== null ? Math.min(100, (Math.abs(day.delta) / maxAbsDelta) * 100) : 0;
+        const isGreen = day.tone === "green";
+        const isRed = day.tone === "red";
+        return (
+          <div
+            className={cn("relative overflow-hidden rounded-[18px] border px-3 py-3 text-xs", balanceToneClasses(day.tone))}
+            key={day.day}
+          >
+            <div className="relative z-10 font-semibold">{formatCalendarDay(day.day)}</div>
+            <div className="relative z-10 mt-1 text-[11px] opacity-80">{day.closeBalance !== null ? formatUsd(day.closeBalance, 0) : "No close"}</div>
+            <div className="relative z-10 mt-1 text-[11px] font-medium opacity-90">{day.delta !== null ? formatSignedUsd(day.delta, 0) : "—"}</div>
+            {(isGreen || isRed) && pct > 0 && (
+              <div
+                className="absolute bottom-0 left-0 h-[3px] rounded-full opacity-60 transition-all duration-500"
+                style={{
+                  width: `${pct}%`,
+                  background: isGreen ? "var(--cal-green-text)" : "var(--cal-red-text)",
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -4015,7 +4305,7 @@ function ActionButton({
   runOperatorAction: (action: OperatorAction, targetMode?: OperatorMode) => Promise<void>;
 }) {
   return (
-    <Button className="justify-start rounded-[20px] px-4 py-5" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction(action)} variant="outline">
+    <Button className="justify-start rounded-lg px-4 py-2" disabled={pendingOperatorAction !== null} onClick={() => void runOperatorAction(action)} variant="outline">
       <Icon className={cn("size-4", pendingOperatorAction === action && "animate-spin")} />
       {label}
     </Button>
@@ -4024,36 +4314,39 @@ function ActionButton({
 
 function StrategyNote({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-3xl border border-border/70 bg-muted/35 p-5">
-      <div className="text-sm font-medium text-foreground">{title}</div>
-      <div className="mt-2 text-sm leading-6 text-muted-foreground">{detail}</div>
+    <div className="rounded-xl border border-border/70 bg-muted/35 p-4">
+      <div className="text-sm font-semibold text-foreground">{title}</div>
+      <div className="mt-1.5 text-sm leading-6 text-muted-foreground">{detail}</div>
     </div>
   );
 }
 
-function WatchMetric({ label, value, active }: { label: string; value: string; active: boolean }) {
+function WatchMetric({ label, value }: { label: string; value: string; active?: boolean }) {
   return (
-    <div className={cn("min-w-0 rounded-[20px] border px-4 py-3.5", active ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border/70 bg-background/70") }>
-      <div className={cn("text-[10px] uppercase tracking-[0.18em]", active ? "text-primary-foreground/65" : "text-muted-foreground")}>{label}</div>
-      <div className={cn("mt-2.5 wrap-break-word text-sm leading-5 font-medium tracking-[-0.02em]", active ? "text-primary-foreground" : "text-foreground")}>{value}</div>
+    <div className="min-w-0 rounded-xl border border-border/60 bg-background/70 px-3 py-3">
+      <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
+      <div className="mt-1.5 wrap-break-word text-sm leading-5 font-semibold tracking-[-0.02em] text-foreground">{value}</div>
     </div>
   );
 }
 
 function TerminalStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0 space-y-1 rounded-[20px] border border-border/60 bg-muted/40 px-3 py-2.5">
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className="wrap-break-word text-sm leading-5 font-medium tracking-[-0.02em] text-foreground">{value}</div>
+    <div className="min-w-0 space-y-1 rounded-xl border border-border/60 bg-muted/40 px-3 py-2.5">
+      <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</div>
+      <div className="wrap-break-word text-sm leading-5 font-semibold tracking-[-0.02em] text-foreground">{value}</div>
     </div>
   );
 }
 
 function BotHealthBadge({ health, prominent = false }: { health: BotHealthReport; prominent?: boolean }) {
+  const isHealthy = health.level === "healthy";
   return (
-    <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
-      {health.label}
-    </Badge>
+    <span className={cn("relative inline-flex items-center", isHealthy && "bot-healthy-pulse")}>
+      <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
+        {health.label}
+      </Badge>
+    </span>
   );
 }
 
@@ -4069,29 +4362,37 @@ function ProvenExecutionCard({
   tone: "positive" | "negative" | "neutral";
 }) {
   return (
-    <div className={cn("rounded-3xl border p-5", metricCardClasses(tone))}>
-      <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{label}</div>
-      <div className="mt-3 text-lg font-medium tracking-[-0.04em] text-foreground">{timestampMs === null ? "Not proven yet" : formatTimestampMs(timestampMs)}</div>
-      <div className="mt-1 text-sm text-muted-foreground">{timestampMs === null ? "No timestamp available" : formatRelativeDuration(timestampMs)}</div>
-      <div className="mt-4 text-sm leading-6 text-foreground">{body}</div>
+    <div className={cn("rounded-xl border p-4", metricCardClasses(tone))}>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+      <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-foreground">{timestampMs === null ? "Not proven yet" : formatTimestampMs(timestampMs)}</div>
+      <div className="mt-0.5 text-xs text-muted-foreground">{timestampMs === null ? "No timestamp available" : formatRelativeDuration(timestampMs)}</div>
+      <div className="mt-3 text-sm leading-6 text-foreground">{body}</div>
     </div>
   );
 }
 
 function MetricCard({ label, value, tone, compact = false }: { label: string; value: string; tone: "positive" | "negative" | "neutral"; compact?: boolean }) {
+  const [flashKey, setFlashKey] = useState(0);
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current !== value) {
+      prevValue.current = value;
+      setFlashKey((k) => k + 1);
+    }
+  }, [value]);
   return (
-    <div className={cn("rounded-[28px] border px-5 py-5", compact ? "min-h-28" : "min-h-32", metricCardClasses(tone))}>
-      <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{label}</div>
-      <div className={cn("mt-4 font-medium tracking-[-0.04em]", compact ? "text-xl" : "text-[1.75rem]")}>{value}</div>
+    <div className={cn("rounded-xl border px-4 py-4", metricCardClasses(tone))}>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+      <div key={flashKey} className={cn("mt-2.5 font-semibold tracking-[-0.03em] value-flash", compact ? "text-lg" : "text-2xl")}>{value}</div>
     </div>
   );
 }
 
 function MetricBlock({ label, value, tone = "neutral", compact = false }: { label: string; value: string; tone?: "positive" | "negative" | "neutral"; compact?: boolean }) {
   return (
-    <div className={cn("min-w-0 rounded-[20px] border px-5 py-4", metricCardClasses(tone), compact && "px-4 py-3") }>
-      <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
-      <div className={cn("mt-2 wrap-break-word font-medium leading-6 text-foreground", compact ? "text-sm" : "text-base")}>{value}</div>
+    <div className={cn("min-w-0 rounded-xl border px-4 py-3", metricCardClasses(tone)) }>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+      <div className={cn("mt-1.5 wrap-break-word font-semibold leading-6 text-foreground", compact ? "text-sm" : "text-base")}>{value}</div>
     </div>
   );
 }
@@ -4111,7 +4412,7 @@ function RetentionBar({ label, percent, detail }: { label: string; percent: numb
 }
 
 function EmptyState({ message }: { message: string }) {
-  return <div className="rounded-3xl border border-border/70 bg-muted/35 px-6 py-12 text-sm leading-6 text-muted-foreground">{message}</div>;
+  return <div className="rounded-xl border border-border/70 bg-muted/35 px-5 py-10 text-sm leading-6 text-muted-foreground">{message}</div>;
 }
 
 function buildMistakes(snapshot: RuntimeSnapshot, operator: DashboardOperatorData) {
@@ -4146,6 +4447,11 @@ function buildMistakes(snapshot: RuntimeSnapshot, operator: DashboardOperatorDat
   return mistakes.slice(0, 4);
 }
 
+const ALL_MONITORED_SYMBOLS = [
+  "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
+  "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "LINKUSDT", "DOTUSDT",
+];
+
 function strategySymbols(snapshot: RuntimeSnapshot) {
   const symbols = new Set<string>();
 
@@ -4159,7 +4465,16 @@ function strategySymbols(snapshot: RuntimeSnapshot) {
     }
   });
 
-  return Array.from(symbols);
+  // If the supervisor hasn't populated multi-symbol data yet (early boot),
+  // fall back to the full configured symbol list so the watchlist is never blank.
+  if (symbols.size <= 1) {
+    ALL_MONITORED_SYMBOLS.forEach((s) => symbols.add(s));
+  }
+
+  // Return in canonical order
+  return ALL_MONITORED_SYMBOLS.filter((s) => symbols.has(s)).concat(
+    Array.from(symbols).filter((s) => !ALL_MONITORED_SYMBOLS.includes(s)),
+  );
 }
 
 function filterSnapshotForStrategy(snapshot: RuntimeSnapshot, selectedSymbol: string, selectedWindow: number) {
@@ -4282,9 +4597,9 @@ function metricCardClasses(tone: "positive" | "negative" | "neutral") {
 function balanceToneClasses(tone: AuditBalanceCalendarDay["tone"]) {
   switch (tone) {
     case "green":
-      return "border-(--success-border) bg-(--success-surface) text-(--success-foreground)";
+      return "border-[color:var(--cal-green-border)] bg-[color:var(--cal-green-surface)] text-[color:var(--cal-green-text)]";
     case "red":
-      return "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)";
+      return "border-[color:var(--cal-red-border)] bg-[color:var(--cal-red-surface)] text-[color:var(--cal-red-text)]";
     case "flat":
       return "border-border/70 bg-muted/50 text-foreground/80";
     default:
