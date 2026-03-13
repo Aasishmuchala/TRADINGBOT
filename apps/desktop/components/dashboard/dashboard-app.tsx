@@ -1255,7 +1255,7 @@ function StrategiesPage({
   return (
     <div className="space-y-6">
       <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardContent className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)] xl:p-5">
+        <CardContent className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
@@ -1264,13 +1264,17 @@ function StrategiesPage({
             <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Market structure, opportunity ranking, and live posture in one view.</div>
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Chart first, watchlist second, and research context close enough to act without scanning disconnected panels.</p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
-            <MetricBlock compact label="Last price" value={latestCandle ? formatUsd(latestCandle.close, 2) : "No data"} />
-            <MetricBlock compact label="Consensus" tone={(latestIndicatorPoint?.signal_consensus ?? 0) > 0 ? "positive" : (latestIndicatorPoint?.signal_consensus ?? 0) < 0 ? "negative" : "neutral"} value={latestIndicatorPoint ? formatSignedNumber(latestIndicatorPoint.signal_consensus, 3) : "No data"} />
-            <MetricBlock compact label="Queued action" tone={selectedOpportunity?.action === "Buy" ? "positive" : selectedOpportunity?.action === "Sell" ? "negative" : "neutral"} value={selectedOpportunity ? `${selectedOpportunity.action} · ${selectedOpportunity.family}` : "NoSignal"} />
-            <MetricBlock compact label="Funding rate" tone={(selectedOpportunity?.funding_rate ?? 0) > 0.0005 ? "negative" : (selectedOpportunity?.funding_rate ?? 0) < -0.0005 ? "positive" : "neutral"} value={selectedOpportunity ? `${((selectedOpportunity.funding_rate ?? 0) * 100).toFixed(4)}%` : "—"} />
-            <MetricBlock compact label="HTF bias" tone={(selectedOpportunity?.htf_trend_bias ?? 0) > 0.2 ? "positive" : (selectedOpportunity?.htf_trend_bias ?? 0) < -0.2 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.htf_trend_bias ?? 0, 2) : "—"} />
-            <MetricBlock compact label="Depth imbal." tone={(selectedOpportunity?.depth_imbalance ?? 0) > 0.1 ? "positive" : (selectedOpportunity?.depth_imbalance ?? 0) < -0.1 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.depth_imbalance ?? 0, 2) : "—"} />
+          <div className="space-y-2">
+            <div className="grid gap-2 grid-cols-3">
+              <MetricBlock compact label="Last price" value={latestCandle ? formatUsd(latestCandle.close, 2) : "No data"} />
+              <MetricBlock compact label="Consensus" tone={(latestIndicatorPoint?.signal_consensus ?? 0) > 0 ? "positive" : (latestIndicatorPoint?.signal_consensus ?? 0) < 0 ? "negative" : "neutral"} value={latestIndicatorPoint ? formatSignedNumber(latestIndicatorPoint.signal_consensus, 3) : "No data"} />
+              <MetricBlock compact label="Queued action" tone={selectedOpportunity?.action === "Buy" ? "positive" : selectedOpportunity?.action === "Sell" ? "negative" : "neutral"} value={selectedOpportunity ? `${selectedOpportunity.action} · ${selectedOpportunity.family}` : "No signal"} />
+            </div>
+            <div className="grid gap-2 grid-cols-3">
+              <MetricBlock compact label="Funding rate" tone={(selectedOpportunity?.funding_rate ?? 0) > 0.0005 ? "negative" : (selectedOpportunity?.funding_rate ?? 0) < -0.0005 ? "positive" : "neutral"} value={selectedOpportunity ? `${((selectedOpportunity.funding_rate ?? 0) * 100).toFixed(4)}%` : "—"} />
+              <MetricBlock compact label="HTF bias" tone={(selectedOpportunity?.htf_trend_bias ?? 0) > 0.2 ? "positive" : (selectedOpportunity?.htf_trend_bias ?? 0) < -0.2 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.htf_trend_bias ?? 0, 2) : "—"} />
+              <MetricBlock compact label="Depth imbal." tone={(selectedOpportunity?.depth_imbalance ?? 0) > 0.1 ? "positive" : (selectedOpportunity?.depth_imbalance ?? 0) < -0.1 ? "negative" : "neutral"} value={selectedOpportunity ? formatSignedNumber(selectedOpportunity.depth_imbalance ?? 0, 2) : "—"} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -1593,27 +1597,44 @@ function ExecutionPage({
             <CardDescription>Dedicated operator page with real actions instead of sharing space with charts and review.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => {
-                const isActive = snapshot.mode === mode;
-                return (
-                  <Button
-                    className={cn(
-                      "justify-start rounded-[20px] px-4 py-5",
-                      isActive && "ring-2 ring-primary/40 ring-offset-1 ring-offset-background",
-                    )}
-                    disabled={pendingOperatorAction !== null}
-                    key={mode}
-                    onClick={() => void runOperatorAction("set-mode", mode)}
-                    variant={isActive ? "default" : "outline"}
-                  >
-                    {isActive ? <Check className="size-4" /> : <Radar className="size-4" />}
-                    {mode}
-                    {isActive && <span className="ml-auto text-[10px] font-normal uppercase tracking-[0.18em] opacity-70">active</span>}
-                  </Button>
-                );
-              })}
-            </div>
+            {(() => {
+              const modeDescriptions: Record<string, { label: string; desc: string }> = {
+                Research: { label: "Research", desc: "No fills. Scores candidates and trains models in the background only." },
+                Paper: { label: "Paper", desc: "Simulated fills at live prices. Full strategy execution without real capital." },
+                Protected: { label: "Protected", desc: "Live capital, reduced size. Extra confluence required before any fill." },
+                SemiAuto: { label: "Semi-auto", desc: "Live capital, full size. Operator confirms each order before submission." },
+              };
+              return (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(["Research", "Paper", "Protected", "SemiAuto"] as OperatorMode[]).map((mode) => {
+                    const isActive = snapshot.mode === mode;
+                    const meta = modeDescriptions[mode]!;
+                    return (
+                      <button
+                        className={cn(
+                          "flex w-full flex-col items-start gap-1 rounded-[20px] border px-4 py-4 text-left transition-all",
+                          isActive
+                            ? "border-foreground/25 bg-foreground text-background shadow-(--shadow-card)"
+                            : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
+                          pendingOperatorAction !== null && "cursor-not-allowed opacity-50",
+                        )}
+                        disabled={pendingOperatorAction !== null}
+                        key={mode}
+                        onClick={() => void runOperatorAction("set-mode", mode)}
+                        type="button"
+                      >
+                        <div className="flex w-full items-center gap-2">
+                          {isActive ? <Check className="size-3.5 shrink-0" /> : <Radar className="size-3.5 shrink-0 opacity-50" />}
+                          <span className="text-sm font-semibold tracking-[-0.02em]">{meta.label}</span>
+                          {isActive && <span className="ml-auto text-[9px] font-normal uppercase tracking-[0.2em] opacity-60">active</span>}
+                        </div>
+                        <p className={cn("text-[11px] leading-4", isActive ? "opacity-60" : "text-muted-foreground")}>{meta.desc}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
             <div className="grid gap-3 sm:grid-cols-2">
               <ActionButton action="status" icon={Activity} label="Stack status" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="overlay-compare" icon={BrainCircuit} label="Overlay compare" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
@@ -2963,19 +2984,19 @@ function SettingsPage({
                     className={cn(
                       "flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-2.5 text-left transition-all duration-150",
                       active
-                        ? "border-primary/25 bg-primary text-primary-foreground shadow-(--shadow-card)"
+                        ? "border-border bg-card text-foreground shadow-(--shadow-card)"
                         : "border-border/60 bg-muted/20 text-foreground hover:border-border hover:bg-muted/50",
                     )}
                     key={mode}
                     onClick={() => setThemePreference(mode)}
                     type="button"
                   >
-                    <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full", active ? "bg-primary-foreground/15" : "bg-muted")}>
+                    <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full", active ? "bg-muted" : "bg-muted")}>
                       <Icon className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className={cn("block text-sm font-medium capitalize")}>{mode}</span>
-                      <span className={cn("block text-[11px]", active ? "text-primary-foreground/65" : "text-muted-foreground")}>{sub}</span>
+                      <span className={cn("block text-[11px]", active ? "text-muted-foreground" : "text-muted-foreground")}>{sub}</span>
                     </span>
                     {active ? <Check className="size-3.5 shrink-0 opacity-70" /> : null}
                   </button>
@@ -3163,7 +3184,7 @@ function SettingsPage({
                         className={cn(
                           "rounded-md px-1 py-0.5 transition-colors",
                           tradingSettings.supervisorIntervalMs === preset
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-muted text-foreground font-semibold"
                             : "hover:text-foreground",
                         )}
                         key={preset}
@@ -3688,7 +3709,7 @@ function WatchlistRail({
                   className={cn(
                     "block w-full rounded-4xl border px-4 py-4 text-left transition-all duration-200",
                     active
-                      ? "border-primary/25 bg-primary text-primary-foreground shadow-(--shadow-card)"
+                      ? "border-border bg-card shadow-(--shadow-card) ring-1 ring-border"
                       : "border-border/70 bg-muted/35 hover:border-border hover:bg-muted/55",
                   )}
                   key={item.symbol}
@@ -3701,7 +3722,7 @@ function WatchlistRail({
                         <div className="text-base font-semibold tracking-[-0.03em]">{item.symbol}</div>
                         {item.regime && (
                           <span className={cn("rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.18em]",
-                            active ? "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground/80"
+                            active ? "border-border/60 bg-muted text-muted-foreground"
                               : item.regime.includes("NoTrade") || item.regime.includes("Disordered")
                                 ? "border-(--danger-border) bg-(--danger-surface) text-(--danger-foreground)"
                                 : item.regime.includes("Trending") || item.regime.includes("Breakout")
@@ -3712,10 +3733,10 @@ function WatchlistRail({
                           </span>
                         )}
                       </div>
-                      <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
+                      <div className={cn("mt-1 text-xs uppercase tracking-[0.2em]", active ? "text-muted-foreground" : "text-muted-foreground")}>{formatStrategyFamily(item.family)}</div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
-                      <Badge className={cn("rounded-full border", active ? "border-primary-foreground/20 bg-primary-foreground/12 text-primary-foreground" : actionBadgeClasses(item.action))} variant="outline">
+                      <Badge className={cn("rounded-full border", active ? "border-border bg-muted text-foreground" : actionBadgeClasses(item.action))} variant="outline">
                         {item.action}
                       </Badge>
                       {/* Mini sparkline */}
@@ -3746,7 +3767,7 @@ function WatchlistRail({
                     <WatchMetric active={active} label="HTF bias" value={`${item.htfBias >= 0 ? "+" : ""}${item.htfBias.toFixed(2)}`} />
                     <WatchMetric active={active} label="Funding" value={`${(item.fundingRate * 100).toFixed(4)}%`} />
                   </div>
-                  <div className={cn("mt-3 text-sm leading-6", active ? "text-primary-foreground/75" : "text-muted-foreground")}>
+                  <div className={cn("mt-3 text-sm leading-6", active ? "text-muted-foreground" : "text-muted-foreground")}>
                     {item.position
                       ? `Live position ${formatNumber(item.position.quantity, 4)} at ${formatUsd(item.position.entry_price, 2)} with ${formatSignedUsd(item.position.unrealized_pnl)} unrealized.${item.entryTimestampMs !== null ? ` Open since ${formatTimestampMs(item.entryTimestampMs)}.` : ""}`
                       : "No open position on this symbol."}
@@ -4036,7 +4057,7 @@ function SegmentedControl({
                     ? "bg-white text-slate-950 shadow-[0_10px_24px_rgba(255,255,255,0.12)]"
                     : "bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
                   : active
-                    ? "bg-primary text-primary-foreground shadow-(--shadow-card)"
+                    ? "bg-foreground text-background shadow-(--shadow-card)"
                     : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
               key={option.value}
@@ -4359,7 +4380,7 @@ function StrategyNote({ title, detail }: { title: string; detail: string }) {
 
 function WatchMetric({ label, value, active }: { label: string; value: string; active: boolean }) {
   return (
-    <div className={cn("min-w-0 rounded-[20px] border px-4 py-3.5", active ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border/70 bg-background/70") }>
+    <div className={cn("min-w-0 rounded-[20px] border px-4 py-3.5", active ? "border-border/60 bg-background/80" : "border-border/70 bg-background/70") }>
       <div className={cn("text-[10px] uppercase tracking-[0.18em]", active ? "text-primary-foreground/65" : "text-muted-foreground")}>{label}</div>
       <div className={cn("mt-2.5 wrap-break-word text-sm leading-5 font-medium tracking-[-0.02em]", active ? "text-primary-foreground" : "text-foreground")}>{value}</div>
     </div>
@@ -4483,6 +4504,11 @@ function buildMistakes(snapshot: RuntimeSnapshot, operator: DashboardOperatorDat
   return mistakes.slice(0, 4);
 }
 
+const ALL_MONITORED_SYMBOLS = [
+  "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
+  "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "LINKUSDT", "DOTUSDT",
+];
+
 function strategySymbols(snapshot: RuntimeSnapshot) {
   const symbols = new Set<string>();
 
@@ -4496,7 +4522,16 @@ function strategySymbols(snapshot: RuntimeSnapshot) {
     }
   });
 
-  return Array.from(symbols);
+  // If the supervisor hasn't populated multi-symbol data yet (early boot),
+  // fall back to the full configured symbol list so the watchlist is never blank.
+  if (symbols.size <= 1) {
+    ALL_MONITORED_SYMBOLS.forEach((s) => symbols.add(s));
+  }
+
+  // Return in canonical order
+  return ALL_MONITORED_SYMBOLS.filter((s) => symbols.has(s)).concat(
+    Array.from(symbols).filter((s) => !ALL_MONITORED_SYMBOLS.includes(s)),
+  );
 }
 
 function filterSnapshotForStrategy(snapshot: RuntimeSnapshot, selectedSymbol: string, selectedWindow: number) {
