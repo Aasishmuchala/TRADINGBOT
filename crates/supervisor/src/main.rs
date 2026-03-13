@@ -904,6 +904,13 @@ fn main() {
                 let cb = b.confidence.parse::<f64>().unwrap_or(0.0);
                 cb.partial_cmp(&ca).unwrap_or(std::cmp::Ordering::Equal)
             });
+            // Deduplicate by (symbol, model_id) — keep first (highest confidence) occurrence.
+            // The same promoted model can be selected for multiple candidates of the same symbol,
+            // producing identical keys that break React rendering.
+            {
+                let mut seen = std::collections::HashSet::new();
+                all_opportunities.retain(|op| seen.insert((op.symbol.clone(), op.model_id.clone())));
+            }
             // Fallback if truly no opportunities across all symbols
             if all_opportunities.is_empty() {
                 all_opportunities.push(SnapshotOpportunity {

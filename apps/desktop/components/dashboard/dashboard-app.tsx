@@ -1335,7 +1335,7 @@ function StrategiesPage({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {scopedSnapshot.opportunities.map((item) => {
+                    {scopedSnapshot.opportunities.map((item, idx) => {
                       const fundingRate = item.funding_rate ?? 0;
                       const htf = item.htf_trend_bias ?? 0;
                       const oi = item.oi_delta ?? 0;
@@ -1348,7 +1348,7 @@ function StrategiesPage({
                       const depthTone = depth > 0.1 ? "text-(--success-foreground)" : depth < -0.1 ? "text-(--danger-foreground)" : "text-muted-foreground";
                       const corrTone = corr > 0.8 ? "text-(--warning-foreground)" : "text-muted-foreground";
                       return (
-                        <TableRow key={`${item.symbol}-${item.model_id}`}>
+                        <TableRow key={`${item.symbol}-${item.model_id}-${idx}`}>
                           <TableCell className="font-medium">{item.symbol}</TableCell>
                           <TableCell>{formatStrategyFamily(item.family)}</TableCell>
                           <TableCell>{item.regime}</TableCell>
