@@ -535,18 +535,18 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                     className={cn(
                       "executive-nav-item executive-clickable block rounded-[28px] border px-5 py-5 transition-colors",
                       active
-                        ? "border-primary/18 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--primary)_92%,white_8%),var(--primary))] text-primary-foreground shadow-(--shadow-button) ring-1 ring-primary/10"
+                        ? "border-foreground/14 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--foreground)_88%,transparent_12%),var(--foreground))] text-background shadow-(--shadow-button) ring-1 ring-foreground/8"
                         : "border-border/60 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--background)_94%,white_6%),color-mix(in_srgb,var(--background)_99%,transparent_1%))] shadow-[0_10px_28px_rgba(15,23,42,0.04)] hover:border-border hover:bg-muted/40",
                     )}
                     href={item.href}
                   >
                     <div className="flex items-start gap-4">
-                      <span className={cn("mt-0.5 rounded-full p-2.5", active ? "bg-primary-foreground/15" : "bg-muted") }>
+                      <span className={cn("mt-0.5 rounded-full p-2.5", active ? "bg-background/14" : "bg-muted") }>
                         <Icon className="size-4" />
                       </span>
                       <div className="space-y-1.5">
                         <div className="text-sm font-medium tracking-[-0.02em]">{item.label}</div>
-                        <div className={cn("text-xs leading-5", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{item.description}</div>
+                        <div className={cn("text-xs leading-5", active ? "text-background/65" : "text-muted-foreground")}>{item.description}</div>
                       </div>
                     </div>
                   </Link>
@@ -582,19 +582,19 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                     className={cn(
                       "executive-clickable min-w-48 rounded-3xl border px-5 py-4",
                       active
-                        ? "border-primary/18 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--primary)_92%,white_8%),var(--primary))] text-primary-foreground shadow-(--shadow-button) ring-1 ring-primary/10"
+                        ? "border-foreground/14 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--foreground)_88%,transparent_12%),var(--foreground))] text-background shadow-(--shadow-button) ring-1 ring-foreground/8"
                         : "border-border/60 bg-card/94 shadow-[0_12px_34px_rgba(15,23,42,0.05)]",
                     )}
                     href={item.href}
                     key={item.page}
                   >
                     <div className="flex items-center gap-3.5">
-                      <span className={cn("rounded-full p-2.5", active ? "bg-primary-foreground/15" : "bg-muted") }>
+                      <span className={cn("rounded-full p-2.5", active ? "bg-background/14" : "bg-muted") }>
                         <Icon className="size-4" />
                       </span>
                       <div>
                         <div className="text-sm font-medium">{item.label}</div>
-                        <div className={cn("text-xs", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{item.description}</div>
+                        <div className={cn("text-xs", active ? "text-background/65" : "text-muted-foreground")}>{item.description}</div>
                       </div>
                     </div>
                   </Link>
@@ -928,7 +928,7 @@ function OverviewPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] items-start">
         <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
         <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
           <CardHeader className="pb-3">
@@ -1261,8 +1261,8 @@ function StrategiesPage({
               <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
               <Badge className="rounded-full" variant="secondary">{selectedSymbol === "All" ? "All symbols" : selectedSymbol}</Badge>
             </div>
-            <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Market structure, opportunity ranking, and live posture in one view.</div>
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Chart first, watchlist second, and research context close enough to act without scanning disconnected panels.</p>
+            <div className="text-base font-semibold tracking-[-0.03em] text-foreground">Signal intelligence, opportunity queue, and live chart in one surface.</div>
+            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">Select a symbol from the watchlist to load its chart, indicators, and live signal context. Consensus, HTF bias, and funding rate update each cycle.</p>
           </div>
           <div className="space-y-2">
             <div className="grid gap-2 grid-cols-3">
@@ -1316,7 +1316,7 @@ function StrategiesPage({
         <Card className="rounded-4xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
           <CardHeader>
             <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Opportunity queue</CardTitle>
-            <CardDescription>Current candidates with regime and model scope. This page is now strategy-only detail.</CardDescription>
+            <CardDescription>All active candidates ranked by confluence score with full signal context — funding, HTF bias, OI delta, depth, and BTC correlation.</CardDescription>
           </CardHeader>
           <CardContent>
             {scopedSnapshot.opportunities.length === 0 ? (
@@ -1635,6 +1635,10 @@ function ExecutionPage({
                 </div>
               );
             })()}
+            <div className="rounded-[20px] border border-border/60 bg-muted/20 px-4 py-3 mb-1">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Maintenance actions</p>
+              <p className="mt-1 text-xs text-muted-foreground">These run once and report back to the event feed. Safe to run at any time without affecting live positions.</p>
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <ActionButton action="status" icon={Activity} label="Stack status" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
               <ActionButton action="overlay-compare" icon={BrainCircuit} label="Overlay compare" pendingOperatorAction={pendingOperatorAction} runOperatorAction={runOperatorAction} />
@@ -3013,7 +3017,7 @@ function SettingsPage({
             <CardDescription>Store Binance Futures credentials in the {tradingSettings.credentialBackend === "wincred" ? "Windows Credential Manager" : "macOS Keychain"}, choose mainnet or testnet transport, and run Paper mode with simulated fills.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+            <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
               <MetricBlock label="Environment" value={tradingSettings.binanceEnvironment === "testnet" ? "Testnet" : "Mainnet"} compact />
               <MetricBlock label={tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"} value={tradingSettings.keychainAvailable ? "Available" : "Unavailable"} compact />
               <MetricBlock label="API key" value={tradingSettings.hasApiKey ? "Stored" : "Missing"} compact />
@@ -3071,7 +3075,7 @@ function SettingsPage({
                     onClick={() => setTradingSettings((current) => ({ ...current, binanceEnvironment: environment }))}
                     className={cn(
                       "rounded-[20px] border px-4 py-3 text-left transition-all",
-                      active ? "border-primary/30 bg-primary/10" : "border-border/70 bg-background hover:bg-muted/35",
+                      active ? "border-border bg-card shadow-sm" : "border-border/70 bg-background hover:bg-muted/35",
                     )}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -3083,7 +3087,7 @@ function SettingsPage({
                         ? "Binance Futures testnet private account access."
                         : "Binance Futures mainnet private account access with simulated fills while live orders stay off."}
                     </p>
-                    {detected ? <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-primary">Matches stored credentials</p> : null}
+                    {detected ? <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">· matches stored credentials</p> : null}
                   </button>
                 );
               })}
@@ -3164,7 +3168,7 @@ function SettingsPage({
                     </span>
                   </div>
                   <input
-                    className="w-full accent-primary"
+                    className="w-full"
                     max={5000}
                     min={100}
                     onChange={(event) => {
@@ -4378,11 +4382,11 @@ function StrategyNote({ title, detail }: { title: string; detail: string }) {
   );
 }
 
-function WatchMetric({ label, value, active }: { label: string; value: string; active: boolean }) {
+function WatchMetric({ label, value }: { label: string; value: string; active?: boolean }) {
   return (
-    <div className={cn("min-w-0 rounded-[20px] border px-4 py-3.5", active ? "border-border/60 bg-background/80" : "border-border/70 bg-background/70") }>
-      <div className={cn("text-[10px] uppercase tracking-[0.18em]", active ? "text-primary-foreground/65" : "text-muted-foreground")}>{label}</div>
-      <div className={cn("mt-2.5 wrap-break-word text-sm leading-5 font-medium tracking-[-0.02em]", active ? "text-primary-foreground" : "text-foreground")}>{value}</div>
+    <div className="min-w-0 rounded-[20px] border border-border/60 bg-background/70 px-4 py-3.5">
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+      <div className="mt-2.5 wrap-break-word text-sm leading-5 font-medium tracking-[-0.02em] text-foreground">{value}</div>
     </div>
   );
 }
