@@ -723,7 +723,7 @@ function NyraQLockup({ compact = false }: { compact?: boolean }) {
 
 function NyraQHeaderBadge() {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/72 px-3 py-2 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+    <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/72 px-3 py-2 ">
       <img alt="NyraQ mark" className="size-6 object-contain" src="/nyraq-mark.svg" />
       <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">NyraQ</span>
     </div>
@@ -918,12 +918,12 @@ function PositionsPage({
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Open positions</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Open positions</CardTitle>
             <CardDescription>Current exposure, leverage, and unrealized mark-to-market.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             {snapshot.positions.length === 0 ? (
               <EmptyState message={emptyPositionsMessage} />
             ) : (
@@ -970,23 +970,23 @@ function PositionsPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Balance calendar</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Balance calendar</CardTitle>
             <CardDescription>Daily closes with the same green/red logic operators use to assess discipline.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             <BalanceCalendar days={balanceSummary.calendar} emptyMessage={emptyBalanceMessage} />
           </CardContent>
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Recent closed trades</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Recent closed trades</CardTitle>
           <CardDescription>The last eight closures with source quality and realized result.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           {tradeSummary.recentTrades.length === 0 ? (
             <EmptyState message="No closed trades recorded yet." />
           ) : (
@@ -1064,12 +1064,12 @@ function SymbolHeatmap({
   }
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Symbol heatmap</CardTitle>
+    <Card className="rounded-xl border-border/60 bg-card">
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Symbol heatmap</CardTitle>
         <CardDescription>Top candidate per symbol. Green = tradeable regime. Funding, HTF bias, and depth imbalance shown per cell.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 pb-4">
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {displaySymbols.map((sym) => {
             const op = opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
@@ -1193,8 +1193,8 @@ function StrategiesPage({
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardContent className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardContent className="px-4 pb-4 grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
@@ -1252,12 +1252,12 @@ function StrategiesPage({
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Opportunity queue</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Opportunity queue</CardTitle>
             <CardDescription>All active candidates ranked by confluence score with full signal context — funding, HTF bias, OI delta, depth, and BTC correlation.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             {scopedSnapshot.opportunities.length === 0 ? (
               <EmptyState message="No strategy candidates are currently queued." />
             ) : (
@@ -1314,12 +1314,12 @@ function StrategiesPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Research leaderboard</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research leaderboard</CardTitle>
             <CardDescription>Top promoted models and their threshold posture.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="px-4 pb-4 space-y-4">
             {scopedSnapshot.research_models.length === 0 ? (
               <EmptyState message="No research leaderboard is available yet." />
             ) : (
@@ -1347,12 +1347,12 @@ function StrategiesPage({
 
       <SymbolHeatmap opportunities={snapshot.opportunities} symbols={availableSymbols} />
 
-      <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">What this means for entries</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">What this means for entries</CardTitle>
           <CardDescription>Do not treat a queued candidate as a trade signal without confirming indicator posture and live trade quality.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
+        <CardContent className="px-4 pb-4 grid gap-4 md:grid-cols-3">
           <StrategyNote title="Wait for structure" detail="Use price and EMA relationship first. A model score without structure alignment is not enough." />
           <StrategyNote title="Respect recent P&L" detail={`Recent expectancy is ${formatSignedUsd(tradeSummary.expectancyPerTrade)}. If it degrades, lower aggressiveness instead of searching for more trades.`} />
           <StrategyNote title="Confirm momentum regime" detail={`RSI, MACD, and volume should support ${selectedSymbol === "All" ? "the active symbol" : selectedSymbol}. Range logic in a trend pane is where forced errors begin.`} />
@@ -1369,12 +1369,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Risk posture</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Risk posture</CardTitle>
             <CardDescription>Live qualitative notes, system gate, and sentiment modifiers.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 lg:grid-cols-2">
               <MetricBlock label="Execution summary" value={snapshot.execution_summary} />
               <MetricBlock label="Exchange gate" value={snapshot.exchange_gate} />
@@ -1387,12 +1387,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Audit pressure</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Audit pressure</CardTitle>
             <CardDescription>Retention and incident pressure that can quietly degrade launch quality.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <RetentionBar label="Order intent retention" percent={retentionOrderPct} detail={`${operator.audit.retention.orderIntents.currentCount}/${operator.audit.retention.orderIntents.limit}`} />
             <RetentionBar label="Execution event retention" percent={retentionExecPct} detail={`${operator.audit.retention.executionEvents.currentCount}/${operator.audit.retention.executionEvents.limit}`} />
             <div className="space-y-3">
@@ -1408,12 +1408,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Overlay comparator</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Overlay comparator</CardTitle>
           <CardDescription>Scoped overlay validation belongs in risk because it explains how promoted indicators alter approvals.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           {operator.overlayCompare ? (
             <div className="space-y-5">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1530,12 +1530,12 @@ function ExecutionPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Mode and control plane</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode and control plane</CardTitle>
             <CardDescription>Dedicated operator page with real actions instead of sharing space with charts and review.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             {(() => {
               const modeDescriptions: Record<string, { label: string; desc: string }> = {
                 Research: { label: "Research", desc: "No fills. Scores candidates and trains models in the background only." },
@@ -1645,17 +1645,17 @@ function ExecutionPage({
         </Card>
 
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Runtime health</CardTitle>
+                  <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Runtime health</CardTitle>
                   <CardDescription>Execution-side status for mode, monitor freshness, and whether recent paper activity proves the bot is still working.</CardDescription>
                 </div>
                 <BotHealthBadge health={botHealth} prominent />
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="px-4 pb-4 space-y-4">
               <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock compact label="Paper posture" tone={botHealth.paper_ready ? "positive" : "negative"} value={botHealth.paper_status} />
@@ -1680,12 +1680,12 @@ function ExecutionPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Operator event feed</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Operator event feed</CardTitle>
               <CardDescription>Recent supervisor, maintenance, and mode-change events.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="px-4 pb-4 space-y-3">
               {operator.events.length === 0 ? (
                 <EmptyState message="No operator events are available." />
               ) : (
@@ -2126,12 +2126,12 @@ function ReviewPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Realized equity curve</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Realized equity curve</CardTitle>
             <CardDescription>The equity curve now follows the same active review slice as the filters, metrics, and table.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 md:grid-cols-3">
               <MetricBlock compact label="Curve points" value={String(filteredEquityCurve.length)} />
               <MetricBlock compact label="Slice net P&L" value={formatSignedUsd(reviewMetrics.realizedPnlTotal)} />
@@ -2161,12 +2161,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Review guardrails</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review guardrails</CardTitle>
             <CardDescription>Filters now drive the review lens, so the metrics below reflect the current slice.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <MetricBlock label="Filtered trades" value={String(reviewMetrics.closedTrades)} />
             <MetricBlock label="Exact coverage" value={formatPercent(reviewMetrics.exactCoverageRate ?? exactCoverage, 0)} />
             <MetricBlock label="Average win" value={formatSignedUsd(reviewMetrics.averageWinPnl)} />
@@ -2187,16 +2187,16 @@ function ReviewPage({
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Slice versus full book</CardTitle>
+      <Card className="rounded-xl border-border/60 bg-card">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice versus full book</CardTitle>
           <CardDescription>
             {isFocusedSlice
               ? `The current review slice ${currentSliceLabel} is compared directly against the full closed-trade history.`
               : "No focused slice is active yet. Click a ranked slice to compare it directly against the full closed-trade history."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="px-4 pb-4 space-y-5">
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
             <div className="rounded-xl border border-border/70 bg-muted/25 p-5">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Current slice</div>
@@ -2240,12 +2240,12 @@ function ReviewPage({
       </Card>
 
       <div className="grid gap-5 xl:grid-cols-[1.04fr_0.96fr]">
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Slice rankings</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice rankings</CardTitle>
             <CardDescription>Best and weakest model-regime-family combinations inside the current filtered review universe. Applying a slice resets the secondary filters so you review the exact cohort.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-5 2xl:grid-cols-2">
+          <CardContent className="px-4 pb-4 grid gap-5 2xl:grid-cols-2">
             <div className="space-y-4">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Best slices</div>
               {sliceRankings.best.length === 0 ? (
@@ -2453,12 +2453,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Trade history</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Trade history</CardTitle>
             <CardDescription>Filter by symbol, model, family, regime, close reason, side, source quality, and hold duration, then sort the slice you actually want to review.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5">
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Symbol</div>
@@ -2693,12 +2693,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Review mistakes</CardTitle>
+        <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review mistakes</CardTitle>
             <CardDescription>Concrete actions to avoid and the reason they damage expectancy.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="px-4 pb-4 space-y-3">
             {mistakes.map((mistake) => (
               <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={mistake.title}>
                 <div className="text-sm font-medium text-foreground">{mistake.title}</div>
@@ -2895,12 +2895,12 @@ function SettingsPage({
       </div>
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Mode requests</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode requests</CardTitle>
               <CardDescription>Current request state and protected-mode posture.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="px-4 pb-4 space-y-4">
               <MetricBlock label="Pending request" value={operator.pendingModeRequest ?? "None"} />
               <MetricBlock label="Promoted indicator" value={snapshot.promoted_indicator.id ?? "None"} />
               <MetricBlock label="Overlay enabled" value={snapshot.promoted_indicator.overlay_enabled ? "True" : "False"} />
@@ -2912,12 +2912,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Theme</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme</CardTitle>
               <CardDescription>Follow the system by default or force the dashboard into light or dark mode.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="px-4 pb-4 space-y-2">
               {(["system", "light", "dark"] as ThemePreference[]).map((mode) => {
                 const active = themePreference === mode;
                 const Icon = mode === "system" ? Monitor : mode === "light" ? Sun : Moon;
@@ -2950,12 +2950,12 @@ function SettingsPage({
         </div>
 
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Binance paper session</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+          <CardHeader className="pb-2 pt-4 px-4">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Binance paper session</CardTitle>
             <CardDescription>Store Binance Futures credentials in the {tradingSettings.credentialBackend === "wincred" ? "Windows Credential Manager" : "macOS Keychain"}, choose mainnet or testnet transport, and run Paper mode with simulated fills.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="px-4 pb-4 space-y-4">
             <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
               <MetricBlock label="Environment" value={tradingSettings.binanceEnvironment === "testnet" ? "Testnet" : "Mainnet"} compact />
               <MetricBlock label={tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"} value={tradingSettings.keychainAvailable ? "Available" : "Unavailable"} compact />
@@ -3228,12 +3228,12 @@ function SettingsPage({
           </CardContent>
         </Card>
 
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Research policy and leaderboards</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research policy and leaderboards</CardTitle>
               <CardDescription>See why models survive, which indicator genomes are strong enough, and remove weak overlays before they touch approvals.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="px-4 pb-4 space-y-5">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock label="Promoted model" value={modelPacks.active.promoted_model?.model?.id ?? "None"} compact />
                 <MetricBlock label="Promoted indicator" value={modelPacks.active.promoted_indicator_pack?.genome?.id ?? "None"} compact />
@@ -3366,12 +3366,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Theme rationale</CardTitle>
+          <Card className="rounded-xl border-border/60 bg-card">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme rationale</CardTitle>
               <CardDescription>This dashboard now uses a restrained trading workspace instead of high-saturation status cards.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-2">
+            <CardContent className="px-4 pb-4 grid gap-3 md:grid-cols-2">
               <StrategyNote title="Neutral shell" detail="Whitespace and slate tones keep attention on price, P&L, and risk instead of decorative gradients." />
               <StrategyNote title="Separate pages" detail="Each navigation item now owns a route and a detailed context instead of scrolling through a single overloaded page." />
               <StrategyNote title="Indicator-first panes" detail="Price, EMA, RSI, and MACD are grouped like a trading terminal instead of mixing them with maintenance controls." />
@@ -3490,7 +3490,7 @@ function TradingViewPanel({
   const lastTimestamp = activeCandle?.timestamp_ms ?? chartPoints.at(-1)?.timestamp_ms ?? null;
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
+    <Card className="rounded-xl border-border/60 bg-card">
       <CardHeader className="space-y-3 border-b border-border/50 pb-4">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-2.5">
@@ -3561,7 +3561,7 @@ function TradingViewPanel({
           <TerminalStat label="Updated" value={updatedAt ? formatOperatorTimestamp(updatedAt) : "No data"} />
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 pt-4">
+      <CardContent className="px-4 pb-4 space-y-4 pt-4">
         {chartPoints.length < 2 ? (
           <div className="rounded-xl border border-border/70 bg-muted/25 px-6 py-14 text-sm leading-6 text-muted-foreground">Not enough indicator data to render the market pane.</div>
         ) : (
@@ -3629,12 +3629,12 @@ function WatchlistRail({
   });
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card/96 shadow-[0_12px_42px_rgba(15,23,42,0.04)]">
+    <Card className="rounded-xl border-border/60 bg-card">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold tracking-[-0.04em]">Watchlist</CardTitle>
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Watchlist</CardTitle>
         <CardDescription>Compact symbol rail with price change, RSI, consensus, and live position state.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3.5">
+      <CardContent className="px-4 pb-4 space-y-3.5">
         <div className="grid gap-3 sm:grid-cols-3">
           <MetricBlock compact label="Symbols" value={String(watchlist.length)} />
           <MetricBlock compact label="Live positions" value={String(watchlist.filter((item) => item.position !== null).length)} />
