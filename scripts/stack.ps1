@@ -127,11 +127,16 @@ function Start-Supervisor {
     $proc = [System.Diagnostics.Process]::Start($psi)
     $proc.Id | Set-Content $SupervisorPidFile
 
-    # Async log capture
+    # Async log capture (PS5-compatible)
+    $logPath = $SupervisorLog
+    Register-ObjectEvent -InputObject $proc -EventName OutputDataReceived -Action {
+        if ($Event.SourceEventArgs.Data) { Add-Content $using:logPath $Event.SourceEventArgs.Data }
+    } | Out-Null
+    Register-ObjectEvent -InputObject $proc -EventName ErrorDataReceived -Action {
+        if ($Event.SourceEventArgs.Data) { Add-Content $using:logPath $Event.SourceEventArgs.Data }
+    } | Out-Null
     $proc.BeginOutputReadLine()
     $proc.BeginErrorReadLine()
-    $proc.OutputDataReceived.Add({ param($s,$e); if ($e.Data) { Add-Content $SupervisorLog $e.Data } }) | Out-Null
-    $proc.ErrorDataReceived.Add({  param($s,$e); if ($e.Data) { Add-Content $SupervisorLog $e.Data } }) | Out-Null
 
     # Wait up to 10 s for it to actually be running
     for ($i = 0; $i -lt 40; $i++) {
