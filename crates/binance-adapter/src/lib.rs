@@ -221,7 +221,6 @@ pub enum ExchangeValidationError {
     UnknownSymbol,
 }
 
-#[derive(Debug, Clone, PartialEq)]
 /// Funding rate fetched from Binance Futures.
 #[derive(Debug, Clone, PartialEq)]
 pub struct FundingRateSnapshot {
