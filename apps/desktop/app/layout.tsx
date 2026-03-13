@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans" });
-const ibmPlexMono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"] });
+// Fonts injected via globals.css @import (works offline)
+const spaceGrotesk = { variable: "--font-sans" };
+const ibmPlexMono = { variable: "--font-mono" };
 
 export const metadata: Metadata = {
   title: "NyraQ",
