@@ -190,7 +190,7 @@ function Get-Health {
     }
     Write-Host "Supervisor process OK: $pid"
 
-    $port = $env:STHYRA_DESKTOP_PORT ?? "4174"
+    if ($env:STHYRA_DESKTOP_PORT) { $port = $env:STHYRA_DESKTOP_PORT } else { $port = "4174" }
     $apiUrl = "http://localhost:$port/api/runtime-snapshot"
 
     try {
