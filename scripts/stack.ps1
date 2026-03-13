@@ -15,17 +15,17 @@ $DesktopLog         = Join-Path $StateDir "desktop.log"
 $SupervisorBinary   = Join-Path $RootDir "target\debug\sthyra-supervisor.exe"
 $ExportDir          = Join-Path $StateDir "exports"
 
-# ─── Defaults ─────────────────────────────────────────────────────────────────
-$env:STHYRA_DESKTOP_PORT                  ??= "4174"
-$env:STHYRA_BINANCE_USE_TESTNET           ??= "1"
-$env:STHYRA_ENABLE_BINANCE_HTTP           ??= "0"
-$env:STHYRA_ENABLE_BINANCE_STREAM         ??= "0"
-$env:STHYRA_ENABLE_BINANCE_TRADING        ??= "0"
-$env:STHYRA_CANCEL_AFTER_SUBMIT           ??= "0"
-$env:STHYRA_SUPERVISOR_INTERVAL_MS        ??= "500"
-$env:STHYRA_RESEARCH_REFRESH_INTERVAL_MS  ??= "1800000"
-$env:STHYRA_INDICATOR_PRUNE_MIN_FITNESS   ??= "0.05"
-$env:STHYRA_INDICATOR_RETENTION_LIMIT     ??= "6"
+# ─── Defaults (PS5-compatible, no ??= operator) ───────────────────────────────
+if (-not $env:STHYRA_DESKTOP_PORT)                 { $env:STHYRA_DESKTOP_PORT                 = "4174" }
+if (-not $env:STHYRA_BINANCE_USE_TESTNET)          { $env:STHYRA_BINANCE_USE_TESTNET          = "1" }
+if (-not $env:STHYRA_ENABLE_BINANCE_HTTP)          { $env:STHYRA_ENABLE_BINANCE_HTTP          = "0" }
+if (-not $env:STHYRA_ENABLE_BINANCE_STREAM)        { $env:STHYRA_ENABLE_BINANCE_STREAM        = "0" }
+if (-not $env:STHYRA_ENABLE_BINANCE_TRADING)       { $env:STHYRA_ENABLE_BINANCE_TRADING       = "0" }
+if (-not $env:STHYRA_CANCEL_AFTER_SUBMIT)          { $env:STHYRA_CANCEL_AFTER_SUBMIT          = "0" }
+if (-not $env:STHYRA_SUPERVISOR_INTERVAL_MS)       { $env:STHYRA_SUPERVISOR_INTERVAL_MS       = "500" }
+if (-not $env:STHYRA_RESEARCH_REFRESH_INTERVAL_MS) { $env:STHYRA_RESEARCH_REFRESH_INTERVAL_MS = "1800000" }
+if (-not $env:STHYRA_INDICATOR_PRUNE_MIN_FITNESS)  { $env:STHYRA_INDICATOR_PRUNE_MIN_FITNESS  = "0.05" }
+if (-not $env:STHYRA_INDICATOR_RETENTION_LIMIT)    { $env:STHYRA_INDICATOR_RETENTION_LIMIT    = "6" }
 
 New-Item -ItemType Directory -Force -Path $StateDir  | Out-Null
 New-Item -ItemType Directory -Force -Path $AppDataDir | Out-Null
