@@ -3282,13 +3282,13 @@ function SettingsPage({
                   {modelPacks.indicator_leaderboard.length === 0 ? (
                     <EmptyState message={`No indicator genomes currently survive the active fitness floor of ${formatNumber(modelPacks.policy?.indicatorPruneMinFitness ?? tradingSettings.indicatorPruneMinFitness)}.`} />
                   ) : (
-                    modelPacks.indicator_leaderboard.slice(0, 6).map((entry) => {
+                    modelPacks.indicator_leaderboard.slice(0, 6).map((entry, entryIdx) => {
                       const indicatorId = entry.genome?.id ?? "unknown-indicator";
                       const deleteKey = `delete-indicator:${indicatorId}`;
                       const blacklistKey = `blacklist-indicator:${indicatorId}`;
 
                       return (
-                        <div className="p-4" style={{background:"var(--card)"}} key={indicatorId}>
+                        <div className="p-4" style={{background:"var(--card)"}} key={`${indicatorId}-${entryIdx}`}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <div className="text-sm font-medium text-foreground">{indicatorId}</div>
