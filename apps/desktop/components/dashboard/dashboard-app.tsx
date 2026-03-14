@@ -3489,7 +3489,7 @@ function TradingViewPanel({
 
   return (
     <div className="n-card">
-      <CardHeader className="pb-0 pt-0 px-0 border-b" style={{borderColor:"var(--n-line)"}}>
+      <div className="border-b" style={{borderColor:"var(--n-line)"}}>
         <div className="flex items-center justify-between gap-2 px-3 py-2 border-b" style={{borderColor:"var(--n-line)"}}>
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{color:"var(--muted-foreground)"}}>CHART DECK</span>
@@ -3610,9 +3610,8 @@ function WatchlistRail({
 
   return (
     <div className="n-card">
-      <CardHeader className="pb-4">
+      <div className="px-4 pt-4 pb-3 border-b" style={{borderColor:"var(--n-line)"}}>
         <span className="n-label">Watchlist</span>
-        
       </div>
       <div className="px-4 pb-4 space-y-3.5">
         <div className="grid gap-3 sm:grid-cols-3">
