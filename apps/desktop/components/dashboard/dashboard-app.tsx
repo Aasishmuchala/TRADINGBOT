@@ -3971,13 +3971,63 @@ function SegmentedControl({
     </div>
   );
 }
+function IndicatorPane({
+  label,
+  series,
+  min,
+  max,
+  positiveThreshold,
+  negativeThreshold,
+  hoverIndex,
+  onHoverIndex,
+}: {
+  label: string;
+  series: number[];
+  min: number;
+  max: number;
+  positiveThreshold?: number;
+  negativeThreshold?: number;
+  hoverIndex: number;
+  onHoverIndex: (index: number) => void;
+}) {
+  const width = 420;
+  const height = 170;
+  const padding = 18;
+  const scaleX = createIndexScale(series.length, padding, width - padding);
+  const scaleY = createScale(min, max, height - padding, padding);
+  const crosshairX = scaleX(Math.min(hoverIndex, Math.max(series.length - 1, 0)));
+
+  function updateHoverIndex(clientX: number, left: number, widthPx: number) {
+    if (series.length === 0) return;
+    const ratio = Math.max(0, Math.min(1, (clientX - left) / Math.max(widthPx, 1)));
+    onHoverIndex(Math.round(ratio * (series.length - 1)));
+  }
+
+  const areaPoints = series.length > 1
+    ? `${scaleX(0)},${scaleY(series[0]!)} ` +
+      series.slice(1).map((v, i) => `${scaleX(i + 1)},${scaleY(v)}`).join(" ") +
+      ` ${scaleX(series.length - 1)},${height} ${scaleX(0)},${height}`
+    : "";
+  const lastValue = series.at(-1);
+  const lastY = lastValue !== undefined ? scaleY(lastValue) : null;
+
+  return (
+    <div className="overflow-hidden n-card">
+      <div className="border-b border-[var(--n-line)] px-4 py-2.5 text-[11px] uppercase tracking-[0.14em]" style={{color:"var(--muted-foreground)"}}>{label}</div>
+      <svg
+        className="h-42.5 w-full"
+        onMouseLeave={() => onHoverIndex(Math.max(series.length - 1, 0))}
+        onMouseMove={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          updateHoverIndex(event.clientX, rect.left, rect.width);
+        }}
         preserveAspectRatio="none"
         viewBox={`0 0 ${width} ${height}`}
       >
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" id={`indGrad-${label}`} x1="0" x2="0" y1={padding} y2={height}>
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
           </linearGradient>
         </defs>
         <ChartGrid height={height} width={width} />
@@ -3985,9 +4035,9 @@ function SegmentedControl({
         {typeof positiveThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
         {typeof negativeThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
         {areaPoints && <polygon fill={`url(#indGrad-${label})`} points={areaPoints} />}
-        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#22d3ee" strokeWidth="2.2" />
+        <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#3b82f6" strokeWidth="2.2" />
         {lastValue !== undefined && lastY !== null && (
-          <text fill="#22d3ee" fontSize="9" textAnchor="end" x={width - 2} y={Math.max(10, lastY - 3)}>
+          <text fill="#3b82f6" fontSize="9" textAnchor="end" x={width - 2} y={Math.max(10, lastY - 3)}>
             {lastValue.toFixed(2)}
           </text>
         )}
