@@ -510,21 +510,21 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
   const mistakes = buildMistakes(snapshot, operator);
 
   return (
-    <div className="min-h-screen bg-(--background) text-(--foreground)">
+    <div className="min-h-screen" style={{background:"#000000",color:"#F8FAFC",fontFamily:"Exo 2,system-ui,sans-serif"}}>
       <div className="flex min-h-screen w-full">
         {/* ── Slim dark sidebar ── */}
-        <aside className="hidden lg:flex w-[200px] xl:w-[220px] shrink-0 flex-col bg-[#1a1a1a] dark:bg-[#111111]">
-          <div className="sticky top-0 flex h-screen flex-col px-4 py-5">
+        <aside className="hidden lg:flex w-[220px] shrink-0 flex-col" style={{background:"#000000",borderRight:"1px solid rgba(255,255,255,0.07)"}}>
+          <div className="sticky top-0 flex h-screen flex-col px-3 py-4" style={{background:"#000000"}}>
             {/* Logo */}
-            <div className="mb-6 flex items-center gap-2.5 px-2">
-              <img alt="NyraQ mark" className="size-6 object-contain invert dark:invert-0" src="/nyraq-mark.svg" />
-              <span className="text-[13px] font-semibold tracking-[-0.02em] text-white/90">NyraQ</span>
+            <div className="mb-5 flex items-center gap-2.5 px-2 pb-4" style={{borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <img alt="NyraQ mark" className="size-6 object-contain" src="/nyraq-mark.svg" style={{filter:"brightness(0) saturate(100%) invert(72%) sepia(60%) saturate(800%) hue-rotate(5deg) brightness(105%)"}} />
+              <span style={{fontFamily:"Orbitron,sans-serif",fontSize:"12px",fontWeight:700,letterSpacing:"0.14em",color:"#F59E0B",textShadow:"0 0 12px rgba(245,158,11,0.4)"}}>NYRAQ</span>
             </div>
 
             {/* Nav groups */}
             <nav className="flex-1 space-y-6">
               <div>
-                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Monitor</div>
+                <div style={{fontFamily:"Space Mono,monospace",fontSize:"8px",fontWeight:700,letterSpacing:"0.22em",color:"rgba(245,158,11,0.35)",padding:"0 8px",marginBottom:"4px",textTransform:"uppercase"}}>MONITOR</div>
                 <div className="space-y-0.5">
                   {navItems.filter(i => ["overview","positions","markets"].includes(i.page)).map((item) => {
                     const Icon = item.icon;
@@ -533,12 +533,18 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                       <Link
                         key={item.page}
                         href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
-                          active
-                            ? "bg-white/12 text-white"
-                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
-                        )}
+                        className="flex items-center gap-3 px-2 py-2 transition-all"
+                        style={{
+                          borderRadius:"7px",
+                          fontSize:"12.5px",
+                          fontWeight:500,
+                          fontFamily:"Exo 2,system-ui,sans-serif",
+                          color: active ? "#F8FAFC" : "#6B7280",
+                          background: active ? "rgba(245,158,11,0.10)" : "transparent",
+                          boxShadow: active ? "inset 3px 0 0 #F59E0B" : "none",
+                          marginBottom:"1px",
+                          cursor:"pointer",
+                        }}
                       >
                         <Icon className="size-4 shrink-0" />
                         <span className="font-medium">{item.label}</span>
@@ -548,7 +554,7 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                 </div>
               </div>
               <div>
-                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">Operate</div>
+                <div style={{fontFamily:"Space Mono,monospace",fontSize:"8px",fontWeight:700,letterSpacing:"0.22em",color:"rgba(245,158,11,0.35)",padding:"0 8px",marginBottom:"4px",marginTop:"16px",textTransform:"uppercase"}}>OPERATE</div>
                 <div className="space-y-0.5">
                   {navItems.filter(i => ["risk","execution","review","settings"].includes(i.page)).map((item) => {
                     const Icon = item.icon;
@@ -557,12 +563,18 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
                       <Link
                         key={item.page}
                         href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors",
-                          active
-                            ? "bg-white/12 text-white"
-                            : "text-white/50 hover:bg-white/6 hover:text-white/80",
-                        )}
+                        className="flex items-center gap-3 px-2 py-2 transition-all"
+                        style={{
+                          borderRadius:"7px",
+                          fontSize:"12.5px",
+                          fontWeight:500,
+                          fontFamily:"Exo 2,system-ui,sans-serif",
+                          color: active ? "#F8FAFC" : "#6B7280",
+                          background: active ? "rgba(245,158,11,0.10)" : "transparent",
+                          boxShadow: active ? "inset 3px 0 0 #F59E0B" : "none",
+                          marginBottom:"1px",
+                          cursor:"pointer",
+                        }}
                       >
                         <Icon className="size-4 shrink-0" />
                         <span className="font-medium">{item.label}</span>
@@ -574,13 +586,13 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
             </nav>
 
             {/* Runtime status footer */}
-            <div className="mt-4 rounded-lg border border-white/8 bg-white/4 p-3 space-y-2">
+            <div className="mt-4 p-3 space-y-2" style={{borderRadius:"8px",border:"1px solid rgba(255,255,255,0.07)",background:"rgba(255,255,255,0.03)"}}>
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{currentModeLabel}</Badge>
-                <Badge className="rounded border-0 bg-white/10 text-white/80 text-[10px] px-2 py-0.5" variant="outline">{snapshot.venue}</Badge>
+                <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.10em",textTransform:"uppercase",padding:"2px 7px",borderRadius:"4px",background:"rgba(245,158,11,0.10)",border:"1px solid rgba(245,158,11,0.22)",color:"#F59E0B"}}>{currentModeLabel}</span>
+                <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.10em",textTransform:"uppercase",padding:"2px 7px",borderRadius:"4px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",color:"#9CA3AF"}}>{snapshot.venue}</span>
                 <BotHealthBadge health={botHealth} />
               </div>
-              <p className="text-[11px] leading-4 text-white/35 truncate">{refreshState}</p>
+              <p style={{fontSize:"10px",color:"rgba(107,114,128,0.8)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontFamily:"Space Mono,monospace"}}>{refreshState}</p>
             </div>
           </div>
         </aside>
@@ -616,16 +628,16 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
           </div>
 
           {/* ── Slim topbar ── */}
-          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-(--background) px-5 lg:px-6">
+          <header className="flex h-[52px] shrink-0 items-center justify-between px-5 lg:px-6" style={{background:"rgba(0,0,0,0.92)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
             <div className="flex items-center gap-3">
-              <h1 className="text-[15px] font-semibold tracking-[-0.02em] text-foreground">{headlineForPage(page)}</h1>
+              <h1 style={{fontFamily:"Orbitron,sans-serif",fontSize:"13px",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:"#F59E0B",textShadow:"0 0 16px rgba(245,158,11,0.35)"}}>{headlineForPage(page)}</h1>
               <BotHealthBadge health={botHealth} />
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden text-xs text-muted-foreground sm:block">
                 {pendingOperatorAction === null ? operatorState : `Running ${pendingOperatorAction}…`}
               </div>
-              <Button className="h-8 rounded-md px-3 text-xs" disabled={isRefreshing} onClick={() => void refreshSnapshot(true)} variant="outline">
+              <Button className="h-7 px-3 text-[11px] font-semibold" style={{borderRadius:"6px",border:"1px solid rgba(255,255,255,0.12)",background:"transparent",color:"#9CA3AF",fontFamily:"Exo 2,system-ui,sans-serif",letterSpacing:"0.03em",cursor:"pointer"}} disabled={isRefreshing} onClick={() => void refreshSnapshot(true)} variant="outline">
                 <RefreshCw className={cn("size-3.5", isRefreshing && "animate-spin")} />
                 Refresh
               </Button>
@@ -633,7 +645,7 @@ export function DashboardApp({ initialData, page }: { initialData: DashboardInit
           </header>
 
           {/* ── Page content ── */}
-          <div className="flex-1 overflow-auto px-5 py-5 lg:px-6 lg:py-6 space-y-5">
+          <div className="flex-1 overflow-auto space-y-4" style={{padding:"20px 24px"}}>
 
           {page === "overview" ? (
             <OverviewPage
@@ -776,9 +788,9 @@ function OverviewPage({
 
       {/* ── Bot health chips + trade stats ── */}
       <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-        <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
+        <div style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px",padding:"14px 16px"}} className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Bot health</span>
+            <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Bot health</span>
             <BotHealthBadge health={botHealth} />
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -790,7 +802,7 @@ function OverviewPage({
           <p className="text-xs leading-5 text-muted-foreground">{botHealth.summary}</p>
         </div>
         <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2 lg:w-52">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Trade stats</span>
+          <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Trade stats</span>
           <div className="grid grid-cols-2 gap-2">
             <MetricBlock compact label="Win rate" value={formatPercent(tradeSummary.winRate, 1)} />
             <MetricBlock compact label="Profit factor" value={formatNumber(tradeSummary.profitFactor)} />
@@ -801,8 +813,8 @@ function OverviewPage({
       </div>
 
       {/* ── Symbol scan strip ── */}
-      <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Symbol scan</span>
+      <div style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px",padding:"14px 16px"}} className="space-y-3">
+        <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Symbol scan</span>
         <div className="grid gap-1.5 grid-cols-5 sm:grid-cols-10">
           {["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","DOTUSDT"].map((sym) => {
             const op = snapshot.opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
@@ -852,9 +864,9 @@ function OverviewPage({
         <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
         <div className="space-y-4">
           {/* Current attention */}
-          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Current attention</span>
-            <p className="text-sm leading-6 text-foreground">
+          <div style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px",padding:"14px 16px"}} className="space-y-2">
+            <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Current attention</span>
+            <p style={{fontSize:"13px",fontFamily:"Space Mono,monospace",fontWeight:500,color:"#F8FAFC",lineHeight:1.5}}>
               {topPosition
                 ? `${topPosition.symbol} — ${formatSignedUsd(topPosition.unrealized_pnl)} unrealized P&L.${topPositionEntryTimestamp !== null ? ` Open ${formatRelativeDuration(topPositionEntryTimestamp)}.` : ""}`
                 : "No live position. Preserve capital instead of forcing exposure."}
@@ -866,13 +878,13 @@ function OverviewPage({
             )}
           </div>
           {/* Mistakes */}
-          <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mistakes to avoid</span>
+          <div style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px",padding:"14px 16px"}} className="space-y-2">
+            <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Mistakes to avoid</span>
             <div className="space-y-2">
               {mistakes.map((mistake) => (
-                <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5" key={mistake.title}>
-                  <div className="text-xs font-semibold text-foreground">{mistake.title}</div>
-                  <div className="mt-1 text-xs leading-5 text-muted-foreground">{mistake.why}</div>
+                <div key={mistake.title} style={{borderRadius:"6px",border:"1px solid rgba(255,255,255,0.06)",background:"rgba(255,255,255,0.02)",padding:"10px 12px",marginBottom:"6px"}}>
+                  <div style={{fontSize:"12px",fontWeight:600,color:"#F8FAFC",marginBottom:"4px"}}>{mistake.title}</div>
+                  <div style={{fontSize:"11px",lineHeight:1.5,color:"#6B7280"}}>{mistake.why}</div>
                 </div>
               ))}
             </div>
@@ -928,12 +940,12 @@ function PositionsPage({
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Open positions</CardTitle>
-            <CardDescription>Current exposure, leverage, and unrealized mark-to-market.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Open positions</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
             {snapshot.positions.length === 0 ? (
               <EmptyState message={emptyPositionsMessage} />
             ) : (
@@ -980,23 +992,23 @@ function PositionsPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Balance calendar</CardTitle>
-            <CardDescription>Daily closes with the same green/red logic operators use to assess discipline.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Balance calendar</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
             <BalanceCalendar days={balanceSummary.calendar} emptyMessage={emptyBalanceMessage} />
           </CardContent>
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Recent closed trades</CardTitle>
-          <CardDescription>The last eight closures with source quality and realized result.</CardDescription>
+      <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+        <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Recent closed trades</CardTitle>
+          
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
           {tradeSummary.recentTrades.length === 0 ? (
             <EmptyState message="No closed trades recorded yet." />
           ) : (
@@ -1074,12 +1086,12 @@ function SymbolHeatmap({
   }
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
-      <CardHeader className="pb-2 pt-4 px-4">
-        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Symbol heatmap</CardTitle>
-        <CardDescription>Top candidate per symbol. Green = tradeable regime. Funding, HTF bias, and depth imbalance shown per cell.</CardDescription>
+    <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+      <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Symbol heatmap</CardTitle>
+        
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {displaySymbols.map((sym) => {
             const op = opportunities.find((o) => o.symbol === sym && o.family !== "NoCandidate");
@@ -1203,8 +1215,8 @@ function StrategiesPage({
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardContent className="px-4 pb-4 grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5">
+      <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+        <CardContent className="px-4 pb-4 grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:p-5" style={{padding:"14px 16px"}}>
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="rounded-full" variant="outline">Markets workstation</Badge>
@@ -1262,12 +1274,12 @@ function StrategiesPage({
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Opportunity queue</CardTitle>
-            <CardDescription>All active candidates ranked by confluence score with full signal context — funding, HTF bias, OI delta, depth, and BTC correlation.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Opportunity queue</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
             {scopedSnapshot.opportunities.length === 0 ? (
               <EmptyState message="No strategy candidates are currently queued." />
             ) : (
@@ -1324,12 +1336,12 @@ function StrategiesPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research leaderboard</CardTitle>
-            <CardDescription>Top promoted models and their threshold posture.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Research leaderboard</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-4">
+          <CardContent className="px-4 pb-4 space-y-4" style={{padding:"14px 16px"}}>
             {scopedSnapshot.research_models.length === 0 ? (
               <EmptyState message="No research leaderboard is available yet." />
             ) : (
@@ -1357,12 +1369,12 @@ function StrategiesPage({
 
       <SymbolHeatmap opportunities={snapshot.opportunities} symbols={availableSymbols} />
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">What this means for entries</CardTitle>
-          <CardDescription>Do not treat a queued candidate as a trade signal without confirming indicator posture and live trade quality.</CardDescription>
+      <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+        <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>What this means for entries</CardTitle>
+          
         </CardHeader>
-        <CardContent className="px-4 pb-4 grid gap-4 md:grid-cols-3">
+        <CardContent className="px-4 pb-4 grid gap-4 md:grid-cols-3" style={{padding:"14px 16px"}}>
           <StrategyNote title="Wait for structure" detail="Use price and EMA relationship first. A model score without structure alignment is not enough." />
           <StrategyNote title="Respect recent P&L" detail={`Recent expectancy is ${formatSignedUsd(tradeSummary.expectancyPerTrade)}. If it degrades, lower aggressiveness instead of searching for more trades.`} />
           <StrategyNote title="Confirm momentum regime" detail={`RSI, MACD, and volume should support ${selectedSymbol === "All" ? "the active symbol" : selectedSymbol}. Range logic in a trend pane is where forced errors begin.`} />
@@ -1379,12 +1391,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Risk posture</CardTitle>
-            <CardDescription>Live qualitative notes, system gate, and sentiment modifiers.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Risk posture</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             <div className="grid gap-4 lg:grid-cols-2">
               <MetricBlock label="Execution summary" value={snapshot.execution_summary} />
               <MetricBlock label="Exchange gate" value={snapshot.exchange_gate} />
@@ -1397,12 +1409,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Audit pressure</CardTitle>
-            <CardDescription>Retention and incident pressure that can quietly degrade launch quality.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Audit pressure</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             <RetentionBar label="Order intent retention" percent={retentionOrderPct} detail={`${operator.audit.retention.orderIntents.currentCount}/${operator.audit.retention.orderIntents.limit}`} />
             <RetentionBar label="Execution event retention" percent={retentionExecPct} detail={`${operator.audit.retention.executionEvents.currentCount}/${operator.audit.retention.executionEvents.limit}`} />
             <div className="space-y-3">
@@ -1418,12 +1430,12 @@ function RiskPage({ snapshot, operator }: { snapshot: RuntimeSnapshot; operator:
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Overlay comparator</CardTitle>
-          <CardDescription>Scoped overlay validation belongs in risk because it explains how promoted indicators alter approvals.</CardDescription>
+      <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+        <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Overlay comparator</CardTitle>
+          
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4" style={{padding:"14px 16px"}}>
           {operator.overlayCompare ? (
             <div className="space-y-5">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1540,12 +1552,12 @@ function ExecutionPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode and control plane</CardTitle>
-            <CardDescription>Dedicated operator page with real actions instead of sharing space with charts and review.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Mode and control plane</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             {(() => {
               const modeDescriptions: Record<string, { label: string; desc: string }> = {
                 Research: { label: "Research", desc: "No fills. Scores candidates and trains models in the background only." },
@@ -1655,17 +1667,17 @@ function ExecutionPage({
         </Card>
 
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Runtime health</CardTitle>
-                  <CardDescription>Execution-side status for mode, monitor freshness, and whether recent paper activity proves the bot is still working.</CardDescription>
+                  <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Runtime health</CardTitle>
+                  
                 </div>
                 <BotHealthBadge health={botHealth} prominent />
               </div>
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-4">
+            <CardContent className="px-4 pb-4 space-y-4" style={{padding:"14px 16px"}}>
               <div className="rounded-xl border border-border/70 bg-muted/35 p-5 text-sm leading-6 text-foreground">{botHealth.summary}</div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock compact label="Paper posture" tone={botHealth.paper_ready ? "positive" : "negative"} value={botHealth.paper_status} />
@@ -1690,12 +1702,12 @@ function ExecutionPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Operator event feed</CardTitle>
-              <CardDescription>Recent supervisor, maintenance, and mode-change events.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Operator event feed</CardTitle>
+              
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-3">
+            <CardContent className="px-4 pb-4 space-y-3" style={{padding:"14px 16px"}}>
               {operator.events.length === 0 ? (
                 <EmptyState message="No operator events are available." />
               ) : (
@@ -2136,12 +2148,12 @@ function ReviewPage({
   return (
     <div className="space-y-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Realized equity curve</CardTitle>
-            <CardDescription>The equity curve now follows the same active review slice as the filters, metrics, and table.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Realized equity curve</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             <div className="grid gap-4 md:grid-cols-3">
               <MetricBlock compact label="Curve points" value={String(filteredEquityCurve.length)} />
               <MetricBlock compact label="Slice net P&L" value={formatSignedUsd(reviewMetrics.realizedPnlTotal)} />
@@ -2171,12 +2183,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review guardrails</CardTitle>
-            <CardDescription>Filters now drive the review lens, so the metrics below reflect the current slice.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Review guardrails</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             <MetricBlock label="Filtered trades" value={String(reviewMetrics.closedTrades)} />
             <MetricBlock label="Exact coverage" value={formatPercent(reviewMetrics.exactCoverageRate ?? exactCoverage, 0)} />
             <MetricBlock label="Average win" value={formatSignedUsd(reviewMetrics.averageWinPnl)} />
@@ -2197,16 +2209,12 @@ function ReviewPage({
         </Card>
       </div>
 
-      <Card className="rounded-xl border-border/60 bg-card">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice versus full book</CardTitle>
-          <CardDescription>
-            {isFocusedSlice
-              ? `The current review slice ${currentSliceLabel} is compared directly against the full closed-trade history.`
-              : "No focused slice is active yet. Click a ranked slice to compare it directly against the full closed-trade history."}
-          </CardDescription>
+      <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+        <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+          <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Slice versus full book</CardTitle>
+          
         </CardHeader>
-        <CardContent className="px-4 pb-4 space-y-5">
+        <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
             <div className="rounded-xl border border-border/70 bg-muted/25 p-5">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Current slice</div>
@@ -2250,12 +2258,12 @@ function ReviewPage({
       </Card>
 
       <div className="grid gap-5 xl:grid-cols-[1.04fr_0.96fr]">
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Slice rankings</CardTitle>
-            <CardDescription>Best and weakest model-regime-family combinations inside the current filtered review universe. Applying a slice resets the secondary filters so you review the exact cohort.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Slice rankings</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 grid gap-5 2xl:grid-cols-2">
+          <CardContent className="px-4 pb-4 grid gap-5 2xl:grid-cols-2" style={{padding:"14px 16px"}}>
             <div className="space-y-4">
               <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Best slices</div>
               {sliceRankings.best.length === 0 ? (
@@ -2463,12 +2471,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Trade history</CardTitle>
-            <CardDescription>Filter by symbol, model, family, regime, close reason, side, source quality, and hold duration, then sort the slice you actually want to review.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Trade history</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-5">
+          <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               <div className="space-y-2">
                 <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Symbol</div>
@@ -2703,12 +2711,12 @@ function ReviewPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Review mistakes</CardTitle>
-            <CardDescription>Concrete actions to avoid and the reason they damage expectancy.</CardDescription>
+        <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Review mistakes</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-3">
+          <CardContent className="px-4 pb-4 space-y-3" style={{padding:"14px 16px"}}>
             {mistakes.map((mistake) => (
               <div className="rounded-lg border border-border/70 bg-muted/35 p-4" key={mistake.title}>
                 <div className="text-sm font-medium text-foreground">{mistake.title}</div>
@@ -2905,12 +2913,12 @@ function SettingsPage({
       </div>
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Mode requests</CardTitle>
-              <CardDescription>Current request state and protected-mode posture.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Mode requests</CardTitle>
+              
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-4">
+            <CardContent className="px-4 pb-4 space-y-4" style={{padding:"14px 16px"}}>
               <MetricBlock label="Pending request" value={operator.pendingModeRequest ?? "None"} />
               <MetricBlock label="Promoted indicator" value={snapshot.promoted_indicator.id ?? "None"} />
               <MetricBlock label="Overlay enabled" value={snapshot.promoted_indicator.overlay_enabled ? "True" : "False"} />
@@ -2922,12 +2930,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme</CardTitle>
-              <CardDescription>Follow the system by default or force the dashboard into light or dark mode.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Theme</CardTitle>
+              
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-2">
+            <CardContent className="px-4 pb-4 space-y-2" style={{padding:"14px 16px"}}>
               {(["system", "light", "dark"] as ThemePreference[]).map((mode) => {
                 const active = themePreference === mode;
                 const Icon = mode === "system" ? Monitor : mode === "light" ? Sun : Moon;
@@ -2960,12 +2968,12 @@ function SettingsPage({
         </div>
 
         <div className="space-y-5">
-          <Card className="rounded-xl border-border/60 bg-card">
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Binance paper session</CardTitle>
-            <CardDescription>Store Binance Futures credentials in the {tradingSettings.credentialBackend === "wincred" ? "Windows Credential Manager" : "macOS Keychain"}, choose mainnet or testnet transport, and run Paper mode with simulated fills.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+          <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Binance paper session</CardTitle>
+            
           </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-4">
+          <CardContent className="px-4 pb-4 space-y-4" style={{padding:"14px 16px"}}>
             <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
               <MetricBlock label="Environment" value={tradingSettings.binanceEnvironment === "testnet" ? "Testnet" : "Mainnet"} compact />
               <MetricBlock label={tradingSettings.credentialBackend === "wincred" ? "Credential Manager" : "Keychain"} value={tradingSettings.keychainAvailable ? "Available" : "Unavailable"} compact />
@@ -3112,7 +3120,7 @@ function SettingsPage({
                 <div className="rounded-lg border border-border/70 bg-background px-4 py-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium tabular-nums text-foreground">{tradingSettings.supervisorIntervalMs} ms</span>
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <span style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>
                       {tradingSettings.supervisorIntervalMs <= 150 ? "Aggressive" : tradingSettings.supervisorIntervalMs <= 350 ? "Fast" : tradingSettings.supervisorIntervalMs <= 750 ? "Balanced" : tradingSettings.supervisorIntervalMs <= 1500 ? "Conservative" : "Slow"}
                     </span>
                   </div>
@@ -3238,12 +3246,12 @@ function SettingsPage({
           </CardContent>
         </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Research policy and leaderboards</CardTitle>
-              <CardDescription>See why models survive, which indicator genomes are strong enough, and remove weak overlays before they touch approvals.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Research policy and leaderboards</CardTitle>
+              
             </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-5">
+            <CardContent className="px-4 pb-4 space-y-5" style={{padding:"14px 16px"}}>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricBlock label="Promoted model" value={modelPacks.active.promoted_model?.model?.id ?? "None"} compact />
                 <MetricBlock label="Promoted indicator" value={modelPacks.active.promoted_indicator_pack?.genome?.id ?? "None"} compact />
@@ -3376,12 +3384,12 @@ function SettingsPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/60 bg-card">
-            <CardHeader className="pb-2 pt-4 px-4">
-              <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Theme rationale</CardTitle>
-              <CardDescription>This dashboard now uses a restrained trading workspace instead of high-saturation status cards.</CardDescription>
+          <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+            <CardHeader className="pb-2 pt-4 px-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+              <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Theme rationale</CardTitle>
+              
             </CardHeader>
-            <CardContent className="px-4 pb-4 grid gap-3 md:grid-cols-2">
+            <CardContent className="px-4 pb-4 grid gap-3 md:grid-cols-2" style={{padding:"14px 16px"}}>
               <StrategyNote title="Neutral shell" detail="Whitespace and slate tones keep attention on price, P&L, and risk instead of decorative gradients." />
               <StrategyNote title="Separate pages" detail="Each navigation item now owns a route and a detailed context instead of scrolling through a single overloaded page." />
               <StrategyNote title="Indicator-first panes" detail="Price, EMA, RSI, and MACD are grouped like a trading terminal instead of mixing them with maintenance controls." />
@@ -3500,8 +3508,8 @@ function TradingViewPanel({
   const lastTimestamp = activeCandle?.timestamp_ms ?? chartPoints.at(-1)?.timestamp_ms ?? null;
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
-      <CardHeader className="space-y-3 border-b border-border/50 pb-4">
+    <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+      <CardHeader className="space-y-3 border-b border-border/50 pb-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2">
@@ -3509,8 +3517,8 @@ function TradingViewPanel({
               <Badge className="rounded-full border-border/70 bg-muted/40 text-foreground" variant="outline">{symbol ?? "All symbols"}</Badge>
               <Badge className="rounded-full border-border/70 bg-muted/40 text-foreground" variant="outline">{requestedWindow} bars</Badge>
             </div>
-            <CardTitle className="text-[1.2rem] font-semibold tracking-[-0.04em] text-foreground">{title}</CardTitle>
-            <CardDescription>Price, EMA stack, volume, RSI, and MACD in a disciplined trading-terminal frame.</CardDescription>
+            <CardTitle className="text-[1.2rem] font-semibold tracking-[-0.04em] text-foreground" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>{title}</CardTitle>
+            
           </div>
           {symbolOptions && onSelectSymbol && onSelectWindow ? (
             <div className="rounded-xl border border-border/70 bg-muted/35 p-2.5">
@@ -3571,7 +3579,7 @@ function TradingViewPanel({
           <TerminalStat label="Updated" value={updatedAt ? formatOperatorTimestamp(updatedAt) : "No data"} />
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4 space-y-4 pt-4">
+      <CardContent className="px-4 pb-4 space-y-4 pt-4" style={{padding:"14px 16px"}}>
         {chartPoints.length < 2 ? (
           <div className="rounded-xl border border-border/70 bg-muted/25 px-6 py-14 text-sm leading-6 text-muted-foreground">Not enough indicator data to render the market pane.</div>
         ) : (
@@ -3639,12 +3647,12 @@ function WatchlistRail({
   });
 
   return (
-    <Card className="rounded-xl border-border/60 bg-card">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-sm font-semibold tracking-[-0.01em]">Watchlist</CardTitle>
-        <CardDescription>Compact symbol rail with price change, RSI, consensus, and live position state.</CardDescription>
+    <Card className="rounded-xl border-border/60 bg-card" style={{background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"10px"}}>
+      <CardHeader className="pb-4" style={{padding:"12px 16px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+        <CardTitle className="text-sm font-semibold tracking-[-0.01em]" style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase",color:"#4B5563"}}>Watchlist</CardTitle>
+        
       </CardHeader>
-      <CardContent className="px-4 pb-4 space-y-3.5">
+      <CardContent className="px-4 pb-4 space-y-3.5" style={{padding:"14px 16px"}}>
         <div className="grid gap-3 sm:grid-cols-3">
           <MetricBlock compact label="Symbols" value={String(watchlist.length)} />
           <MetricBlock compact label="Live positions" value={String(watchlist.filter((item) => item.position !== null).length)} />
@@ -4351,11 +4359,14 @@ function TerminalStat({ label, value }: { label: string; value: string }) {
 
 function BotHealthBadge({ health, prominent = false }: { health: BotHealthReport; prominent?: boolean }) {
   const isHealthy = health.level === "healthy";
+  const isDegraded = health.level === "degraded";
+  const color = isHealthy ? "#22C55E" : isDegraded ? "#F59E0B" : "#EF5350";
+  const bg = isHealthy ? "rgba(34,197,94,0.10)" : isDegraded ? "rgba(245,158,11,0.10)" : "rgba(239,83,80,0.10)";
+  const border = isHealthy ? "rgba(34,197,94,0.22)" : isDegraded ? "rgba(245,158,11,0.22)" : "rgba(239,83,80,0.22)";
   return (
-    <span className={cn("relative inline-flex items-center", isHealthy && "bot-healthy-pulse")}>
-      <Badge className={cn("rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]", botHealthBadgeClasses(health.level), prominent && "px-4 py-2")} variant="outline">
-        {health.label}
-      </Badge>
+    <span style={{display:"inline-flex",alignItems:"center",gap:"5px",padding:"2px 8px",borderRadius:"4px",background:bg,border:`1px solid ${border}`,fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.10em",textTransform:"uppercase",color}}>
+      <span style={{width:"5px",height:"5px",borderRadius:"50%",background:color,boxShadow:`0 0 6px ${color}`,display:"inline-block",animation:isHealthy?"nq-glow-green 1.8s ease-in-out infinite":"none"}} />
+      {health.label}
     </span>
   );
 }
@@ -4371,12 +4382,14 @@ function ProvenExecutionCard({
   body: string;
   tone: "positive" | "negative" | "neutral";
 }) {
+  const pc = tone === "positive" ? "#22C55E" : tone === "negative" ? "#EF5350" : "#6B7280";
+  const pb = tone === "positive" ? "rgba(34,197,94,0.15)" : tone === "negative" ? "rgba(239,83,80,0.15)" : "rgba(255,255,255,0.07)";
   return (
-    <div className={cn("rounded-xl border p-4", metricCardClasses(tone))}>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className="mt-2 text-base font-semibold tracking-[-0.03em] text-foreground">{timestampMs === null ? "Not proven yet" : formatTimestampMs(timestampMs)}</div>
-      <div className="mt-0.5 text-xs text-muted-foreground">{timestampMs === null ? "No timestamp available" : formatRelativeDuration(timestampMs)}</div>
-      <div className="mt-3 text-sm leading-6 text-foreground">{body}</div>
+    <div style={{background:"rgba(255,255,255,0.03)",border:`1px solid ${pb}`,borderRadius:"8px",padding:"14px 16px",borderLeftColor:pc,borderLeftWidth:"3px"}}>
+      <div style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4B5563",marginBottom:"6px"}}>{label}</div>
+      <div style={{fontFamily:"Space Mono,monospace",fontSize:"12px",fontWeight:600,color:pc,marginBottom:"2px"}}>{timestampMs === null ? "Not proven yet" : formatTimestampMs(timestampMs)}</div>
+      <div style={{fontSize:"10px",color:"#6B7280",marginBottom:"6px"}}>{timestampMs === null ? "—" : formatRelativeDuration(timestampMs)}</div>
+      <div style={{fontSize:"12px",lineHeight:1.5,color:"#D1D5DB"}}>{body}</div>
     </div>
   );
 }
@@ -4390,19 +4403,23 @@ function MetricCard({ label, value, tone, compact = false }: { label: string; va
       setFlashKey((k) => k + 1);
     }
   }, [value]);
+  const vc = tone === "positive" ? "#22C55E" : tone === "negative" ? "#EF5350" : "#F8FAFC";
+  const bg = tone === "positive" ? "rgba(34,197,94,0.06)" : tone === "negative" ? "rgba(239,83,80,0.06)" : "transparent";
+  const bc = tone === "positive" ? "rgba(34,197,94,0.18)" : tone === "negative" ? "rgba(239,83,80,0.18)" : "rgba(255,255,255,0.07)";
   return (
-    <div className={cn("rounded-xl border px-4 py-4", metricCardClasses(tone))}>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div key={flashKey} className={cn("mt-2.5 font-semibold tracking-[-0.03em] value-flash", compact ? "text-lg" : "text-2xl")}>{value}</div>
+    <div style={{background:bg,border:`1px solid ${bc}`,borderRadius:"8px",padding:"14px 16px",transition:"border-color 0.15s"}}>
+      <div style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4B5563",marginBottom:"8px"}}>{label}</div>
+      <div key={flashKey} style={{fontFamily:"Space Mono,monospace",fontSize:compact?"16px":"22px",fontWeight:700,letterSpacing:"-0.03em",color:vc,lineHeight:1.1}}>{value}</div>
     </div>
   );
 }
 
 function MetricBlock({ label, value, tone = "neutral", compact = false }: { label: string; value: string; tone?: "positive" | "negative" | "neutral"; compact?: boolean }) {
+  const mvc = tone === "positive" ? "#22C55E" : tone === "negative" ? "#EF5350" : "#F8FAFC";
   return (
-    <div className={cn("min-w-0 rounded-xl border px-4 py-3", metricCardClasses(tone)) }>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className={cn("mt-1.5 wrap-break-word font-semibold leading-6 text-foreground", compact ? "text-sm" : "text-base")}>{value}</div>
+    <div style={{minWidth:0,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"8px",padding:"10px 14px",transition:"border-color 0.15s"}}>
+      <div style={{fontFamily:"Space Mono,monospace",fontSize:"9px",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4B5563",marginBottom:"4px"}}>{label}</div>
+      <div style={{fontFamily:"Space Mono,monospace",fontSize:compact?"12px":"13px",fontWeight:600,color:mvc,wordBreak:"break-word",lineHeight:1.4}}>{value}</div>
     </div>
   );
 }
@@ -4507,7 +4524,12 @@ function SignalConsensusChart({ opportunities }: { opportunities: Array<{ symbol
 }
 
 function EmptyState({ message }: { message: string }) {
-  return <div className="rounded-xl border border-border/70 bg-muted/35 px-5 py-10 text-sm leading-6 text-muted-foreground">{message}</div>;
+  return (
+    <div style={{border:"1px solid rgba(255,255,255,0.07)",borderRadius:"8px",padding:"40px 20px",textAlign:"center",background:"rgba(255,255,255,0.02)"}}>
+      <div style={{fontSize:"24px",opacity:0.15,marginBottom:"8px"}}>◌</div>
+      <div style={{fontSize:"13px",color:"#6B7280"}}>{message}</div>
+    </div>
+  );
 }
 
 function buildMistakes(snapshot: RuntimeSnapshot, operator: DashboardOperatorData) {
