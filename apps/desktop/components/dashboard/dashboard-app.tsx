@@ -837,6 +837,16 @@ function OverviewPage({
         </div>
       </div>
 
+      {/* ── Win Rate + Signal Consensus ── */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1.6fr]">
+        <WinRateGauge
+          winRate={tradeSummary.winRate}
+          profitFactor={tradeSummary.profitFactor}
+          closedTrades={tradeSummary.closedTrades}
+        />
+        <SignalConsensusChart opportunities={snapshot.opportunities} />
+      </div>
+
       {/* ── Chart + side panel ── */}
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
         <TradingViewPanel candles={snapshot.candle_points} points={snapshot.indicator_points} title="Market pane" />
@@ -3796,7 +3806,7 @@ function MarketPane({
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
+    <div className="overflow-hidden rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a]">
       <svg
         className="h-80 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(normalizedCandles.length - 1, 0))}
@@ -3834,7 +3844,7 @@ function MarketPane({
         {areaPath && <path d={areaPath} fill="url(#marketAreaGrad)" />}
 
         {/* Crosshair */}
-        {activeCandle ? <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} /> : null}
+        {activeCandle ? <line stroke="rgba(245,158,11,0.25)" strokeDasharray="4 5" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} /> : null}
 
         {/* Candles */}
         {normalizedCandles.map((candle, index) => {
@@ -3928,8 +3938,8 @@ function VolumePane({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Volume</div>
+    <div className="overflow-hidden rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a]">
+      <div className="border-b border-[var(--nq-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Volume</div>
       <svg
         className="h-32.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(normalizedVolumes.length - 1, 0))}
@@ -3941,7 +3951,7 @@ function VolumePane({
         viewBox={`0 0 ${width} ${height}`}
       >
         <ChartGrid height={height} width={width} />
-        <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
+        <line stroke="rgba(245,158,11,0.25)" strokeDasharray="4 5" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
         {normalizedVolumes.map((value, index) => {
           const x = scaleX(index);
           const y = scaleY(value);
@@ -3951,7 +3961,7 @@ function VolumePane({
 
           return (
             <rect
-              fill={isUp ? "rgba(34,197,94,0.65)" : "rgba(239,68,68,0.65)"}
+              fill={isUp ? "rgba(38,166,154,0.55)" : "rgba(239,83,80,0.55)"}
               height={heightValue}
               key={`volume-${index}`}
               rx="1.4"
@@ -4061,8 +4071,8 @@ function IndicatorPane({
   const lastY = lastValue !== undefined ? scaleY(lastValue) : null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+    <div className="overflow-hidden rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a]">
+      <div className="border-b border-[var(--nq-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(series.length - 1, 0))}
@@ -4080,9 +4090,9 @@ function IndicatorPane({
           </linearGradient>
         </defs>
         <ChartGrid height={height} width={width} />
-        <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
-        {typeof positiveThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
-        {typeof negativeThreshold === "number" ? <line stroke="rgba(100,116,139,0.5)" strokeDasharray="5 6" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
+        <line stroke="rgba(245,158,11,0.25)" strokeDasharray="4 5" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
+        {typeof positiveThreshold === "number" ? <line stroke="rgba(245,158,11,0.20)" strokeDasharray="4 5" strokeWidth="1" x1="0" x2={width} y1={scaleY(positiveThreshold)} y2={scaleY(positiveThreshold)} /> : null}
+        {typeof negativeThreshold === "number" ? <line stroke="rgba(245,158,11,0.20)" strokeDasharray="4 5" strokeWidth="1" x1="0" x2={width} y1={scaleY(negativeThreshold)} y2={scaleY(negativeThreshold)} /> : null}
         {areaPoints && <polygon fill={`url(#indGrad-${label})`} points={areaPoints} />}
         <polyline fill="none" points={polylinePoints(series, scaleX, scaleY)} stroke="#22d3ee" strokeWidth="2.2" />
         {lastValue !== undefined && lastY !== null && (
@@ -4127,8 +4137,8 @@ function HistogramPane({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <div className="border-b border-border/60 px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+    <div className="overflow-hidden rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a]">
+      <div className="border-b border-[var(--nq-line)] px-5 py-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <svg
         className="h-42.5 w-full"
         onMouseLeave={() => onHoverIndex(Math.max(series.length - 1, 0))}
@@ -4140,7 +4150,7 @@ function HistogramPane({
         viewBox={`0 0 ${width} ${height}`}
       >
         <ChartGrid height={height} width={width} />
-        <line stroke="rgba(100,116,139,0.35)" strokeDasharray="5 6" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
+        <line stroke="rgba(245,158,11,0.25)" strokeDasharray="4 5" strokeWidth="1" x1={crosshairX} x2={crosshairX} y1="0" y2={height} />
         <line stroke="#334155" strokeWidth="1" x1="0" x2={width} y1={baselineY} y2={baselineY} />
         {series.map((value, index) => {
           const x = scaleX(index);
@@ -4188,8 +4198,8 @@ function EquityCurve({
   const selectedX = selectedPoint ? scaleX(selectedTrade!.visibleIndex) : null;
   const selectedY = selectedPoint ? scaleY(selectedPoint.cumulativePnl) : null;
   const isPositive = (maxValue + minValue) / 2 >= 0;
-  const lineColor = isPositive ? "#14b8a6" : "#f87171";
-  const gradColor = isPositive ? "#14b8a6" : "#f87171";
+  const lineColor = isPositive ? "#22C55E" : "#EF5350";
+  const gradColor = isPositive ? "#22C55E" : "#EF5350";
 
   // Area path
   const areaPath = series.length > 1
@@ -4207,8 +4217,8 @@ function EquityCurve({
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/25">
-      <svg className="h-70 w-full" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
+    <div className="overflow-hidden rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a]">
+      <svg className="h-72 w-full" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" id="equityGrad" x1="0" x2="0" y1={padding} y2={height - padding}>
             <stop offset="0%" stopColor={gradColor} stopOpacity="0.28" />
@@ -4219,14 +4229,14 @@ function EquityCurve({
 
         {/* Y-axis labels */}
         {yLabels.map(({ value, y }, i) => (
-          <text key={`eqlabel-${i}`} fill="rgba(148,163,184,0.75)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 6))}>
+          <text key={`eqlabel-${i}`} fill="rgba(107,114,128,0.9)" fontSize="9" textAnchor="start" x="4" y={Math.max(10, Math.min(y - 2, height - 6))}>
             {value >= 0 ? `+${value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}` : value <= -1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}
           </text>
         ))}
 
         {/* Zero baseline */}
         {minValue < 0 && maxValue > 0 && (
-          <line stroke="rgba(148,163,184,0.3)" strokeWidth="1" x1={padding + labelWidth} x2={width - padding} y1={scaleY(0)} y2={scaleY(0)} />
+          <line stroke="rgba(245,158,11,0.2)" strokeWidth="1" strokeDasharray="4 4" x1={padding + labelWidth} x2={width - padding} y1={scaleY(0)} y2={scaleY(0)} />
         )}
 
         {/* Area fill */}
@@ -4406,6 +4416,91 @@ function RetentionBar({ label, percent, detail }: { label: string; percent: numb
       </div>
       <div className="h-2 rounded-full bg-muted">
         <div className={cn("h-2 rounded-full", percent >= 90 ? "bg-(--danger-foreground)" : percent >= 70 ? "bg-(--warning-foreground)" : "bg-(--success-foreground)")} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/* ── WinRateGauge: SVG arc gauge showing win rate ── */
+function WinRateGauge({ winRate, profitFactor, closedTrades }: { winRate: number | null; profitFactor: number | null; closedTrades: number }) {
+  const w = 200; const h = 120;
+  const cx = 100; const cy = 105;
+  const r = 78;
+  const startAngle = -Math.PI;
+  const endAngle = 0;
+  const pct = winRate ?? 0;
+  const filled = startAngle + (endAngle - startAngle) * Math.min(1, Math.max(0, pct));
+
+  const arc = (a1: number, a2: number) => {
+    const x1 = cx + r * Math.cos(a1); const y1 = cy + r * Math.sin(a1);
+    const x2 = cx + r * Math.cos(a2); const y2 = cy + r * Math.sin(a2);
+    const large = a2 - a1 > Math.PI ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+  };
+
+  const color = pct >= 0.6 ? "#22C55E" : pct >= 0.45 ? "#F59E0B" : "#EF5350";
+
+  return (
+    <div className="rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a] px-4 pt-3 pb-2">
+      <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#4B5563] mb-1 font-mono">Win Rate</div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full max-w-[200px] mx-auto block">
+        {/* Track */}
+        <path d={arc(startAngle, endAngle)} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" strokeLinecap="round" />
+        {/* Filled */}
+        {winRate !== null && pct > 0 && (
+          <path d={arc(startAngle, filled)} fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" />
+        )}
+        {/* Needle dot */}
+        {winRate !== null && (
+          <circle cx={cx + r * Math.cos(filled)} cy={cy + r * Math.sin(filled)} r="5" fill={color} />
+        )}
+        {/* Value */}
+        <text x={cx} y={cy - 14} textAnchor="middle" fontSize="24" fontWeight="700" fill={winRate !== null ? color : "#4B5563"} fontFamily="Space Mono, monospace" letterSpacing="-1">
+          {winRate !== null ? `${(pct * 100).toFixed(0)}%` : "—"}
+        </text>
+        <text x={cx} y={cy + 4} textAnchor="middle" fontSize="9" fill="#4B5563" fontFamily="Space Mono, monospace" letterSpacing="1">
+          {closedTrades} TRADES
+        </text>
+        <text x={cx} y={cy + 18} textAnchor="middle" fontSize="9" fill="#4B5563" fontFamily="Space Mono, monospace">
+          PF {profitFactor !== null ? profitFactor.toFixed(2) : "—"}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+/* ── SignalConsensusChart: horizontal bars per symbol ── */
+function SignalConsensusChart({ opportunities }: { opportunities: Array<{ symbol: string; action: string; signal_consensus?: number; htf_trend_bias?: number; confidence: string }> }) {
+  const symbols = ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","DOTUSDT"];
+  const rows = symbols.map((sym) => {
+    const op = opportunities.find((o) => o.symbol === sym);
+    return { sym: sym.replace("USDT",""), consensus: 0, htf: op?.htf_trend_bias ?? 0, action: op?.action ?? "—", conf: op ? Math.min(1, Math.max(0, parseFloat(op.confidence) || 0)) : 0 };
+  }).filter((r) => r.conf > 0 || r.htf !== 0);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-[var(--nq-line)] bg-[#0a0a0a] overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-[var(--nq-line)] flex items-center justify-between">
+        <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#4B5563] font-mono">Signal Strength</span>
+        <span className="text-[9px] text-[#4B5563] font-mono">{rows.length} symbols</span>
+      </div>
+      <div className="px-3 py-2 space-y-1.5">
+        {rows.map((row) => {
+          const isLong = row.action === "Buy" || row.htf > 0.2;
+          const isShort = row.action === "Sell" || row.htf < -0.2;
+          const barColor = isLong ? "#22C55E" : isShort ? "#EF5350" : "#F59E0B";
+          const barWidth = `${Math.round(row.conf * 100)}%`;
+          return (
+            <div key={row.sym} className="grid items-center gap-2" style={{gridTemplateColumns:"36px 1fr 28px"}}>
+              <span className="text-[11px] font-bold text-right font-mono" style={{color: isLong ? "#22C55E" : isShort ? "#EF5350" : "#6B7280"}}>{row.sym}</span>
+              <div className="h-[5px] rounded-full" style={{background:"rgba(255,255,255,0.05)"}}>
+                <div className="h-full rounded-full transition-all duration-500" style={{width:barWidth, background:barColor, boxShadow:row.conf > 0.5 ? `0 0 6px ${barColor}` : "none"}} />
+              </div>
+              <span className="text-[9px] font-mono text-[#4B5563]">{Math.round(row.conf * 100)}%</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
