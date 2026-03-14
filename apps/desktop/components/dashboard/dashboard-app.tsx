@@ -4264,11 +4264,6 @@ function ActionButton({
       {children}
     </button>
   );
-}>
-      <Icon className={cn("size-3 mr-1.5", pendingOperatorAction === action && "animate-spin")} />
-      {label}
-    </Button>
-  );
 }
 
 function StrategyNote({ title, body }: { title: string; body: string }) {
@@ -4278,11 +4273,6 @@ function StrategyNote({ title, body }: { title: string; body: string }) {
       <div className="text-[11px] leading-5" style={{color:"var(--muted-foreground)"}}>{body}</div>
     </div>
   );
-}>
-      <div className="text-xs font-bold uppercase tracking-[0.08em]" style={{color:"var(--n-blue)"}}>{title}</div>
-      <div className="mt-1 text-xs leading-5" style={{color:"var(--muted-foreground)"}}>{detail}</div>
-    </div>
-  );
 }
 
 function WatchMetric({ label, value }: { label: string; value: string }) {
@@ -4290,11 +4280,6 @@ function WatchMetric({ label, value }: { label: string; value: string }) {
     <div className="n-card px-3 py-2.5">
       <div className="n-label mb-1">{label}</div>
       <div className="text-[12px] font-medium truncate" style={{color:"var(--foreground)",fontFamily:"var(--font-mono)"}}>{value}</div>
-    </div>
-  );
-}>
-      <div className="text-[9px] font-bold uppercase tracking-[0.12em]" style={{color:"var(--muted-foreground)"}}>{label}</div>
-      <div className="mt-1 wrap-break-word text-xs font-semibold" style={{color:"var(--foreground)"}}>{value}</div>
     </div>
   );
 }
