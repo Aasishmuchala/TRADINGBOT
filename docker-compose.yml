@@ -1,0 +1,199 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy noeviction
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: trader
+      POSTGRES_DB: trading
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader -d trading"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  data-ingestion:
+    build:
+      context: .
+      dockerfile: services/data_ingestion/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  feature-engine:
+    build:
+      context: .
+      dockerfile: services/feature_engine/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  regime-detector:
+    build:
+      context: .
+      dockerfile: services/regime_detector/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  strategy-selector:
+    build:
+      context: .
+      dockerfile: services/strategy_selector/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  strategy-runner:
+    build:
+      context: .
+      dockerfile: services/strategy_runner/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./strategies:/app/strategies
+    restart: unless-stopped
+
+  risk-layer:
+    build:
+      context: .
+      dockerfile: services/risk_layer/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  execution-engine:
+    build:
+      context: .
+      dockerfile: services/execution_engine/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  trade-ledger:
+    build:
+      context: .
+      dockerfile: services/trade_ledger/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  correlation-engine:
+    build:
+      context: .
+      dockerfile: services/correlation_engine/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  watchdog:
+    build:
+      context: .
+      dockerfile: services/watchdog/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  latency-monitor:
+    build:
+      context: .
+      dockerfile: services/latency_monitor/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  retrainer:
+    build:
+      context: .
+      dockerfile: services/retrainer/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backtester:
+    build:
+      context: .
+      dockerfile: services/backtester/Dockerfile
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dashboard-api:
+    build:
+      context: .
+      dockerfile: services/dashboard_api/Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dashboard-ui:
+    build:
+      context: .
+      dockerfile: services/dashboard_ui/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - dashboard-api
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  timescale_data:
