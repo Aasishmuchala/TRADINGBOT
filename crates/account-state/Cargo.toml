@@ -1,0 +1,10 @@
+[package]
+name = "sthyra-account-state"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[lib]
+name = "sthyra_account_state"
+path = "src/lib.rs"

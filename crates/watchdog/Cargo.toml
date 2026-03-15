@@ -1,0 +1,12 @@
+[package]
+name = "sthyra-watchdog"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sthyra-market-data = { path = "../market-data" }
+sthyra-mode-authority = { path = "../mode-authority" }
+
+[lib]
+name = "sthyra_watchdog"
+path = "src/lib.rs"

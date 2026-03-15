@@ -1,0 +1,35 @@
+[package]
+name = "sthyra-supervisor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sthyra-account-state = { path = "../account-state" }
+sthyra-backtest = { path = "../backtest" }
+sthyra-binance-adapter = { path = "../binance-adapter" }
+sthyra-confluence = { path = "../confluence" }
+sthyra-config = { path = "../config" }
+sthyra-domain = { path = "../domain" }
+sthyra-event-bus = { path = "../event-bus" }
+sthyra-execution = { path = "../execution" }
+sthyra-learning = { path = "../learning" }
+sthyra-market-data = { path = "../market-data" }
+sthyra-mode-authority = { path = "../mode-authority" }
+sthyra-news-sentiment = { path = "../news-sentiment" }
+sthyra-patch-sandbox = { path = "../patch-sandbox" }
+sthyra-portfolio = { path = "../portfolio" }
+sthyra-replay = { path = "../replay" }
+sthyra-risk-engine = { path = "../risk-engine" }
+sthyra-safeguards = { path = "../safeguards" }
+sthyra-secrets = { path = "../secrets" }
+sthyra-self-heal = { path = "../self-heal" }
+sthyra-storage = { path = "../storage" }
+sthyra-strategy-engine = { path = "../strategy-engine" }
+sthyra-watchdog = { path = "../watchdog" }
+
+[[bin]]
+name = "sthyra-supervisor"
+path = "src/main.rs"

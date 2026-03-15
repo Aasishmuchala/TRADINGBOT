@@ -1,0 +1,10 @@
+[package]
+name = "sthyra-portfolio"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[lib]
+name = "sthyra_portfolio"
+path = "src/lib.rs"

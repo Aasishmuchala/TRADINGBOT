@@ -1,0 +1,34 @@
+[workspace]
+members = [
+    "crates/account-state",
+    "crates/backtest",
+    "crates/binance-adapter",
+    "crates/confluence",
+    "crates/config",
+    "crates/domain",
+    "crates/event-bus",
+    "crates/execution",
+    "crates/learning",
+    "crates/market-data",
+    "crates/mode-authority",
+    "crates/news-sentiment",
+    "crates/patch-sandbox",
+    "crates/portfolio",
+    "crates/replay",
+    "crates/risk-engine",
+    "crates/safeguards",
+    "crates/secrets",
+    "crates/self-heal",
+    "crates/storage",
+    "crates/strategy-engine",
+    "crates/supervisor",
+    "crates/watchdog",
+]
+exclude = ["apps/desktop/src-tauri"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "Proprietary"
+version = "0.1.0"
+

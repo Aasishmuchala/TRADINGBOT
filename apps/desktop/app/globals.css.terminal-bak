@@ -1,0 +1,305 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *, [data-theme=dark] *));
+
+/* ═══════════════════════════════════════════════════════
+   NYRAQ QUANT OS — TERMINAL DESIGN SYSTEM v3
+   Aesthetic: Bloomberg terminal × Refinitiv Eikon
+   Palette: Near-black base, amber phosphor accent
+   Typography: Monospace-dominant, zero decorative radius
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;
+
+  /* Base surfaces */
+  --background:         #090909;
+  --foreground:         #e2e0da;
+  --card:               #0d0d0e;
+  --card-foreground:    #e2e0da;
+  --popover:            #131314;
+  --popover-foreground: #e2e0da;
+
+  /* Primary: amber phosphor */
+  --primary:            #c8870a;
+  --primary-foreground: #090909;
+
+  /* Secondary */
+  --secondary:          #181818;
+  --secondary-foreground: #b8b5ae;
+
+  /* Muted */
+  --muted:              #131314;
+  --muted-foreground:   #5e5b56;
+
+  /* Accent: dim amber surface */
+  --accent:             #1a1710;
+  --accent-foreground:  #c8870a;
+
+  /* Destructive */
+  --destructive:        #c23030;
+
+  /* Borders */
+  --border:             rgba(255,255,255,0.07);
+  --input:              rgba(255,255,255,0.07);
+  --ring:               #c8870a;
+
+  /* Charts */
+  --chart-1: #c8870a;
+  --chart-2: #22c55e;
+  --chart-3: #3b82f6;
+  --chart-4: #ef4444;
+  --chart-5: #a78bfa;
+
+  /* Zero radius — hard terminal edges */
+  --radius: 0rem;
+
+  /* Sidebar: slightly darker than card */
+  --sidebar:            #050506;
+  --sidebar-foreground: #b8b5ae;
+  --sidebar-primary:    #c8870a;
+  --sidebar-primary-foreground: #090909;
+  --sidebar-accent:     #131314;
+  --sidebar-accent-foreground:  #c8870a;
+  --sidebar-border:     rgba(255,255,255,0.05);
+  --sidebar-ring:       #c8870a;
+
+  /* Shadows: flat — no drop shadows */
+  --shadow-card:   none;
+  --shadow-shell:  none;
+  --shadow-button: none;
+  --glass-border:  rgba(255,255,255,0.05);
+
+  /* ── Semantic status colors ── */
+  --success-surface:    rgba(34,197,94,0.07);
+  --success-border:     rgba(34,197,94,0.20);
+  --success-foreground: #4ade80;
+
+  --warning-surface:    rgba(200,135,10,0.08);
+  --warning-border:     rgba(200,135,10,0.25);
+  --warning-foreground: #c8870a;
+
+  --danger-surface:     rgba(239,68,68,0.07);
+  --danger-border:      rgba(239,68,68,0.22);
+  --danger-foreground:  #f87171;
+
+  /* Balance calendar */
+  --cal-green-surface: rgba(34,197,94,0.09);
+  --cal-green-border:  rgba(34,197,94,0.25);
+  --cal-green-text:    #4ade80;
+  --cal-red-surface:   rgba(239,68,68,0.09);
+  --cal-red-border:    rgba(239,68,68,0.25);
+  --cal-red-text:      #f87171;
+
+  /* Terminal accent shortcuts */
+  --t-amber:        #c8870a;
+  --t-amber-dim:    rgba(200,135,10,0.12);
+  --t-amber-border: rgba(200,135,10,0.28);
+  --t-green:        #4ade80;
+  --t-red:          #f87171;
+  --t-blue:         #60a5fa;
+  --t-grid:         rgba(255,255,255,0.04);
+  --t-line:         rgba(255,255,255,0.07);
+  --t-line-strong:  rgba(255,255,255,0.12);
+}
+
+/* Light/system: force dark — trading terminal is always dark */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+  }
+}
+
+/* Light mode: paper terminal */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --background:         #f2efe9;
+  --foreground:         #1a1810;
+  --card:               #f8f5ef;
+  --card-foreground:    #1a1810;
+  --popover:            #f8f5ef;
+  --popover-foreground: #1a1810;
+  --primary:            #7a5800;
+  --primary-foreground: #f8f5ef;
+  --secondary:          #e6e2da;
+  --secondary-foreground: #2a2618;
+  --muted:              #e6e2da;
+  --muted-foreground:   #6a6458;
+  --accent:             #e4dccc;
+  --accent-foreground:  #7a5800;
+  --destructive:        #9e2020;
+  --border:             rgba(0,0,0,0.11);
+  --input:              rgba(0,0,0,0.11);
+  --ring:               #7a5800;
+  --success-surface:    rgba(21,128,61,0.08);
+  --success-border:     rgba(21,128,61,0.22);
+  --success-foreground: #15803d;
+  --warning-surface:    rgba(122,88,0,0.09);
+  --warning-border:     rgba(122,88,0,0.25);
+  --warning-foreground: #7a5800;
+  --danger-surface:     rgba(158,32,32,0.08);
+  --danger-border:      rgba(158,32,32,0.22);
+  --danger-foreground:  #9e2020;
+  --cal-green-surface:  rgba(21,128,61,0.09);
+  --cal-green-border:   rgba(21,128,61,0.26);
+  --cal-green-text:     #15803d;
+  --cal-red-surface:    rgba(158,32,32,0.09);
+  --cal-red-border:     rgba(158,32,32,0.26);
+  --cal-red-text:       #9e2020;
+  --t-amber:            #7a5800;
+  --t-amber-dim:        rgba(122,88,0,0.10);
+  --t-amber-border:     rgba(122,88,0,0.25);
+  --t-green:            #15803d;
+  --t-red:              #9e2020;
+  --t-blue:             #1d4ed8;
+  --t-grid:             rgba(0,0,0,0.04);
+  --t-line:             rgba(0,0,0,0.09);
+  --t-line-strong:      rgba(0,0,0,0.15);
+  --sidebar:            #e8e4dc;
+  --sidebar-foreground: #1a1810;
+  --sidebar-primary:    #7a5800;
+  --sidebar-primary-foreground: #f8f5ef;
+  --sidebar-border:     rgba(0,0,0,0.09);
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  /* Monospace as primary — real terminal feel */
+  font-family: "IBM Plex Mono","JetBrains Mono","Fira Code",ui-monospace,"Cascadia Code",Consolas,"Courier New",monospace;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: subpixel-antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,h2,h3,h4 { font-family: inherit; letter-spacing: -0.01em; font-weight: 600; }
+code,.font-mono,pre { font-family: "IBM Plex Mono",ui-monospace,Consolas,monospace; }
+button,input,textarea,select { font: inherit; }
+
+::selection { background: rgba(200,135,10,0.28); color: #e2e0da; }
+
+/* Terminal scrollbar — thin, no radius */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.10); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: rgba(200,135,10,0.4); }
+
+/* ═══════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════ */
+
+@keyframes t-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes t-slide-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes value-flash {
+  0%   { color: var(--t-amber); opacity: 1; }
+  40%  { opacity: 0.4; }
+  100% { color: inherit; opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  70%  { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes t-blink {
+  0%,49% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+
+/* ═══════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════ */
+
+.t-shell { animation: t-fade-in 180ms ease-out both; }
+
+.t-nav-item { animation: t-slide-in 200ms ease-out both; }
+.t-nav-item:nth-child(1) { animation-delay:  0ms; }
+.t-nav-item:nth-child(2) { animation-delay: 25ms; }
+.t-nav-item:nth-child(3) { animation-delay: 50ms; }
+.t-nav-item:nth-child(4) { animation-delay: 75ms; }
+.t-nav-item:nth-child(5) { animation-delay:100ms; }
+.t-nav-item:nth-child(6) { animation-delay:125ms; }
+.t-nav-item:nth-child(7) { animation-delay:150ms; }
+
+.value-flash { animation: value-flash 450ms ease-out both; }
+
+.bot-healthy-pulse { position: relative; }
+.bot-healthy-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 1px solid var(--t-green);
+  animation: pulse-ring 2.6s ease-out infinite;
+  pointer-events: none;
+}
+
+.t-cursor::after {
+  content: "▋";
+  display: inline;
+  animation: t-blink 1s step-end infinite;
+  color: var(--t-amber);
+  margin-left: 1px;
+}
+
+/* Data label — standard terminal caps */
+.t-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Hard divider */
+.t-divider {
+  border: none;
+  border-top: 1px solid var(--t-line);
+}
+
+/* Hard-edge surface */
+.t-card {
+  background: var(--card);
+  border: 1px solid var(--t-line);
+  border-radius: 0;
+}
+
+/* Amber accent */
+.t-amber { color: var(--t-amber); }
+.t-green { color: var(--t-green); }
+.t-red   { color: var(--t-red);   }
+.t-blue  { color: var(--t-blue);  }
+
+/* Nav active state */
+.t-nav-active {
+  background: var(--t-amber-dim) !important;
+  border-left: 2px solid var(--t-amber) !important;
+  color: var(--t-amber) !important;
+}
+
+/* ── Force all radii to hard terminal edges ── */
+.rounded-\[28px\],.rounded-\[20px\],.rounded-3xl,.rounded-4xl,
+.rounded-2xl,.rounded-xl,.rounded-lg,.rounded-md,.rounded-sm,.rounded,.rounded-full {
+  border-radius: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-shell,.t-nav-item,.value-flash,.bot-healthy-pulse::before,.t-cursor::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
